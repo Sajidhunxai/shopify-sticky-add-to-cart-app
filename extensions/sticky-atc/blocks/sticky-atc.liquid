@@ -1,0 +1,165 @@
+{% comment %}
+  Sticky Add to Cart — Theme App Extension block
+  Add this block in the Theme Editor on product templates.
+{% endcomment %}
+
+{% if block.settings.enabled %}
+  {% assign hide_branding = app.metafields.sticky_atc.hide_branding.value %}
+  {% assign product_image = product.featured_image | default: product.images.first %}
+
+  <div
+    id="satc-bar-{{ block.id }}"
+    class="satc-bar"
+    data-satc-bar
+    data-product-id="{{ product.id }}"
+    data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+    data-after-add="{{ block.settings.after_add }}"
+    data-hide-near-form="{{ block.settings.hide_near_form }}"
+    data-desktop="{{ block.settings.show_on_desktop }}"
+    style="
+      background: {{ block.settings.background_color }};
+      color: {{ block.settings.text_color }};
+    "
+    {{ block.shopify_attributes }}
+  >
+    {% unless hide_branding == true or hide_branding == 'true' %}
+      <span class="satc-bar__branding" style="color: {{ block.settings.text_color }};">
+        Powered by Sticky ATC
+      </span>
+    {% endunless %}
+
+    {% if block.settings.show_image and product_image %}
+      <img
+        class="satc-bar__media"
+        src="{{ product_image | image_url: width: 96 }}"
+        alt="{{ product.title | escape }}"
+        width="48"
+        height="48"
+        loading="lazy"
+      >
+    {% endif %}
+
+    <div class="satc-bar__info">
+      {% if block.settings.show_title %}
+        <p class="satc-bar__title">{{ product.title }}</p>
+      {% endif %}
+      {% if block.settings.show_price %}
+        <p class="satc-bar__price" data-satc-price>
+          {{ product.selected_or_first_available_variant.price | money }}
+        </p>
+      {% endif %}
+    </div>
+
+    <button
+      type="button"
+      class="satc-bar__button"
+      data-satc-button
+      style="
+        background: {{ block.settings.button_background }};
+        color: {{ block.settings.button_text_color }};
+      "
+      {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
+    >
+      {% if product.selected_or_first_available_variant.available %}
+        {{ block.settings.button_label }}
+      {% else %}
+        Sold out
+      {% endif %}
+    </button>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Sticky Add to Cart",
+  "target": "body",
+  "stylesheet": "sticky-atc.css",
+  "javascript": "sticky-atc.js",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Enable sticky bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button text",
+      "default": "Add to cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_desktop",
+      "label": "Show on desktop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show product title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show price",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Show product image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_near_form",
+      "label": "Hide when main Add to cart is visible",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "after_add",
+      "label": "After adding to cart",
+      "options": [
+        { "value": "stay", "label": "Stay on page" },
+        { "value": "cart", "label": "Go to cart" },
+        { "value": "drawer", "label": "Open cart drawer (if theme supports it)" }
+      ],
+      "default": "stay"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Bar background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}

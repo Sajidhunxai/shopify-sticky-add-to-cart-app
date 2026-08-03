@@ -1,0 +1,47 @@
+{
+  "name": "Sticky Add to Cart",
+  "settings": {
+    "enabled": {
+      "label": "Enable sticky bar"
+    },
+    "button_label": {
+      "label": "Button text",
+      "default": "Add to cart"
+    },
+    "show_on_desktop": {
+      "label": "Show on desktop"
+    },
+    "show_price": {
+      "label": "Show price"
+    },
+    "show_title": {
+      "label": "Show product title"
+    },
+    "show_image": {
+      "label": "Show product image"
+    },
+    "background_color": {
+      "label": "Bar background"
+    },
+    "text_color": {
+      "label": "Text color"
+    },
+    "button_background": {
+      "label": "Button background"
+    },
+    "button_text_color": {
+      "label": "Button text color"
+    },
+    "hide_near_form": {
+      "label": "Hide when main Add to cart is visible"
+    },
+    "after_add": {
+      "label": "After adding to cart",
+      "options": {
+        "stay": "Stay on page",
+        "cart": "Go to cart",
+        "drawer": "Open cart drawer (if theme supports it)"
+      }
+    }
+  }
+}
