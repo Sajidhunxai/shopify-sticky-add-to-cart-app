@@ -1,2 +1,5 @@
-name = "sticky-atc"
+api_version = "2025-10"
+name = "Sticky Add to Cart"
+handle = "sticky-atc"
 type = "theme"
+uid = "055e8d18-7e6b-e2d5-cc93-4eda9364f070e5c3ce10"

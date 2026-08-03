@@ -1,9 +1,8 @@
 {% comment %}
-  Sticky Add to Cart — Theme App Extension block
-  Add this block in the Theme Editor on product templates.
+  App block version — add via Theme Editor → Add block → Apps
 {% endcomment %}
 
-{% if block.settings.enabled %}
+{% if block.settings.enabled and request.page_type == 'product' %}
   {% assign hide_branding = app.metafields.sticky_atc.hide_branding.value %}
   {% assign product_image = product.featured_image | default: product.images.first %}
 
@@ -71,10 +70,11 @@
 
 {% schema %}
 {
-  "name": "Sticky Add to Cart",
-  "target": "body",
+  "name": "Sticky ATC Bar",
+  "target": "section",
   "stylesheet": "sticky-atc.css",
   "javascript": "sticky-atc.js",
+  "templates": ["product"],
   "settings": [
     {
       "type": "checkbox",
@@ -128,10 +128,6 @@
         { "value": "drawer", "label": "Open cart drawer (if theme supports it)" }
       ],
       "default": "stay"
-    },
-    {
-      "type": "header",
-      "content": "Colors"
     },
     {
       "type": "color",
