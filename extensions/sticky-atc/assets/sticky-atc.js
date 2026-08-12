@@ -43,16 +43,15 @@
   };
 
   // Show after a short scroll so it feels intentional.
-  let shown = false;
+  const showAfterScroll = Number(bar.dataset.showAfterScroll || 180);
   const onScroll = () => {
-    if (window.scrollY > 180) {
-      shown = true;
+    if (window.scrollY > showAfterScroll) {
       setVisible(true);
       window.removeEventListener("scroll", onScroll);
     }
   };
   window.addEventListener("scroll", onScroll, { passive: true });
-  if (window.scrollY > 180) onScroll();
+  if (window.scrollY > showAfterScroll) onScroll();
 
   if (hideNearForm) {
     const form = document.querySelector(formSelector);

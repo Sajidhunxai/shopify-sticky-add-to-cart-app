@@ -38,6 +38,7 @@ model ShopSettings {
   shop         String   @unique
   plan         String   @default("free")
   hideBranding Boolean  @default(false)
+  barConfig    String   @default("{}")
   updatedAt    DateTime @updatedAt
   createdAt    DateTime @default(now())
 }

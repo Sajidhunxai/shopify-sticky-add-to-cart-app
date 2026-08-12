@@ -1,49 +1,124 @@
 {% comment %}
-  Sticky Add to Cart — Theme App Extension block
-  Add this block in the Theme Editor on product templates.
+  Sticky Add to Cart — Theme App Extension (App Embed)
+  Admin app settings (metafield) override Theme Editor defaults when present.
 {% endcomment %}
 
-{% if block.settings.enabled %}
-  {% assign hide_branding = app.metafields.sticky_atc.hide_branding.value %}
+{% assign cfg = app.metafields.sticky_atc.config.value %}
+{% assign hide_branding = app.metafields.sticky_atc.hide_branding.value %}
+
+{% if cfg != blank %}
+  {% assign satc_enabled = cfg.enabled %}
+  {% assign satc_show_image = cfg.showImage %}
+  {% assign satc_show_title = cfg.showTitle %}
+  {% assign satc_show_price = cfg.showPrice %}
+  {% assign satc_show_desktop = cfg.showDesktop %}
+  {% assign satc_show_mobile = cfg.showMobile %}
+  {% assign satc_hide_near_form = cfg.hideNearForm %}
+  {% assign satc_after_add = cfg.afterAdd %}
+  {% assign satc_button_label = cfg.buttonText %}
+  {% assign satc_sold_out = cfg.soldOutText %}
+  {% assign satc_bg = cfg.backgroundColor %}
+  {% assign satc_text = cfg.textColor %}
+  {% assign satc_btn_bg = cfg.buttonBackground %}
+  {% assign satc_btn_text = cfg.buttonTextColor %}
+  {% assign satc_show_shadow = cfg.showShadow %}
+  {% assign satc_border_width = cfg.borderWidth %}
+  {% assign satc_bar_radius = cfg.barRadius %}
+  {% assign satc_btn_radius = cfg.buttonRadius %}
+  {% assign satc_pad_y = cfg.paddingY %}
+  {% assign satc_pad_x = cfg.paddingX %}
+  {% assign satc_image_size = cfg.imageSize %}
+  {% assign satc_title_size = cfg.titleFontSize %}
+  {% assign satc_price_size = cfg.priceFontSize %}
+  {% assign satc_btn_size = cfg.buttonFontSize %}
+  {% assign satc_desk_max = cfg.desktopMaxWidth %}
+  {% assign satc_desk_bottom = cfg.desktopBottomOffset %}
+  {% assign satc_scroll = cfg.showAfterScroll %}
+{% else %}
+  {% assign satc_enabled = block.settings.enabled %}
+  {% assign satc_show_image = block.settings.show_image %}
+  {% assign satc_show_title = block.settings.show_title %}
+  {% assign satc_show_price = block.settings.show_price %}
+  {% assign satc_show_desktop = block.settings.show_on_desktop %}
+  {% assign satc_show_mobile = true %}
+  {% assign satc_hide_near_form = block.settings.hide_near_form %}
+  {% assign satc_after_add = block.settings.after_add %}
+  {% assign satc_button_label = block.settings.button_label %}
+  {% assign satc_sold_out = 'Sold out' %}
+  {% assign satc_bg = block.settings.background_color %}
+  {% assign satc_text = block.settings.text_color %}
+  {% assign satc_btn_bg = block.settings.button_background %}
+  {% assign satc_btn_text = block.settings.button_text_color %}
+  {% assign satc_show_shadow = true %}
+  {% assign satc_border_width = 0 %}
+  {% assign satc_bar_radius = 14 %}
+  {% assign satc_btn_radius = 8 %}
+  {% assign satc_pad_y = 12 %}
+  {% assign satc_pad_x = 16 %}
+  {% assign satc_image_size = 48 %}
+  {% assign satc_title_size = 14 %}
+  {% assign satc_price_size = 13 %}
+  {% assign satc_btn_size = 14 %}
+  {% assign satc_desk_max = 720 %}
+  {% assign satc_desk_bottom = 20 %}
+  {% assign satc_scroll = 180 %}
+{% endif %}
+
+{% if satc_enabled %}
   {% assign product_image = product.featured_image | default: product.images.first %}
 
   <div
     id="satc-bar-{{ block.id }}"
-    class="satc-bar"
+    class="satc-bar{% unless satc_show_shadow %} satc-bar--no-shadow{% endunless %}"
     data-satc-bar
     data-product-id="{{ product.id }}"
     data-variant-id="{{ product.selected_or_first_available_variant.id }}"
-    data-after-add="{{ block.settings.after_add }}"
-    data-hide-near-form="{{ block.settings.hide_near_form }}"
-    data-desktop="{{ block.settings.show_on_desktop }}"
+    data-after-add="{{ satc_after_add }}"
+    data-hide-near-form="{{ satc_hide_near_form }}"
+    data-desktop="{{ satc_show_desktop }}"
+    data-mobile="{{ satc_show_mobile }}"
+    data-show-after-scroll="{{ satc_scroll }}"
     style="
-      background: {{ block.settings.background_color }};
-      color: {{ block.settings.text_color }};
+      --satc-bg: {{ satc_bg }};
+      --satc-text: {{ satc_text }};
+      --satc-border-width: {{ satc_border_width }}px;
+      --satc-bar-radius: {{ satc_bar_radius }}px;
+      --satc-pad-y: {{ satc_pad_y }}px;
+      --satc-pad-x: {{ satc_pad_x }}px;
+      --satc-image-size: {{ satc_image_size }}px;
+      --satc-title-size: {{ satc_title_size }}px;
+      --satc-price-size: {{ satc_price_size }}px;
+      --satc-btn-radius: {{ satc_btn_radius }}px;
+      --satc-btn-size: {{ satc_btn_size }}px;
+      --satc-desk-max: {{ satc_desk_max }}px;
+      --satc-desk-bottom: {{ satc_desk_bottom }}px;
+      background: var(--satc-bg);
+      color: var(--satc-text);
     "
     {{ block.shopify_attributes }}
   >
     {% unless hide_branding == true or hide_branding == 'true' %}
-      <span class="satc-bar__branding" style="color: {{ block.settings.text_color }};">
+      <span class="satc-bar__branding" style="color: var(--satc-text);">
         Powered by Sticky ATC
       </span>
     {% endunless %}
 
-    {% if block.settings.show_image and product_image %}
+    {% if satc_show_image and product_image %}
       <img
         class="satc-bar__media"
         src="{{ product_image | image_url: width: 96 }}"
         alt="{{ product.title | escape }}"
-        width="48"
-        height="48"
+        width="{{ satc_image_size }}"
+        height="{{ satc_image_size }}"
         loading="lazy"
       >
     {% endif %}
 
     <div class="satc-bar__info">
-      {% if block.settings.show_title %}
+      {% if satc_show_title %}
         <p class="satc-bar__title">{{ product.title }}</p>
       {% endif %}
-      {% if block.settings.show_price %}
+      {% if satc_show_price %}
         <p class="satc-bar__price" data-satc-price>
           {{ product.selected_or_first_available_variant.price | money }}
         </p>
@@ -55,15 +130,15 @@
       class="satc-bar__button"
       data-satc-button
       style="
-        background: {{ block.settings.button_background }};
-        color: {{ block.settings.button_text_color }};
+        background: {{ satc_btn_bg }};
+        color: {{ satc_btn_text }};
       "
       {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
     >
       {% if product.selected_or_first_available_variant.available %}
-        {{ block.settings.button_label }}
+        {{ satc_button_label }}
       {% else %}
-        Sold out
+        {{ satc_sold_out }}
       {% endif %}
     </button>
   </div>
@@ -76,6 +151,10 @@
   "stylesheet": "sticky-atc.css",
   "javascript": "sticky-atc.js",
   "settings": [
+    {
+      "type": "paragraph",
+      "content": "Prefer the app admin for content and style. These Theme Editor fields are used only until you save settings in the app."
+    },
     {
       "type": "checkbox",
       "id": "enabled",
