@@ -9,12 +9,14 @@ generator client {
 // enough when changing adapters.
 // See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
 datasource db {
-  provider = "sqlite"
-  url      = "file:dev.sqlite"
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
+// `id` holds the Shopify session id (e.g. "offline_shop.myshopify.com"), not a
+// Mongo ObjectId, so it is mapped to _id as a plain String without @db.ObjectId.
 model Session {
-  id            String    @id
+  id            String    @id @map("_id")
   shop          String
   state         String
   isOnline      Boolean   @default(false)
@@ -34,7 +36,7 @@ model Session {
 }
 
 model ShopSettings {
-  id           String   @id @default(cuid())
+  id           String   @id @default(cuid()) @map("_id")
   shop         String   @unique
   plan         String   @default("free")
   hideBranding Boolean  @default(false)
