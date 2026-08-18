@@ -34,6 +34,40 @@
   padding: 1.25rem clamp(1.25rem, 4vw, 3rem);
 }
 
+.nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.nav a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav a:hover {
+  color: var(--accent-deep);
+}
+
+.navCta {
+  border-radius: 0.55rem;
+  background: var(--accent);
+  color: #fff !important;
+  padding: 0.5rem 0.85rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+}
+
 .logoMark {
   width: 0.85rem;
   height: 0.85rem;
@@ -140,9 +174,71 @@
   background: var(--accent-deep);
 }
 
+a.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.buttonGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(19, 33, 43, 0.16);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  padding: 0.85rem 1.15rem;
+  text-decoration: none;
+}
+
+.buttonGhost:hover {
+  border-color: rgba(15, 122, 102, 0.45);
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.6rem;
+}
+
+.ctaNote {
+  margin: 0.7rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
 .stage {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.videoFrame {
+  width: min(100%, 520px);
+  aspect-ratio: 16 / 9;
+  border-radius: 1.1rem;
+  overflow: hidden;
+  background: #13212b;
+  border: 1px solid rgba(19, 33, 43, 0.1);
+  box-shadow: 0 18px 40px rgba(19, 33, 43, 0.14);
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.videoCaption {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
 }
 
 .device {
@@ -292,6 +388,116 @@
   line-height: 1.5;
 }
 
+.pricing {
+  padding: 0.5rem clamp(1.25rem, 4vw, 3rem) 3rem;
+}
+
+.pricing > h2 {
+  margin: 0;
+  font-family: Fraunces, Georgia, serif;
+  font-size: clamp(1.6rem, 3vw, 2rem);
+}
+
+.pricingLead {
+  margin: 0.4rem 0 1.4rem;
+  color: var(--muted);
+}
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 320px));
+  gap: 1rem;
+}
+
+.priceCard {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(19, 33, 43, 0.1);
+  border-radius: 1rem;
+  padding: 1.25rem 1.3rem 1.4rem;
+}
+
+.priceCardFeatured {
+  border-color: rgba(15, 122, 102, 0.35);
+  box-shadow: 0 10px 28px rgba(15, 122, 102, 0.1);
+}
+
+.priceBadge {
+  margin: 0 0 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+}
+
+.priceCard h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.price {
+  margin: 0.35rem 0 0.9rem;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.price span {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.priceCard ul {
+  margin: 0 0 1.1rem;
+  padding: 0 0 0 1.1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.existing {
+  padding: 0 clamp(1.25rem, 4vw, 3rem) 3rem;
+}
+
+.existing h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.existing p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem clamp(1.25rem, 4vw, 3rem) 2rem;
+  border-top: 1px solid rgba(19, 33, 43, 0.08);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer a:hover {
+  color: var(--accent-deep);
+}
+
 @keyframes rise {
   from {
     opacity: 0;
@@ -320,6 +526,14 @@
 
   .features {
     grid-template-columns: 1fr;
+  }
+
+  .pricingGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .nav a:not(.navCta) {
+    display: none;
   }
 }
 
