@@ -2,13 +2,27 @@ export type Plan = "free" | "pro";
 
 export type AfterAddBehavior = "stay" | "cart" | "drawer";
 
+/** How the sticky experience is presented on the storefront. */
+export type DisplayMode = "bar" | "slider" | "quickbuy";
+
 export type BarConfig = {
   enabled: boolean;
+  displayMode: DisplayMode;
   showImage: boolean;
   showTitle: boolean;
   showPrice: boolean;
   showMobile: boolean;
   showDesktop: boolean;
+  /** Product pages (recommended — bar needs a product context). */
+  showOnProduct: boolean;
+  /** Collection / catalog pages. */
+  showOnCollection: boolean;
+  /** Store homepage. */
+  showOnHome: boolean;
+  /** Search results. */
+  showOnSearch: boolean;
+  /** Cart, blog, pages, and other templates. */
+  showOnOther: boolean;
   hideNearForm: boolean;
   buttonText: string;
   soldOutText: string;
@@ -25,7 +39,10 @@ export type BarConfig = {
   buttonFontSize: number;
   desktopMaxWidth: number;
   desktopBottomOffset: number;
+  /** Mobile: px scrolled before bar appears. */
   showAfterScroll: number;
+  /** Desktop: px scrolled before bar appears (lower = earlier). */
+  showAfterScrollDesktop: number;
   backgroundColor: string;
   textColor: string;
   buttonBackground: string;
@@ -34,11 +51,17 @@ export type BarConfig = {
 
 export const DEFAULT_BAR_CONFIG: BarConfig = {
   enabled: true,
+  displayMode: "bar",
   showImage: true,
   showTitle: true,
   showPrice: true,
   showMobile: true,
   showDesktop: true,
+  showOnProduct: true,
+  showOnCollection: false,
+  showOnHome: false,
+  showOnSearch: false,
+  showOnOther: false,
   hideNearForm: true,
   buttonText: "Add to cart",
   soldOutText: "Sold out",
@@ -55,7 +78,8 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   buttonFontSize: 14,
   desktopMaxWidth: 720,
   desktopBottomOffset: 20,
-  showAfterScroll: 180,
+  showAfterScroll: 80,
+  showAfterScrollDesktop: 0,
   backgroundColor: "#ffffff",
   textColor: "#111111",
   buttonBackground: "#111111",
@@ -77,6 +101,14 @@ function asString(value: FormDataEntryValue | null | undefined, fallback: string
   return s || fallback;
 }
 
+function asDisplayMode(
+  value: FormDataEntryValue | null | undefined,
+): DisplayMode {
+  const raw = String(value || "bar");
+  if (raw === "slider" || raw === "quickbuy") return raw;
+  return "bar";
+}
+
 export function parseBarConfig(raw: string | null | undefined): BarConfig {
   if (!raw) return { ...DEFAULT_BAR_CONFIG };
   try {
@@ -94,11 +126,17 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
 
   return {
     enabled: asBool(formData.get("enabled"), false),
+    displayMode: asDisplayMode(formData.get("displayMode")),
     showImage: asBool(formData.get("showImage"), false),
     showTitle: asBool(formData.get("showTitle"), false),
     showPrice: asBool(formData.get("showPrice"), false),
     showMobile: asBool(formData.get("showMobile"), false),
     showDesktop: asBool(formData.get("showDesktop"), false),
+    showOnProduct: asBool(formData.get("showOnProduct"), false),
+    showOnCollection: asBool(formData.get("showOnCollection"), false),
+    showOnHome: asBool(formData.get("showOnHome"), false),
+    showOnSearch: asBool(formData.get("showOnSearch"), false),
+    showOnOther: asBool(formData.get("showOnOther"), false),
     hideNearForm: asBool(formData.get("hideNearForm"), false),
     buttonText: asString(formData.get("buttonText"), DEFAULT_BAR_CONFIG.buttonText),
     soldOutText: asString(formData.get("soldOutText"), DEFAULT_BAR_CONFIG.soldOutText),
@@ -127,6 +165,10 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
     showAfterScroll: asNumber(
       formData.get("showAfterScroll"),
       DEFAULT_BAR_CONFIG.showAfterScroll,
+    ),
+    showAfterScrollDesktop: asNumber(
+      formData.get("showAfterScrollDesktop"),
+      DEFAULT_BAR_CONFIG.showAfterScrollDesktop,
     ),
     backgroundColor: asString(
       formData.get("backgroundColor"),

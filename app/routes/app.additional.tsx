@@ -14,7 +14,7 @@ export default function HelpPage() {
           <s-list-item>
             Confirm the App embed is enabled and the theme was saved
           </s-list-item>
-          <s-list-item>View a product page (not home or collection)</s-list-item>
+          <s-list-item>View a product page (enable Collection/Home only if needed)</s-list-item>
           <s-list-item>
             Scroll past the threshold set in Style & layout (default 180px)
           </s-list-item>

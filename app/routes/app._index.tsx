@@ -134,6 +134,42 @@ export default function Index() {
           Changes update instantly here. Click <strong>Save settings</strong> to
           push them to your storefront.
         </s-paragraph>
+
+        <div className={styles.modeGrid} role="radiogroup" aria-label="Display style">
+          {(
+            [
+              {
+                id: "bar" as const,
+                title: "Sticky Add to Cart Bar",
+                blurb: "Classic sticky bar with image, price, and CTA",
+              },
+              {
+                id: "slider" as const,
+                title: "Sticky Cart + Slider",
+                blurb: "Sticky bar opens a cart drawer after add",
+              },
+              {
+                id: "quickbuy" as const,
+                title: "Quick Buy Cart",
+                blurb: "Floating quick-buy button that expands",
+              },
+            ] as const
+          ).map((mode) => (
+            <button
+              key={mode.id}
+              type="button"
+              className={`${styles.modeCard} ${
+                config.displayMode === mode.id ? styles.modeCardActive : ""
+              }`}
+              onClick={() => updateConfig(setConfig, "displayMode", mode.id)}
+              aria-pressed={config.displayMode === mode.id}
+            >
+              <strong>{mode.title}</strong>
+              <span>{mode.blurb}</span>
+            </button>
+          ))}
+        </div>
+
         <div className={styles.previewShell}>
           <div className={styles.previewChrome}>
             <span className={styles.previewDot} />
@@ -141,79 +177,145 @@ export default function Index() {
             <span className={styles.previewDot} />
             <span className={styles.previewUrl}>{shop}/products/demo</span>
           </div>
-          <div className={styles.previewStage}>
+          <div
+            className={`${styles.previewStage} ${
+              config.displayMode === "slider" ? styles.previewStageSlider : ""
+            }`}
+          >
             <div className={styles.previewProduct}>
               <div className={styles.previewThumb} />
               <div>
                 <p className={styles.previewTitle}>Classic Canvas Sneaker</p>
-                <p className={styles.previewSubtitle}>Product page mock · scroll preview</p>
+                <p className={styles.previewSubtitle}>
+                  {config.displayMode === "quickbuy"
+                    ? "Quick Buy preview"
+                    : config.displayMode === "slider"
+                      ? "Bar + cart slider preview"
+                      : "Product page mock · scroll preview"}
+                </p>
               </div>
             </div>
             <button type="button" className={styles.previewNativeBtn}>
               Native Add to cart
             </button>
 
-            <div
-              className={`${styles.previewBar} ${config.enabled ? "" : styles.previewBarDisabled}`}
-              style={{
-                background: config.backgroundColor,
-                color: config.textColor,
-                borderRadius: `${config.barRadius}px`,
-                padding: `${config.paddingY}px ${config.paddingX}px`,
-                border: `${config.borderWidth}px solid rgba(0,0,0,0.08)`,
-                boxShadow: config.showShadow
-                  ? "0 -8px 28px rgba(0,0,0,0.14)"
-                  : "none",
-              }}
-            >
-              {!hideBranding && (
-                <span className={styles.previewBrand} style={{ color: config.textColor }}>
-                  Powered by Sticky ATC
-                </span>
-              )}
-              {config.showImage && (
-                <div
-                  className={styles.previewMedia}
-                  style={{
-                    width: config.imageSize,
-                    height: config.imageSize,
-                    background:
-                      "linear-gradient(135deg, #94a3b8, #64748b)",
-                  }}
-                />
-              )}
-              <div className={styles.previewInfo}>
-                {config.showTitle && (
-                  <p
-                    className={styles.previewBarTitle}
-                    style={{ fontSize: `${config.titleFontSize}px` }}
-                  >
-                    Classic Canvas Sneaker
-                  </p>
-                )}
-                {config.showPrice && (
-                  <p
-                    className={styles.previewBarPrice}
-                    style={{ fontSize: `${config.priceFontSize}px` }}
-                  >
-                    $68.00
-                  </p>
-                )}
-              </div>
-              <button
-                type="button"
-                className={styles.previewBarButton}
+            {config.displayMode === "quickbuy" ? (
+              <div
+                className={`${styles.previewQuick} ${
+                  config.enabled ? "" : styles.previewBarDisabled
+                }`}
                 style={{
                   background: config.buttonBackground,
                   color: config.buttonTextColor,
-                  borderRadius: `${config.buttonRadius}px`,
+                  borderRadius: `${Math.max(config.buttonRadius, 20)}px`,
                   fontSize: `${config.buttonFontSize}px`,
-                  padding: "10px 16px",
+                  boxShadow: config.showShadow
+                    ? "0 10px 28px rgba(0,0,0,0.18)"
+                    : "none",
                 }}
               >
                 {config.buttonText}
-              </button>
-            </div>
+              </div>
+            ) : (
+              <div
+                className={`${styles.previewBar} ${
+                  config.enabled ? "" : styles.previewBarDisabled
+                }`}
+                style={{
+                  background: config.backgroundColor,
+                  color: config.textColor,
+                  borderRadius: `${config.barRadius}px`,
+                  padding: `${config.paddingY}px ${config.paddingX}px`,
+                  border: `${config.borderWidth}px solid rgba(0,0,0,0.08)`,
+                  boxShadow: config.showShadow
+                    ? "0 -8px 28px rgba(0,0,0,0.14)"
+                    : "none",
+                }}
+              >
+                {!hideBranding && (
+                  <span
+                    className={styles.previewBrand}
+                    style={{ color: config.textColor }}
+                  >
+                    Powered by Sticky ATC
+                  </span>
+                )}
+                {config.showImage && (
+                  <div
+                    className={styles.previewMedia}
+                    style={{
+                      width: config.imageSize,
+                      height: config.imageSize,
+                      background: "linear-gradient(135deg, #94a3b8, #64748b)",
+                    }}
+                  />
+                )}
+                <div className={styles.previewInfo}>
+                  {config.showTitle && (
+                    <p
+                      className={styles.previewBarTitle}
+                      style={{ fontSize: `${config.titleFontSize}px` }}
+                    >
+                      Classic Canvas Sneaker
+                    </p>
+                  )}
+                  {config.showPrice && (
+                    <p
+                      className={styles.previewBarPrice}
+                      style={{ fontSize: `${config.priceFontSize}px` }}
+                    >
+                      $68.00
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className={styles.previewBarButton}
+                  style={{
+                    background: config.buttonBackground,
+                    color: config.buttonTextColor,
+                    borderRadius: `${config.buttonRadius}px`,
+                    fontSize: `${config.buttonFontSize}px`,
+                    padding: "10px 16px",
+                  }}
+                >
+                  {config.buttonText}
+                </button>
+              </div>
+            )}
+
+            {config.displayMode === "slider" && config.enabled && (
+              <div className={styles.previewSlider}>
+                <div className={styles.previewSliderHeader}>
+                  <strong>Your cart</strong>
+                  <span>×</span>
+                </div>
+                <div className={styles.previewSliderItem}>
+                  <div className={styles.previewSliderThumb} />
+                  <div>
+                    <p>Classic Canvas Sneaker</p>
+                    <span>Qty 1</span>
+                  </div>
+                  <strong>$68.00</strong>
+                </div>
+                <div className={styles.previewSliderFooter}>
+                  <div>
+                    <span>Subtotal</span>
+                    <strong>$68.00</strong>
+                  </div>
+                  <div
+                    className={styles.previewSliderCheckout}
+                    style={{
+                      background: config.buttonBackground,
+                      color: config.buttonTextColor,
+                      borderRadius: `${config.buttonRadius}px`,
+                    }}
+                  >
+                    Checkout
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </s-section>
@@ -324,6 +426,71 @@ export default function Index() {
             }
           />
         </div>
+
+        <s-stack gap="base" paddingBlockStart="base">
+          <s-heading>Show on pages</s-heading>
+          <s-paragraph>
+            Choose which storefront templates can display the sticky bar. The
+            bar needs a product on the page, so product pages work best.
+          </s-paragraph>
+          <div className={styles.toggleRow}>
+            <s-switch
+              label="Product pages"
+              checked={config.showOnProduct}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "showOnProduct",
+                  (e.currentTarget as HTMLInputElement).checked,
+                )
+              }
+            />
+            <s-switch
+              label="Collection pages"
+              checked={config.showOnCollection}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "showOnCollection",
+                  (e.currentTarget as HTMLInputElement).checked,
+                )
+              }
+            />
+            <s-switch
+              label="Homepage"
+              checked={config.showOnHome}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "showOnHome",
+                  (e.currentTarget as HTMLInputElement).checked,
+                )
+              }
+            />
+            <s-switch
+              label="Search results"
+              checked={config.showOnSearch}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "showOnSearch",
+                  (e.currentTarget as HTMLInputElement).checked,
+                )
+              }
+            />
+            <s-switch
+              label="Other pages (cart, blog, pages…)"
+              checked={config.showOnOther}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "showOnOther",
+                  (e.currentTarget as HTMLInputElement).checked,
+                )
+              }
+            />
+          </div>
+        </s-stack>
 
         <s-stack gap="base" paddingBlockStart="base">
           <s-grid gridTemplateColumns="1fr 1fr" gap="base">
@@ -519,13 +686,25 @@ export default function Index() {
               }
             />
             <s-number-field
-              label="Show after scroll (px)"
+              label="Show after scroll — mobile (px)"
               value={String(config.showAfterScroll)}
               min={0}
               onChange={(e: Event) =>
                 updateConfig(
                   setConfig,
                   "showAfterScroll",
+                  Number((e.currentTarget as HTMLInputElement).value),
+                )
+              }
+            />
+            <s-number-field
+              label="Show after scroll — desktop (px)"
+              value={String(config.showAfterScrollDesktop)}
+              min={0}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "showAfterScrollDesktop",
                   Number((e.currentTarget as HTMLInputElement).value),
                 )
               }

@@ -200,8 +200,148 @@
   gap: 8px 16px;
 }
 
+.modeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.modeCard {
+  text-align: left;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px 12px 14px;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modeCard strong {
+  font-size: 13px;
+  color: #111827;
+}
+
+.modeCard span {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.modeCardActive {
+  border-color: #111827;
+  box-shadow: 0 0 0 1px #111827;
+}
+
+.previewStageSlider {
+  padding-right: 150px;
+}
+
+.previewQuick {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  padding: 12px 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.previewSlider {
+  position: absolute;
+  top: 12px;
+  right: 0;
+  bottom: 12px;
+  width: 138px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px 0 0 12px;
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 11px;
+  color: #111827;
+}
+
+.previewSliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.previewSliderItem {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.previewSliderItem p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.previewSliderItem span {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.previewSliderThumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+}
+
+.previewSliderFooter {
+  margin-top: auto;
+  display: grid;
+  gap: 8px;
+}
+
+.previewSliderFooter > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.previewSliderCheckout {
+  text-align: center;
+  padding: 8px;
+  font-weight: 700;
+  font-size: 11px;
+}
+
 @media (max-width: 700px) {
   .toggleRow {
     grid-template-columns: 1fr;
+  }
+
+  .modeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .previewStageSlider {
+    padding-right: 18px;
+    padding-bottom: 120px;
+  }
+
+  .previewSlider {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: 72px;
+    width: auto;
+    height: 110px;
+    border-radius: 12px;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
   }
 }

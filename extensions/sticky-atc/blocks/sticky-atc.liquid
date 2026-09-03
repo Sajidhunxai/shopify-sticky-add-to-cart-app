@@ -8,11 +8,17 @@
 
 {% if cfg != blank %}
   {% assign satc_enabled = cfg.enabled %}
+  {% assign satc_display_mode = cfg.displayMode %}
   {% assign satc_show_image = cfg.showImage %}
   {% assign satc_show_title = cfg.showTitle %}
   {% assign satc_show_price = cfg.showPrice %}
   {% assign satc_show_desktop = cfg.showDesktop %}
   {% assign satc_show_mobile = cfg.showMobile %}
+  {% assign satc_show_on_product = cfg.showOnProduct %}
+  {% assign satc_show_on_collection = cfg.showOnCollection %}
+  {% assign satc_show_on_home = cfg.showOnHome %}
+  {% assign satc_show_on_search = cfg.showOnSearch %}
+  {% assign satc_show_on_other = cfg.showOnOther %}
   {% assign satc_hide_near_form = cfg.hideNearForm %}
   {% assign satc_after_add = cfg.afterAdd %}
   {% assign satc_button_label = cfg.buttonText %}
@@ -34,13 +40,20 @@
   {% assign satc_desk_max = cfg.desktopMaxWidth %}
   {% assign satc_desk_bottom = cfg.desktopBottomOffset %}
   {% assign satc_scroll = cfg.showAfterScroll %}
+  {% assign satc_scroll_desktop = cfg.showAfterScrollDesktop %}
 {% else %}
   {% assign satc_enabled = block.settings.enabled %}
+  {% assign satc_display_mode = block.settings.display_mode %}
   {% assign satc_show_image = block.settings.show_image %}
   {% assign satc_show_title = block.settings.show_title %}
   {% assign satc_show_price = block.settings.show_price %}
   {% assign satc_show_desktop = block.settings.show_on_desktop %}
   {% assign satc_show_mobile = true %}
+  {% assign satc_show_on_product = block.settings.show_on_product %}
+  {% assign satc_show_on_collection = block.settings.show_on_collection %}
+  {% assign satc_show_on_home = block.settings.show_on_home %}
+  {% assign satc_show_on_search = block.settings.show_on_search %}
+  {% assign satc_show_on_other = block.settings.show_on_other %}
   {% assign satc_hide_near_form = block.settings.hide_near_form %}
   {% assign satc_after_add = block.settings.after_add %}
   {% assign satc_button_label = block.settings.button_label %}
@@ -61,16 +74,41 @@
   {% assign satc_btn_size = 14 %}
   {% assign satc_desk_max = 720 %}
   {% assign satc_desk_bottom = 20 %}
-  {% assign satc_scroll = 180 %}
+  {% assign satc_scroll = 80 %}
+  {% assign satc_scroll_desktop = 0 %}
 {% endif %}
 
-{% if satc_enabled %}
+{% if satc_display_mode == blank %}{% assign satc_display_mode = 'bar' %}{% endif %}
+{% if satc_scroll_desktop == blank %}{% assign satc_scroll_desktop = 0 %}{% endif %}
+{% comment %} Defaults when older saved configs omit page flags {% endcomment %}
+{% if satc_show_on_product == blank %}{% assign satc_show_on_product = true %}{% endif %}
+{% if satc_show_on_collection == blank %}{% assign satc_show_on_collection = false %}{% endif %}
+{% if satc_show_on_home == blank %}{% assign satc_show_on_home = false %}{% endif %}
+{% if satc_show_on_search == blank %}{% assign satc_show_on_search = false %}{% endif %}
+{% if satc_show_on_other == blank %}{% assign satc_show_on_other = false %}{% endif %}
+
+{% assign satc_page_ok = false %}
+{% case request.page_type %}
+  {% when 'product' %}
+    {% if satc_show_on_product %}{% assign satc_page_ok = true %}{% endif %}
+  {% when 'collection' %}
+    {% if satc_show_on_collection %}{% assign satc_page_ok = true %}{% endif %}
+  {% when 'index' %}
+    {% if satc_show_on_home %}{% assign satc_page_ok = true %}{% endif %}
+  {% when 'search' %}
+    {% if satc_show_on_search %}{% assign satc_page_ok = true %}{% endif %}
+  {% else %}
+    {% if satc_show_on_other %}{% assign satc_page_ok = true %}{% endif %}
+{% endcase %}
+
+{% if satc_enabled and satc_page_ok and product != blank %}
   {% assign product_image = product.featured_image | default: product.images.first %}
 
   <div
     id="satc-bar-{{ block.id }}"
-    class="satc-bar{% unless satc_show_shadow %} satc-bar--no-shadow{% endunless %}"
+    class="satc-bar satc-bar--{{ satc_display_mode }}{% unless satc_show_shadow %} satc-bar--no-shadow{% endunless %}"
     data-satc-bar
+    data-display-mode="{{ satc_display_mode }}"
     data-product-id="{{ product.id }}"
     data-variant-id="{{ product.selected_or_first_available_variant.id }}"
     data-after-add="{{ satc_after_add }}"
@@ -78,6 +116,7 @@
     data-desktop="{{ satc_show_desktop }}"
     data-mobile="{{ satc_show_mobile }}"
     data-show-after-scroll="{{ satc_scroll }}"
+    data-show-after-scroll-desktop="{{ satc_scroll_desktop }}"
     style="
       --satc-bg: {{ satc_bg }};
       --satc-text: {{ satc_text }};
@@ -92,6 +131,8 @@
       --satc-btn-size: {{ satc_btn_size }}px;
       --satc-desk-max: {{ satc_desk_max }}px;
       --satc-desk-bottom: {{ satc_desk_bottom }}px;
+      --satc-btn-bg: {{ satc_btn_bg }};
+      --satc-btn-text: {{ satc_btn_text }};
       background: var(--satc-bg);
       color: var(--satc-text);
     "
@@ -102,6 +143,20 @@
         Powered by Sticky ATC
       </span>
     {% endunless %}
+
+    {% if satc_display_mode == 'quickbuy' %}
+      <button
+        type="button"
+        class="satc-bar__quick-toggle"
+        data-satc-quick-toggle
+        aria-expanded="false"
+        aria-label="{{ satc_button_label | escape }}"
+        style="background: {{ satc_btn_bg }}; color: {{ satc_btn_text }};"
+      >
+        {{ satc_button_label }}
+      </button>
+      <div class="satc-bar__quick-panel" data-satc-quick-panel hidden>
+    {% endif %}
 
     {% if satc_show_image and product_image %}
       <img
@@ -141,7 +196,42 @@
         {{ satc_sold_out }}
       {% endif %}
     </button>
+
+    {% if satc_display_mode == 'quickbuy' %}
+      </div>
+    {% endif %}
   </div>
+
+  {% if satc_display_mode == 'slider' %}
+    <div class="satc-slider" data-satc-slider hidden>
+      <div class="satc-slider__backdrop" data-satc-slider-close></div>
+      <aside
+        class="satc-slider__panel"
+        role="dialog"
+        aria-label="Cart"
+        style="--satc-bg: {{ satc_bg }}; --satc-text: {{ satc_text }}; --satc-btn-bg: {{ satc_btn_bg }}; --satc-btn-text: {{ satc_btn_text }};"
+      >
+        <header class="satc-slider__header">
+          <h2 class="satc-slider__title">Your cart</h2>
+          <button type="button" class="satc-slider__close" data-satc-slider-close aria-label="Close">
+            ×
+          </button>
+        </header>
+        <div class="satc-slider__body" data-satc-slider-items>
+          <p class="satc-slider__empty">Your cart is empty</p>
+        </div>
+        <footer class="satc-slider__footer">
+          <div class="satc-slider__total">
+            <span>Subtotal</span>
+            <strong data-satc-slider-total>—</strong>
+          </div>
+          <a class="satc-slider__checkout" href="{{ routes.cart_url }}" data-satc-slider-checkout>
+            Checkout
+          </a>
+        </footer>
+      </aside>
+    </div>
+  {% endif %}
 {% endif %}
 
 {% schema %}
@@ -160,6 +250,51 @@
       "id": "enabled",
       "label": "Enable sticky bar",
       "default": true
+    },
+    {
+      "type": "select",
+      "id": "display_mode",
+      "label": "Display style",
+      "options": [
+        { "value": "bar", "label": "Sticky Add to Cart Bar" },
+        { "value": "slider", "label": "Sticky Cart with Cart Slider" },
+        { "value": "quickbuy", "label": "Quick Buy Cart" }
+      ],
+      "default": "bar"
+    },
+    {
+      "type": "header",
+      "content": "Show on pages"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_product",
+      "label": "Product pages",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_collection",
+      "label": "Collection pages",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_home",
+      "label": "Homepage",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_search",
+      "label": "Search results",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_other",
+      "label": "Other pages",
+      "default": false
     },
     {
       "type": "text",
