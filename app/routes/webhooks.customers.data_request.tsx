@@ -4,6 +4,6 @@ import { authenticate } from "../shopify.server";
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { shop, topic } = await authenticate.webhook(request);
   console.log(`Received ${topic} webhook for ${shop}`);
-  // Sticky ATC does not store customer PII beyond the shop session.
-  return new Response();
+  // App does not store customer PII beyond shop session/settings.
+  return new Response(null, { status: 200 });
 };

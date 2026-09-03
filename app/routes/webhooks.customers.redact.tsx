@@ -4,6 +4,6 @@ import { authenticate } from "../shopify.server";
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { shop, topic } = await authenticate.webhook(request);
   console.log(`Received ${topic} webhook for ${shop}`);
-  // No customer records stored by this app.
-  return new Response();
+  // App does not store customer PII.
+  return new Response(null, { status: 200 });
 };

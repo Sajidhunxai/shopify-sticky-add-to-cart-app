@@ -1,13 +1,17 @@
 import type { ActionFunctionArgs } from "react-router";
 import { authenticate } from "../shopify.server";
-import db from "../db.server";
+import { deleteShopData } from "../models/shop-cleanup.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { shop, topic } = await authenticate.webhook(request);
+
   console.log(`Received ${topic} webhook for ${shop}`);
 
-  await db.shopSettings.deleteMany({ where: { shop } });
-  await db.session.deleteMany({ where: { shop } });
+  try {
+    await deleteShopData(shop);
+  } catch (error) {
+    console.error(`Failed to delete shop data on ${topic} for ${shop}`, error);
+  }
 
-  return new Response();
+  return new Response(null, { status: 200 });
 };
