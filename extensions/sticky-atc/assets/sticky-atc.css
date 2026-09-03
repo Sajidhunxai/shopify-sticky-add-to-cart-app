@@ -59,7 +59,18 @@
   width: 100%;
 }
 
+.satc-bar--layout-compact {
+  gap: 8px;
+  /* Keep bar height stable when title/price are hidden */
+  min-height: calc(var(--satc-image-size, 64px) + (var(--satc-pad-y, 12px) * 2));
+}
+
 .satc-bar--layout-compact .satc-bar__info {
+  display: none;
+}
+
+.satc-bar--layout-compact .satc-bar__title,
+.satc-bar--layout-compact .satc-bar__price {
   display: none;
 }
 

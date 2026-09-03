@@ -162,6 +162,7 @@
 
 .previewBarCompact {
   gap: 8px;
+  min-height: 72px;
 }
 
 .previewBarCompact .previewInfo {

@@ -191,7 +191,8 @@
       <div class="satc-bar__quick-panel" data-satc-quick-panel hidden>
     {% endif %}
 
-    {% if satc_show_image and product_image %}
+    {% if satc_show_image == true or satc_show_image == 'true' %}
+      {% if product_image %}
       <img
         class="satc-bar__media"
         src="{{ product_image | image_url: width: 240 }}"
@@ -200,20 +201,23 @@
         height="{{ satc_image_size }}"
         loading="lazy"
       >
+      {% endif %}
     {% endif %}
 
+    {% if satc_show_title == true or satc_show_title == 'true' or satc_show_price == true or satc_show_price == 'true' %}
     <div class="satc-bar__info">
-      {% if satc_show_title %}
+      {% if satc_show_title == true or satc_show_title == 'true' %}
         <p class="satc-bar__title">{{ product.title }}</p>
       {% endif %}
-      {% if satc_show_price %}
+      {% if satc_show_price == true or satc_show_price == 'true' %}
         <p class="satc-bar__price" data-satc-price>
           {{ product.selected_or_first_available_variant.price | money }}
         </p>
       {% endif %}
     </div>
+    {% endif %}
 
-    {% if satc_show_qty %}
+    {% if satc_show_qty == true or satc_show_qty == 'true' %}
       <div class="satc-bar__qty" data-satc-qty>
         <button type="button" class="satc-bar__qty-btn" data-satc-qty-minus aria-label="Decrease quantity">−</button>
         <input

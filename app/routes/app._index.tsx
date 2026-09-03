@@ -631,8 +631,8 @@ export default function Index() {
                 )
               }
             >
-              <s-option value="row">Row (image · info · button)</s-option>
-              <s-option value="compact">Compact</s-option>
+              <s-option value="row">Row (image · title · button)</s-option>
+              <s-option value="compact">Compact (hide title, same bar size)</s-option>
               <s-option value="stacked">Stacked (button full width)</s-option>
             </s-select>
             <s-select
