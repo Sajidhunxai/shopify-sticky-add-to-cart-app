@@ -79,6 +79,51 @@ function updateConfig<K extends keyof BarConfig>(
   setConfig((prev) => ({ ...prev, [key]: value }));
 }
 
+function previewPositionStyle(
+  position: BarConfig["barPosition"],
+  edge: number,
+): CSSProperties {
+  const offset = Math.max(8, edge || 12);
+  const floating: CSSProperties = {
+    width: "max-content",
+    maxWidth: "calc(100% - 24px)",
+    left: "auto",
+    right: "auto",
+  };
+
+  switch (position) {
+    case "top":
+      return { top: offset, bottom: "auto", left: 12, right: 12 };
+    case "top-left":
+      return { ...floating, top: offset, bottom: "auto", left: offset };
+    case "top-right":
+      return { ...floating, top: offset, bottom: "auto", right: offset };
+    case "bottom-left":
+      return { ...floating, bottom: offset, top: "auto", left: offset };
+    case "bottom-right":
+      return { ...floating, bottom: offset, top: "auto", right: offset };
+    case "left":
+      return {
+        ...floating,
+        top: "50%",
+        bottom: "auto",
+        left: offset,
+        transform: "translateY(-50%)",
+      };
+    case "right":
+      return {
+        ...floating,
+        top: "50%",
+        bottom: "auto",
+        right: offset,
+        transform: "translateY(-50%)",
+      };
+    case "bottom":
+    default:
+      return { bottom: offset, top: "auto", left: 12, right: 12 };
+  }
+}
+
 export default function Index() {
   const { shop, plan, hideBranding, config: initialConfig } =
     useLoaderData<typeof loader>();
@@ -152,9 +197,7 @@ export default function Index() {
       config.backgroundStyle === "blur" ? "saturate(160%) blur(12px)" : undefined,
     flexDirection: config.layout === "stacked" ? "column" : "row",
     alignItems: config.layout === "stacked" ? "stretch" : "center",
-    ...(config.barPosition === "top"
-      ? { top: 12, bottom: "auto" }
-      : { bottom: 12, top: "auto" }),
+    ...previewPositionStyle(config.barPosition, config.desktopBottomOffset),
   };
 
   return (
@@ -632,7 +675,7 @@ export default function Index() {
               }
             >
               <s-option value="row">Row (image · title · button)</s-option>
-              <s-option value="compact">Compact (hide title, same bar size)</s-option>
+              <s-option value="compact">Compact (floating pill, no title)</s-option>
               <s-option value="stacked">Stacked (button full width)</s-option>
             </s-select>
             <s-select
@@ -679,8 +722,14 @@ export default function Index() {
                 )
               }
             >
-              <s-option value="bottom">Bottom</s-option>
-              <s-option value="top">Top</s-option>
+              <s-option value="bottom">Bottom center</s-option>
+              <s-option value="bottom-left">Bottom left</s-option>
+              <s-option value="bottom-right">Bottom right</s-option>
+              <s-option value="top">Top center</s-option>
+              <s-option value="top-left">Top left</s-option>
+              <s-option value="top-right">Top right</s-option>
+              <s-option value="left">Middle left</s-option>
+              <s-option value="right">Middle right</s-option>
             </s-select>
           </s-grid>
 
@@ -862,7 +911,7 @@ export default function Index() {
               }
             />
             <s-number-field
-              label="Desktop edge offset"
+              label="Edge offset (px)"
               value={String(config.desktopBottomOffset)}
               min={0}
               onChange={(e: Event) =>

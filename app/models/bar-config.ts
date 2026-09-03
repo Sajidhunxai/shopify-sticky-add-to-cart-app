@@ -9,7 +9,15 @@ export type BackgroundStyle = "solid" | "blur" | "gradient";
 export type ImageShape = "rounded" | "circle" | "square";
 export type BarLayout = "row" | "compact" | "stacked";
 export type ButtonSize = "normal" | "large" | "full";
-export type BarPosition = "bottom" | "top";
+export type BarPosition =
+  | "bottom"
+  | "bottom-left"
+  | "bottom-right"
+  | "top"
+  | "top-left"
+  | "top-right"
+  | "left"
+  | "right";
 
 export type BarConfig = {
   enabled: boolean;
@@ -162,7 +170,19 @@ function asButtonSize(value: FormDataEntryValue | null | undefined): ButtonSize 
 }
 
 function asBarPosition(value: FormDataEntryValue | null | undefined): BarPosition {
-  return String(value || "bottom") === "top" ? "top" : "bottom";
+  const raw = String(value || "bottom");
+  switch (raw) {
+    case "bottom-left":
+    case "bottom-right":
+    case "top":
+    case "top-left":
+    case "top-right":
+    case "left":
+    case "right":
+      return raw;
+    default:
+      return "bottom";
+  }
 }
 
 export function parseBarConfig(raw: string | null | undefined): BarConfig {

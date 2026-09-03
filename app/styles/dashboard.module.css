@@ -161,8 +161,14 @@
 }
 
 .previewBarCompact {
-  gap: 8px;
+  left: 50% !important;
+  right: auto !important;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  transform: translateX(-50%);
+  gap: 10px;
   min-height: 72px;
+  justify-content: center;
 }
 
 .previewBarCompact .previewInfo {

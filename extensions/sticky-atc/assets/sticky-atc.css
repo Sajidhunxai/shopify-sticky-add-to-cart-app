@@ -51,6 +51,99 @@
   transform: translateY(-110%);
 }
 
+/* Corner + side positions: floating content-sized bar */
+.satc-bar--pos-bottom-left,
+.satc-bar--pos-bottom-right,
+.satc-bar--pos-top-left,
+.satc-bar--pos-top-right,
+.satc-bar--pos-left,
+.satc-bar--pos-right {
+  left: auto;
+  right: auto;
+  width: max-content;
+  max-width: calc(100% - (var(--satc-edge, 16px) * 2));
+  border-radius: var(--satc-bar-radius, 14px);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.18);
+}
+
+.satc-bar--pos-bottom-left {
+  left: var(--satc-edge, 16px);
+  right: auto;
+  bottom: var(--satc-edge, 16px);
+  transform: translateY(120%);
+}
+
+.satc-bar--pos-bottom-right {
+  right: var(--satc-edge, 16px);
+  left: auto;
+  bottom: var(--satc-edge, 16px);
+  transform: translateY(120%);
+}
+
+.satc-bar--pos-top-left {
+  left: var(--satc-edge, 16px);
+  right: auto;
+  top: var(--satc-edge, 16px);
+  bottom: auto;
+  transform: translateY(-120%);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.18);
+}
+
+.satc-bar--pos-top-right {
+  right: var(--satc-edge, 16px);
+  left: auto;
+  top: var(--satc-edge, 16px);
+  bottom: auto;
+  transform: translateY(-120%);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.18);
+}
+
+.satc-bar--pos-left {
+  left: var(--satc-edge, 16px);
+  right: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translate(-120%, -50%);
+}
+
+.satc-bar--pos-right {
+  right: var(--satc-edge, 16px);
+  left: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translate(120%, -50%);
+}
+
+.satc-bar--pos-bottom-left.is-visible,
+.satc-bar--pos-bottom-right.is-visible,
+.satc-bar--pos-top-left.is-visible,
+.satc-bar--pos-top-right.is-visible {
+  transform: translateY(0);
+}
+
+.satc-bar--pos-left.is-visible,
+.satc-bar--pos-right.is-visible {
+  transform: translate(0, -50%);
+}
+
+.satc-bar--pos-bottom-left.is-hidden-near-form,
+.satc-bar--pos-bottom-right.is-hidden-near-form {
+  transform: translateY(120%);
+}
+
+.satc-bar--pos-top-left.is-hidden-near-form,
+.satc-bar--pos-top-right.is-hidden-near-form {
+  transform: translateY(-120%);
+}
+
+.satc-bar--pos-left.is-hidden-near-form {
+  transform: translate(-120%, -50%);
+}
+
+.satc-bar--pos-right.is-hidden-near-form {
+  transform: translate(120%, -50%);
+}
+
 .satc-bar--layout-stacked {
   flex-wrap: wrap;
 }
@@ -59,10 +152,49 @@
   width: 100%;
 }
 
+/* Compact: floating pill; position classes control corner/side */
 .satc-bar--layout-compact {
-  gap: 8px;
-  /* Keep bar height stable when title/price are hidden */
+  width: max-content;
+  max-width: calc(100% - (var(--satc-edge, 16px) * 2));
+  gap: 10px;
   min-height: calc(var(--satc-image-size, 64px) + (var(--satc-pad-y, 12px) * 2));
+  border-radius: calc(var(--satc-bar-radius, 14px) + 4px);
+  justify-content: center;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.18);
+}
+
+/* Compact + center bottom/top: keep centered */
+.satc-bar--layout-compact.satc-bar--pos-bottom {
+  left: 50%;
+  right: auto;
+  bottom: var(--satc-edge, 16px);
+  width: max-content;
+  transform: translate(-50%, 120%);
+}
+
+.satc-bar--layout-compact.satc-bar--pos-bottom.is-visible {
+  transform: translate(-50%, 0);
+}
+
+.satc-bar--layout-compact.satc-bar--pos-bottom.is-hidden-near-form {
+  transform: translate(-50%, 120%);
+}
+
+.satc-bar--layout-compact.satc-bar--pos-top {
+  left: 50%;
+  right: auto;
+  top: var(--satc-edge, 16px);
+  bottom: auto;
+  width: max-content;
+  transform: translate(-50%, -120%);
+}
+
+.satc-bar--layout-compact.satc-bar--pos-top.is-visible {
+  transform: translate(-50%, 0);
+}
+
+.satc-bar--layout-compact.satc-bar--pos-top.is-hidden-near-form {
+  transform: translate(-50%, -120%);
 }
 
 .satc-bar--layout-compact .satc-bar__info {
@@ -72,6 +204,10 @@
 .satc-bar--layout-compact .satc-bar__title,
 .satc-bar--layout-compact .satc-bar__price {
   display: none;
+}
+
+.satc-bar--layout-compact .satc-bar__button {
+  flex: 0 0 auto;
 }
 
 .satc-bar--btn-large .satc-bar__button {
@@ -414,40 +550,59 @@
     display: none !important;
   }
 
-  .satc-bar:not(.satc-bar--quickbuy) {
+  .satc-bar.satc-bar--pos-bottom:not(.satc-bar--quickbuy):not(.satc-bar--layout-compact),
+  .satc-bar.satc-bar--pos-top:not(.satc-bar--quickbuy):not(.satc-bar--layout-compact) {
     left: 50%;
     right: auto;
-    bottom: var(--satc-desk-bottom, 20px);
     width: min(var(--satc-desk-max, 720px), calc(100% - 40px));
-    transform: translate(-50%, 120%);
     border-radius: var(--satc-bar-radius, 14px);
   }
 
-  .satc-bar:not(.satc-bar--quickbuy).satc-bar--pos-top {
-    top: var(--satc-desk-bottom, 20px);
+  .satc-bar.satc-bar--pos-bottom:not(.satc-bar--quickbuy):not(.satc-bar--layout-compact) {
+    bottom: var(--satc-edge, 20px);
+    transform: translate(-50%, 120%);
+  }
+
+  .satc-bar.satc-bar--pos-top:not(.satc-bar--quickbuy):not(.satc-bar--layout-compact) {
+    top: var(--satc-edge, 20px);
     bottom: auto;
     transform: translate(-50%, -120%);
   }
 
-  .satc-bar:not(.satc-bar--quickbuy).is-visible {
+  .satc-bar.satc-bar--pos-bottom:not(.satc-bar--quickbuy):not(.satc-bar--layout-compact).is-visible,
+  .satc-bar.satc-bar--pos-top:not(.satc-bar--quickbuy):not(.satc-bar--layout-compact).is-visible {
     transform: translate(-50%, 0);
   }
 
-  .satc-bar:not(.satc-bar--quickbuy).is-hidden-near-form {
+  .satc-bar.satc-bar--pos-bottom:not(.satc-bar--quickbuy):not(.satc-bar--layout-compact).is-hidden-near-form {
     transform: translate(-50%, 120%);
   }
 
-  .satc-bar:not(.satc-bar--quickbuy).satc-bar--pos-top.is-hidden-near-form {
+  .satc-bar.satc-bar--pos-top:not(.satc-bar--quickbuy):not(.satc-bar--layout-compact).is-hidden-near-form {
     transform: translate(-50%, -120%);
   }
 
   .satc-bar--quickbuy {
-    right: 24px;
-    bottom: var(--satc-desk-bottom, 24px);
+    right: var(--satc-edge, 24px);
+    bottom: var(--satc-edge, 24px);
+    left: auto;
   }
 
-  .satc-bar--quickbuy.satc-bar--pos-top {
-    top: var(--satc-desk-bottom, 24px);
+  .satc-bar--quickbuy.satc-bar--pos-top,
+  .satc-bar--quickbuy.satc-bar--pos-top-left,
+  .satc-bar--quickbuy.satc-bar--pos-top-right {
+    top: var(--satc-edge, 24px);
     bottom: auto;
+  }
+
+  .satc-bar--quickbuy.satc-bar--pos-left {
+    left: var(--satc-edge, 24px);
+    right: auto;
+  }
+
+  .satc-bar--quickbuy.satc-bar--pos-bottom-left,
+  .satc-bar--quickbuy.satc-bar--pos-top-left {
+    left: var(--satc-edge, 24px);
+    right: auto;
   }
 }
