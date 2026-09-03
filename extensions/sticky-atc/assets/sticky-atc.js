@@ -4,6 +4,9 @@
 
   const button = bar.querySelector("[data-satc-button]");
   const priceEl = bar.querySelector("[data-satc-price]");
+  const qtyInput = bar.querySelector("[data-satc-qty-input]");
+  const qtyMinus = bar.querySelector("[data-satc-qty-minus]");
+  const qtyPlus = bar.querySelector("[data-satc-qty-plus]");
   const displayMode = bar.dataset.displayMode || "bar";
   const formSelector =
     'form[action*="/cart/add"], form[action$="/cart/add"], product-form form, [data-product-form]';
@@ -171,6 +174,21 @@
     el.addEventListener("click", closeSlider);
   });
 
+  const getQuantity = () => {
+    const n = Number(qtyInput?.value || 1);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1;
+  };
+
+  qtyMinus?.addEventListener("click", () => {
+    if (!qtyInput) return;
+    qtyInput.value = String(Math.max(1, getQuantity() - 1));
+  });
+
+  qtyPlus?.addEventListener("click", () => {
+    if (!qtyInput) return;
+    qtyInput.value = String(getQuantity() + 1);
+  });
+
   button?.addEventListener("click", async () => {
     const variantId = getVariantId();
     if (!variantId) {
@@ -190,7 +208,7 @@
           Accept: "application/json",
         },
         body: JSON.stringify({
-          items: [{ id: Number(variantId), quantity: 1 }],
+          items: [{ id: Number(variantId), quantity: getQuantity() }],
         }),
       });
 

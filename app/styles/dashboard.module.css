@@ -160,6 +160,29 @@
   font-weight: 650;
 }
 
+.previewBarCompact {
+  gap: 8px;
+}
+
+.previewBarCompact .previewInfo {
+  display: none;
+}
+
+.previewQty {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.previewQty span {
+  opacity: 0.7;
+}
+
 .planCard {
   border-radius: 14px;
   padding: 16px;

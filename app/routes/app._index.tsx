@@ -1,4 +1,4 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useState, type CSSProperties, type Dispatch, type SetStateAction } from "react";
 import type {
   ActionFunctionArgs,
   HeadersFunction,
@@ -107,6 +107,54 @@ export default function Index() {
       fd.set(key, String(config[key]));
     });
     submit(fd, { method: "post" });
+  };
+
+  const hexToRgba = (hex: string, opacityPct: number) => {
+    const raw = hex.replace("#", "");
+    const full =
+      raw.length === 3
+        ? raw
+            .split("")
+            .map((c) => c + c)
+            .join("")
+        : raw;
+    if (full.length !== 6) return hex;
+    const n = Number.parseInt(full, 16);
+    const r = (n >> 16) & 255;
+    const g = (n >> 8) & 255;
+    const b = n & 255;
+    return `rgba(${r}, ${g}, ${b}, ${(opacityPct / 100).toFixed(2)})`;
+  };
+
+  const previewBg =
+    config.backgroundStyle === "gradient"
+      ? `linear-gradient(135deg, ${hexToRgba(config.backgroundColor, config.backgroundOpacity)}, ${hexToRgba(config.backgroundColor, Math.max(40, config.backgroundOpacity - 25))})`
+      : hexToRgba(config.backgroundColor, config.backgroundOpacity);
+
+  const previewImageRadius =
+    config.imageShape === "circle"
+      ? "999px"
+      : config.imageShape === "square"
+        ? "0px"
+        : `${config.imageRadius}px`;
+
+  const previewBarStyle: CSSProperties = {
+    background: previewBg,
+    color: config.textColor,
+    borderRadius: `${config.barRadius}px`,
+    padding: `${config.paddingY}px ${config.paddingX}px`,
+    border: `${config.borderWidth}px solid ${config.borderColor}`,
+    boxShadow: config.showShadow ? "0 -8px 28px rgba(0,0,0,0.14)" : "none",
+    gap: `${config.contentGap}px`,
+    backdropFilter:
+      config.backgroundStyle === "blur" ? "saturate(160%) blur(12px)" : undefined,
+    WebkitBackdropFilter:
+      config.backgroundStyle === "blur" ? "saturate(160%) blur(12px)" : undefined,
+    flexDirection: config.layout === "stacked" ? "column" : "row",
+    alignItems: config.layout === "stacked" ? "stretch" : "center",
+    ...(config.barPosition === "top"
+      ? { top: 12, bottom: "auto" }
+      : { bottom: 12, top: "auto" }),
   };
 
   return (
@@ -220,17 +268,8 @@ export default function Index() {
               <div
                 className={`${styles.previewBar} ${
                   config.enabled ? "" : styles.previewBarDisabled
-                }`}
-                style={{
-                  background: config.backgroundColor,
-                  color: config.textColor,
-                  borderRadius: `${config.barRadius}px`,
-                  padding: `${config.paddingY}px ${config.paddingX}px`,
-                  border: `${config.borderWidth}px solid rgba(0,0,0,0.08)`,
-                  boxShadow: config.showShadow
-                    ? "0 -8px 28px rgba(0,0,0,0.14)"
-                    : "none",
-                }}
+                } ${config.layout === "compact" ? styles.previewBarCompact : ""}`}
+                style={previewBarStyle}
               >
                 {!hideBranding && (
                   <span
@@ -246,6 +285,7 @@ export default function Index() {
                     style={{
                       width: config.imageSize,
                       height: config.imageSize,
+                      borderRadius: previewImageRadius,
                       background: "linear-gradient(135deg, #94a3b8, #64748b)",
                     }}
                   />
@@ -268,6 +308,13 @@ export default function Index() {
                     </p>
                   )}
                 </div>
+                {config.showQuantity && (
+                  <div className={styles.previewQty}>
+                    <span>−</span>
+                    <strong>1</strong>
+                    <span>+</span>
+                  </div>
+                )}
                 <button
                   type="button"
                   className={styles.previewBarButton}
@@ -276,7 +323,14 @@ export default function Index() {
                     color: config.buttonTextColor,
                     borderRadius: `${config.buttonRadius}px`,
                     fontSize: `${config.buttonFontSize}px`,
-                    padding: "10px 16px",
+                    padding:
+                      config.buttonSize === "large"
+                        ? "14px 22px"
+                        : "10px 16px",
+                    width:
+                      config.buttonSize === "full" || config.layout === "stacked"
+                        ? "100%"
+                        : undefined,
                   }}
                 >
                   {config.buttonText}
@@ -388,6 +442,17 @@ export default function Index() {
               updateConfig(
                 setConfig,
                 "showPrice",
+                (e.currentTarget as HTMLInputElement).checked,
+              )
+            }
+          />
+          <s-switch
+            label="Show quantity selector"
+            checked={config.showQuantity}
+            onChange={(e: Event) =>
+              updateConfig(
+                setConfig,
+                "showQuantity",
                 (e.currentTarget as HTMLInputElement).checked,
               )
             }
@@ -536,23 +601,133 @@ export default function Index() {
       </s-section>
 
       <s-section heading="Style & layout">
-        <s-switch
-          label="Show shadow"
-          checked={config.showShadow}
-          onChange={(e: Event) =>
-            updateConfig(
-              setConfig,
-              "showShadow",
-              (e.currentTarget as HTMLInputElement).checked,
-            )
-          }
-        />
+        <s-stack gap="base">
+          <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+            <s-select
+              label="Background style"
+              value={config.backgroundStyle}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "backgroundStyle",
+                  (e.currentTarget as HTMLSelectElement)
+                    .value as BarConfig["backgroundStyle"],
+                )
+              }
+            >
+              <s-option value="solid">Solid color</s-option>
+              <s-option value="blur">Glass blur</s-option>
+              <s-option value="gradient">Soft gradient</s-option>
+            </s-select>
+            <s-select
+              label="Bar layout"
+              value={config.layout}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "layout",
+                  (e.currentTarget as HTMLSelectElement)
+                    .value as BarConfig["layout"],
+                )
+              }
+            >
+              <s-option value="row">Row (image · info · button)</s-option>
+              <s-option value="compact">Compact</s-option>
+              <s-option value="stacked">Stacked (button full width)</s-option>
+            </s-select>
+            <s-select
+              label="Image shape"
+              value={config.imageShape}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "imageShape",
+                  (e.currentTarget as HTMLSelectElement)
+                    .value as BarConfig["imageShape"],
+                )
+              }
+            >
+              <s-option value="rounded">Rounded</s-option>
+              <s-option value="circle">Circle</s-option>
+              <s-option value="square">Square</s-option>
+            </s-select>
+            <s-select
+              label="Button size"
+              value={config.buttonSize}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "buttonSize",
+                  (e.currentTarget as HTMLSelectElement)
+                    .value as BarConfig["buttonSize"],
+                )
+              }
+            >
+              <s-option value="normal">Normal</s-option>
+              <s-option value="large">Large</s-option>
+              <s-option value="full">Full width</s-option>
+            </s-select>
+            <s-select
+              label="Bar position"
+              value={config.barPosition}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "barPosition",
+                  (e.currentTarget as HTMLSelectElement)
+                    .value as BarConfig["barPosition"],
+                )
+              }
+            >
+              <s-option value="bottom">Bottom</s-option>
+              <s-option value="top">Top</s-option>
+            </s-select>
+          </s-grid>
+
+          <s-switch
+            label="Show shadow"
+            checked={config.showShadow}
+            onChange={(e: Event) =>
+              updateConfig(
+                setConfig,
+                "showShadow",
+                (e.currentTarget as HTMLInputElement).checked,
+              )
+            }
+          />
+        </s-stack>
 
         <s-stack gap="base" paddingBlockStart="base">
           <s-grid
             gridTemplateColumns="repeat(auto-fit, minmax(140px, 1fr))"
             gap="base"
           >
+            <s-number-field
+              label="Background opacity %"
+              value={String(config.backgroundOpacity)}
+              min={40}
+              max={100}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "backgroundOpacity",
+                  Number((e.currentTarget as HTMLInputElement).value),
+                )
+              }
+            />
+            <s-number-field
+              label="Content gap"
+              value={String(config.contentGap)}
+              min={4}
+              max={32}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "contentGap",
+                  Number((e.currentTarget as HTMLInputElement).value),
+                )
+              }
+            />
             <s-number-field
               label="Border width (px)"
               value={String(config.borderWidth)}
@@ -590,6 +765,18 @@ export default function Index() {
               }
             />
             <s-number-field
+              label="Image corner radius"
+              value={String(config.imageRadius)}
+              min={0}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "imageRadius",
+                  Number((e.currentTarget as HTMLInputElement).value),
+                )
+              }
+            />
+            <s-number-field
               label="Padding Y"
               value={String(config.paddingY)}
               min={0}
@@ -614,9 +801,10 @@ export default function Index() {
               }
             />
             <s-number-field
-              label="Image size"
+              label="Product image size"
               value={String(config.imageSize)}
-              min={24}
+              min={32}
+              max={120}
               onChange={(e: Event) =>
                 updateConfig(
                   setConfig,
@@ -674,7 +862,7 @@ export default function Index() {
               }
             />
             <s-number-field
-              label="Desktop bottom offset"
+              label="Desktop edge offset"
               value={String(config.desktopBottomOffset)}
               min={0}
               onChange={(e: Event) =>
@@ -719,6 +907,17 @@ export default function Index() {
                 updateConfig(
                   setConfig,
                   "backgroundColor",
+                  (e.currentTarget as HTMLInputElement).value,
+                )
+              }
+            />
+            <s-color-field
+              label="Border color"
+              value={config.borderColor}
+              onChange={(e: Event) =>
+                updateConfig(
+                  setConfig,
+                  "borderColor",
                   (e.currentTarget as HTMLInputElement).value,
                 )
               }

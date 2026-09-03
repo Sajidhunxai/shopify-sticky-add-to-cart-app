@@ -41,6 +41,16 @@
   {% assign satc_desk_bottom = cfg.desktopBottomOffset %}
   {% assign satc_scroll = cfg.showAfterScroll %}
   {% assign satc_scroll_desktop = cfg.showAfterScrollDesktop %}
+  {% assign satc_bg_style = cfg.backgroundStyle %}
+  {% assign satc_bg_opacity = cfg.backgroundOpacity %}
+  {% assign satc_image_shape = cfg.imageShape %}
+  {% assign satc_layout = cfg.layout %}
+  {% assign satc_button_size = cfg.buttonSize %}
+  {% assign satc_bar_position = cfg.barPosition %}
+  {% assign satc_gap = cfg.contentGap %}
+  {% assign satc_border_color = cfg.borderColor %}
+  {% assign satc_image_radius = cfg.imageRadius %}
+  {% assign satc_show_qty = cfg.showQuantity %}
 {% else %}
   {% assign satc_enabled = block.settings.enabled %}
   {% assign satc_display_mode = block.settings.display_mode %}
@@ -68,7 +78,7 @@
   {% assign satc_btn_radius = 8 %}
   {% assign satc_pad_y = 12 %}
   {% assign satc_pad_x = 16 %}
-  {% assign satc_image_size = 48 %}
+  {% assign satc_image_size = 64 %}
   {% assign satc_title_size = 14 %}
   {% assign satc_price_size = 13 %}
   {% assign satc_btn_size = 14 %}
@@ -76,10 +86,30 @@
   {% assign satc_desk_bottom = 20 %}
   {% assign satc_scroll = 80 %}
   {% assign satc_scroll_desktop = 0 %}
+  {% assign satc_bg_style = 'solid' %}
+  {% assign satc_bg_opacity = 100 %}
+  {% assign satc_image_shape = 'rounded' %}
+  {% assign satc_layout = 'row' %}
+  {% assign satc_button_size = 'normal' %}
+  {% assign satc_bar_position = 'bottom' %}
+  {% assign satc_gap = 12 %}
+  {% assign satc_border_color = '#e5e7eb' %}
+  {% assign satc_image_radius = 8 %}
+  {% assign satc_show_qty = false %}
 {% endif %}
 
 {% if satc_display_mode == blank %}{% assign satc_display_mode = 'bar' %}{% endif %}
 {% if satc_scroll_desktop == blank %}{% assign satc_scroll_desktop = 0 %}{% endif %}
+{% if satc_bg_style == blank %}{% assign satc_bg_style = 'solid' %}{% endif %}
+{% if satc_bg_opacity == blank %}{% assign satc_bg_opacity = 100 %}{% endif %}
+{% if satc_image_shape == blank %}{% assign satc_image_shape = 'rounded' %}{% endif %}
+{% if satc_layout == blank %}{% assign satc_layout = 'row' %}{% endif %}
+{% if satc_button_size == blank %}{% assign satc_button_size = 'normal' %}{% endif %}
+{% if satc_bar_position == blank %}{% assign satc_bar_position = 'bottom' %}{% endif %}
+{% if satc_gap == blank %}{% assign satc_gap = 12 %}{% endif %}
+{% if satc_border_color == blank %}{% assign satc_border_color = '#e5e7eb' %}{% endif %}
+{% if satc_image_radius == blank %}{% assign satc_image_radius = 8 %}{% endif %}
+{% if satc_show_qty == blank %}{% assign satc_show_qty = false %}{% endif %}
 {% comment %} Defaults when older saved configs omit page flags {% endcomment %}
 {% if satc_show_on_product == blank %}{% assign satc_show_on_product = true %}{% endif %}
 {% if satc_show_on_collection == blank %}{% assign satc_show_on_collection = false %}{% endif %}
@@ -106,7 +136,7 @@
 
   <div
     id="satc-bar-{{ block.id }}"
-    class="satc-bar satc-bar--{{ satc_display_mode }}{% unless satc_show_shadow %} satc-bar--no-shadow{% endunless %}"
+    class="satc-bar satc-bar--{{ satc_display_mode }} satc-bar--layout-{{ satc_layout }} satc-bar--bg-{{ satc_bg_style }} satc-bar--pos-{{ satc_bar_position }} satc-bar--btn-{{ satc_button_size }} satc-bar--img-{{ satc_image_shape }}{% unless satc_show_shadow %} satc-bar--no-shadow{% endunless %}"
     data-satc-bar
     data-display-mode="{{ satc_display_mode }}"
     data-product-id="{{ product.id }}"
@@ -121,10 +151,12 @@
       --satc-bg: {{ satc_bg }};
       --satc-text: {{ satc_text }};
       --satc-border-width: {{ satc_border_width }}px;
+      --satc-border-color: {{ satc_border_color }};
       --satc-bar-radius: {{ satc_bar_radius }}px;
       --satc-pad-y: {{ satc_pad_y }}px;
       --satc-pad-x: {{ satc_pad_x }}px;
       --satc-image-size: {{ satc_image_size }}px;
+      --satc-image-radius: {{ satc_image_radius }}px;
       --satc-title-size: {{ satc_title_size }}px;
       --satc-price-size: {{ satc_price_size }}px;
       --satc-btn-radius: {{ satc_btn_radius }}px;
@@ -133,7 +165,8 @@
       --satc-desk-bottom: {{ satc_desk_bottom }}px;
       --satc-btn-bg: {{ satc_btn_bg }};
       --satc-btn-text: {{ satc_btn_text }};
-      background: var(--satc-bg);
+      --satc-gap: {{ satc_gap }}px;
+      --satc-bg-opacity: {{ satc_bg_opacity | divided_by: 100.0 }};
       color: var(--satc-text);
     "
     {{ block.shopify_attributes }}
@@ -161,7 +194,7 @@
     {% if satc_show_image and product_image %}
       <img
         class="satc-bar__media"
-        src="{{ product_image | image_url: width: 96 }}"
+        src="{{ product_image | image_url: width: 240 }}"
         alt="{{ product.title | escape }}"
         width="{{ satc_image_size }}"
         height="{{ satc_image_size }}"
@@ -179,6 +212,21 @@
         </p>
       {% endif %}
     </div>
+
+    {% if satc_show_qty %}
+      <div class="satc-bar__qty" data-satc-qty>
+        <button type="button" class="satc-bar__qty-btn" data-satc-qty-minus aria-label="Decrease quantity">−</button>
+        <input
+          class="satc-bar__qty-input"
+          data-satc-qty-input
+          type="number"
+          min="1"
+          value="1"
+          aria-label="Quantity"
+        >
+        <button type="button" class="satc-bar__qty-btn" data-satc-qty-plus aria-label="Increase quantity">+</button>
+      </div>
+    {% endif %}
 
     <button
       type="button"
