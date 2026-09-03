@@ -1,0 +1,42 @@
+{
+  "name": "Sticky Add to Cart",
+  "settings": {
+    "paragraph_admin": {
+      "content": "コンテンツとスタイルはアプリ管理画面を優先してください。テーマの項目はアプリで保存するまで使われます。"
+    },
+    "enabled": { "label": "スティッキーバーを有効にする" },
+    "display_mode": {
+      "label": "表示スタイル",
+      "options": {
+        "bar": "スティッキー Add to Cart バー",
+        "slider": "スティッキーカート + スライダー",
+        "quickbuy": "クイックバイ"
+      }
+    },
+    "pages_header": { "content": "表示するページ" },
+    "show_on_product": { "label": "商品ページ" },
+    "show_on_collection": { "label": "コレクションページ" },
+    "show_on_home": { "label": "ホーム" },
+    "show_on_search": { "label": "検索結果" },
+    "show_on_other": { "label": "その他のページ" },
+    "button_label": { "label": "ボタンテキスト", "default": "カートに追加" },
+    "show_on_desktop": { "label": "デスクトップに表示" },
+    "show_title": { "label": "商品名を表示" },
+    "show_price": { "label": "価格を表示" },
+    "show_image": { "label": "商品画像を表示" },
+    "hide_near_form": { "label": "メインのATCが表示中は隠す" },
+    "after_add": {
+      "label": "カート追加後の動作",
+      "options": {
+        "stay": "ページに留まる",
+        "cart": "カートへ移動",
+        "drawer": "カートドロワーを開く（対応テーマ）"
+      }
+    },
+    "colors_header": { "content": "カラー" },
+    "background_color": { "label": "バー背景" },
+    "text_color": { "label": "文字色" },
+    "button_background": { "label": "ボタン背景" },
+    "button_text_color": { "label": "ボタン文字色" }
+  }
+}

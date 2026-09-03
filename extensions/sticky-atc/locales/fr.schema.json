@@ -1,0 +1,42 @@
+{
+  "name": "Sticky Add to Cart",
+  "settings": {
+    "paragraph_admin": {
+      "content": "Préférez l’admin de l’app pour le contenu et le style. Ces champs du thème sont utilisés seulement tant que vous n’avez pas enregistré dans l’app."
+    },
+    "enabled": { "label": "Activer la barre sticky" },
+    "display_mode": {
+      "label": "Style d’affichage",
+      "options": {
+        "bar": "Barre Sticky Add to Cart",
+        "slider": "Sticky Cart avec tiroir",
+        "quickbuy": "Achat rapide"
+      }
+    },
+    "pages_header": { "content": "Afficher sur les pages" },
+    "show_on_product": { "label": "Pages produit" },
+    "show_on_collection": { "label": "Pages collection" },
+    "show_on_home": { "label": "Page d’accueil" },
+    "show_on_search": { "label": "Résultats de recherche" },
+    "show_on_other": { "label": "Autres pages" },
+    "button_label": { "label": "Texte du bouton", "default": "Ajouter au panier" },
+    "show_on_desktop": { "label": "Afficher sur ordinateur" },
+    "show_title": { "label": "Afficher le titre du produit" },
+    "show_price": { "label": "Afficher le prix" },
+    "show_image": { "label": "Afficher l’image du produit" },
+    "hide_near_form": { "label": "Masquer quand le bouton principal est visible" },
+    "after_add": {
+      "label": "Après ajout au panier",
+      "options": {
+        "stay": "Rester sur la page",
+        "cart": "Aller au panier",
+        "drawer": "Ouvrir le tiroir panier (si pris en charge)"
+      }
+    },
+    "colors_header": { "content": "Couleurs" },
+    "background_color": { "label": "Fond de la barre" },
+    "text_color": { "label": "Couleur du texte" },
+    "button_background": { "label": "Fond du bouton" },
+    "button_text_color": { "label": "Texte du bouton" }
+  }
+}

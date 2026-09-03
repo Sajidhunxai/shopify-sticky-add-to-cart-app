@@ -67,7 +67,10 @@
   {% assign satc_hide_near_form = block.settings.hide_near_form %}
   {% assign satc_after_add = block.settings.after_add %}
   {% assign satc_button_label = block.settings.button_label %}
-  {% assign satc_sold_out = 'Sold out' %}
+  {% if satc_button_label == blank %}
+    {% assign satc_button_label = 'general.add_to_cart' | t %}
+  {% endif %}
+  {% assign satc_sold_out = 'general.sold_out' | t %}
   {% assign satc_bg = block.settings.background_color %}
   {% assign satc_text = block.settings.text_color %}
   {% assign satc_btn_bg = block.settings.button_background %}
@@ -147,6 +150,10 @@
     data-mobile="{{ satc_show_mobile }}"
     data-show-after-scroll="{{ satc_scroll }}"
     data-show-after-scroll-desktop="{{ satc_scroll_desktop }}"
+    data-i18n-adding="{{ 'general.adding' | t | escape }}"
+    data-i18n-added="{{ 'general.added' | t | escape }}"
+    data-i18n-try-again="{{ 'general.try_again' | t | escape }}"
+    data-i18n-cart-empty="{{ 'general.cart_empty' | t | escape }}"
     style="
       --satc-bg: {{ satc_bg }};
       --satc-text: {{ satc_text }};
@@ -174,7 +181,7 @@
   >
     {% unless hide_branding == true or hide_branding == 'true' %}
       <span class="satc-bar__branding" style="color: var(--satc-text);">
-        Powered by Sticky ATC
+        {{ 'general.powered_by' | t }}
       </span>
     {% endunless %}
 
@@ -220,16 +227,16 @@
 
     {% if satc_show_qty == true or satc_show_qty == 'true' %}
       <div class="satc-bar__qty" data-satc-qty>
-        <button type="button" class="satc-bar__qty-btn" data-satc-qty-minus aria-label="Decrease quantity">−</button>
+        <button type="button" class="satc-bar__qty-btn" data-satc-qty-minus aria-label="{{ 'general.decrease_quantity' | t | escape }}">−</button>
         <input
           class="satc-bar__qty-input"
           data-satc-qty-input
           type="number"
           min="1"
           value="1"
-          aria-label="Quantity"
+          aria-label="{{ 'general.quantity' | t | escape }}"
         >
-        <button type="button" class="satc-bar__qty-btn" data-satc-qty-plus aria-label="Increase quantity">+</button>
+        <button type="button" class="satc-bar__qty-btn" data-satc-qty-plus aria-label="{{ 'general.increase_quantity' | t | escape }}">+</button>
       </div>
     {% endif %}
 
@@ -261,25 +268,25 @@
       <aside
         class="satc-slider__panel"
         role="dialog"
-        aria-label="Cart"
+        aria-label="{{ 'general.your_cart' | t | escape }}"
         style="--satc-bg: {{ satc_bg }}; --satc-text: {{ satc_text }}; --satc-btn-bg: {{ satc_btn_bg }}; --satc-btn-text: {{ satc_btn_text }};"
       >
         <header class="satc-slider__header">
-          <h2 class="satc-slider__title">Your cart</h2>
-          <button type="button" class="satc-slider__close" data-satc-slider-close aria-label="Close">
+          <h2 class="satc-slider__title">{{ 'general.your_cart' | t }}</h2>
+          <button type="button" class="satc-slider__close" data-satc-slider-close aria-label="{{ 'general.close' | t | escape }}">
             ×
           </button>
         </header>
         <div class="satc-slider__body" data-satc-slider-items>
-          <p class="satc-slider__empty">Your cart is empty</p>
+          <p class="satc-slider__empty">{{ 'general.cart_empty' | t }}</p>
         </div>
         <footer class="satc-slider__footer">
           <div class="satc-slider__total">
-            <span>Subtotal</span>
+            <span>{{ 'general.subtotal' | t }}</span>
             <strong data-satc-slider-total>—</strong>
           </div>
           <a class="satc-slider__checkout" href="{{ routes.cart_url }}" data-satc-slider-checkout>
-            Checkout
+            {{ 'general.checkout' | t }}
           </a>
         </footer>
       </aside>
@@ -289,139 +296,139 @@
 
 {% schema %}
 {
-  "name": "Sticky Add to Cart",
+  "name": "t:name",
   "target": "body",
   "stylesheet": "sticky-atc.css",
   "javascript": "sticky-atc.js",
   "settings": [
     {
       "type": "paragraph",
-      "content": "Prefer the app admin for content and style. These Theme Editor fields are used only until you save settings in the app."
+      "content": "t:settings.paragraph_admin.content"
     },
     {
       "type": "checkbox",
       "id": "enabled",
-      "label": "Enable sticky bar",
+      "label": "t:settings.enabled.label",
       "default": true
     },
     {
       "type": "select",
       "id": "display_mode",
-      "label": "Display style",
+      "label": "t:settings.display_mode.label",
       "options": [
-        { "value": "bar", "label": "Sticky Add to Cart Bar" },
-        { "value": "slider", "label": "Sticky Cart with Cart Slider" },
-        { "value": "quickbuy", "label": "Quick Buy Cart" }
+        { "value": "bar", "label": "t:settings.display_mode.options.bar" },
+        { "value": "slider", "label": "t:settings.display_mode.options.slider" },
+        { "value": "quickbuy", "label": "t:settings.display_mode.options.quickbuy" }
       ],
       "default": "bar"
     },
     {
       "type": "header",
-      "content": "Show on pages"
+      "content": "t:settings.pages_header.content"
     },
     {
       "type": "checkbox",
       "id": "show_on_product",
-      "label": "Product pages",
+      "label": "t:settings.show_on_product.label",
       "default": true
     },
     {
       "type": "checkbox",
       "id": "show_on_collection",
-      "label": "Collection pages",
+      "label": "t:settings.show_on_collection.label",
       "default": false
     },
     {
       "type": "checkbox",
       "id": "show_on_home",
-      "label": "Homepage",
+      "label": "t:settings.show_on_home.label",
       "default": false
     },
     {
       "type": "checkbox",
       "id": "show_on_search",
-      "label": "Search results",
+      "label": "t:settings.show_on_search.label",
       "default": false
     },
     {
       "type": "checkbox",
       "id": "show_on_other",
-      "label": "Other pages",
+      "label": "t:settings.show_on_other.label",
       "default": false
     },
     {
       "type": "text",
       "id": "button_label",
-      "label": "Button text",
+      "label": "t:settings.button_label.label",
       "default": "Add to cart"
     },
     {
       "type": "checkbox",
       "id": "show_on_desktop",
-      "label": "Show on desktop",
+      "label": "t:settings.show_on_desktop.label",
       "default": true
     },
     {
       "type": "checkbox",
       "id": "show_title",
-      "label": "Show product title",
+      "label": "t:settings.show_title.label",
       "default": true
     },
     {
       "type": "checkbox",
       "id": "show_price",
-      "label": "Show price",
+      "label": "t:settings.show_price.label",
       "default": true
     },
     {
       "type": "checkbox",
       "id": "show_image",
-      "label": "Show product image",
+      "label": "t:settings.show_image.label",
       "default": true
     },
     {
       "type": "checkbox",
       "id": "hide_near_form",
-      "label": "Hide when main Add to cart is visible",
+      "label": "t:settings.hide_near_form.label",
       "default": true
     },
     {
       "type": "select",
       "id": "after_add",
-      "label": "After adding to cart",
+      "label": "t:settings.after_add.label",
       "options": [
-        { "value": "stay", "label": "Stay on page" },
-        { "value": "cart", "label": "Go to cart" },
-        { "value": "drawer", "label": "Open cart drawer (if theme supports it)" }
+        { "value": "stay", "label": "t:settings.after_add.options.stay" },
+        { "value": "cart", "label": "t:settings.after_add.options.cart" },
+        { "value": "drawer", "label": "t:settings.after_add.options.drawer" }
       ],
       "default": "stay"
     },
     {
       "type": "header",
-      "content": "Colors"
+      "content": "t:settings.colors_header.content"
     },
     {
       "type": "color",
       "id": "background_color",
-      "label": "Bar background",
+      "label": "t:settings.background_color.label",
       "default": "#ffffff"
     },
     {
       "type": "color",
       "id": "text_color",
-      "label": "Text color",
+      "label": "t:settings.text_color.label",
       "default": "#111111"
     },
     {
       "type": "color",
       "id": "button_background",
-      "label": "Button background",
+      "label": "t:settings.button_background.label",
       "default": "#111111"
     },
     {
       "type": "color",
       "id": "button_text_color",
-      "label": "Button text color",
+      "label": "t:settings.button_text_color.label",
       "default": "#ffffff"
     }
   ]

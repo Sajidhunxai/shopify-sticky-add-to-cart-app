@@ -8,6 +8,12 @@
   const qtyMinus = bar.querySelector("[data-satc-qty-minus]");
   const qtyPlus = bar.querySelector("[data-satc-qty-plus]");
   const displayMode = bar.dataset.displayMode || "bar";
+  const i18n = {
+    adding: bar.dataset.i18nAdding || "Adding…",
+    added: bar.dataset.i18nAdded || "Added ✓",
+    tryAgain: bar.dataset.i18nTryAgain || "Try again",
+    cartEmpty: bar.dataset.i18nCartEmpty || "Your cart is empty",
+  };
   const formSelector =
     'form[action*="/cart/add"], form[action$="/cart/add"], product-form form, [data-product-form]';
   const afterAdd = bar.dataset.afterAdd || "stay";
@@ -146,7 +152,7 @@
       if (!res.ok) throw new Error("cart fetch failed");
       const cart = await res.json();
       if (!cart.items?.length) {
-        sliderItems.innerHTML = `<p class="satc-slider__empty">Your cart is empty</p>`;
+        sliderItems.innerHTML = `<p class="satc-slider__empty">${i18n.cartEmpty}</p>`;
       } else {
         sliderItems.innerHTML = cart.items
           .map(
@@ -198,7 +204,7 @@
 
     button.disabled = true;
     const original = button.textContent;
-    button.textContent = "Adding…";
+    button.textContent = i18n.adding;
 
     try {
       const response = await fetch(addUrl(), {
@@ -235,7 +241,7 @@
         }
       }
 
-      button.textContent = "Added ✓";
+      button.textContent = i18n.added;
       setTimeout(() => {
         button.textContent = original;
         button.disabled = false;
@@ -247,7 +253,7 @@
       }, 1200);
     } catch (error) {
       console.error("[Sticky ATC]", error);
-      button.textContent = "Try again";
+      button.textContent = i18n.tryAgain;
       button.disabled = false;
       setTimeout(() => {
         button.textContent = original;

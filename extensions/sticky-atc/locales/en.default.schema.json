@@ -1,0 +1,79 @@
+{
+  "name": "Sticky Add to Cart",
+  "settings": {
+    "paragraph_admin": {
+      "content": "Prefer the app admin for content and style. These Theme Editor fields are used only until you save settings in the app."
+    },
+    "enabled": {
+      "label": "Enable sticky bar"
+    },
+    "display_mode": {
+      "label": "Display style",
+      "options": {
+        "bar": "Sticky Add to Cart Bar",
+        "slider": "Sticky Cart with Cart Slider",
+        "quickbuy": "Quick Buy Cart"
+      }
+    },
+    "pages_header": {
+      "content": "Show on pages"
+    },
+    "show_on_product": {
+      "label": "Product pages"
+    },
+    "show_on_collection": {
+      "label": "Collection pages"
+    },
+    "show_on_home": {
+      "label": "Homepage"
+    },
+    "show_on_search": {
+      "label": "Search results"
+    },
+    "show_on_other": {
+      "label": "Other pages"
+    },
+    "button_label": {
+      "label": "Button text",
+      "default": "Add to cart"
+    },
+    "show_on_desktop": {
+      "label": "Show on desktop"
+    },
+    "show_title": {
+      "label": "Show product title"
+    },
+    "show_price": {
+      "label": "Show price"
+    },
+    "show_image": {
+      "label": "Show product image"
+    },
+    "hide_near_form": {
+      "label": "Hide when main Add to cart is visible"
+    },
+    "after_add": {
+      "label": "After adding to cart",
+      "options": {
+        "stay": "Stay on page",
+        "cart": "Go to cart",
+        "drawer": "Open cart drawer (if theme supports it)"
+      }
+    },
+    "colors_header": {
+      "content": "Colors"
+    },
+    "background_color": {
+      "label": "Bar background"
+    },
+    "text_color": {
+      "label": "Text color"
+    },
+    "button_background": {
+      "label": "Button background"
+    },
+    "button_text_color": {
+      "label": "Button text color"
+    }
+  }
+}

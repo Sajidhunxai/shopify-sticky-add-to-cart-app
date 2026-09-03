@@ -1,0 +1,18 @@
+{
+  "general": {
+    "powered_by": "Desenvolvido por Sticky ATC",
+    "add_to_cart": "Adicionar ao carrinho",
+    "sold_out": "Esgotado",
+    "adding": "Adicionando…",
+    "added": "Adicionado ✓",
+    "try_again": "Tentar de novo",
+    "your_cart": "Seu carrinho",
+    "cart_empty": "Seu carrinho está vazio",
+    "subtotal": "Subtotal",
+    "checkout": "Finalizar compra",
+    "close": "Fechar",
+    "decrease_quantity": "Diminuir quantidade",
+    "increase_quantity": "Aumentar quantidade",
+    "quantity": "Quantidade"
+  }
+}

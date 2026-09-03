@@ -1,0 +1,42 @@
+{
+  "name": "Sticky Add to Cart",
+  "settings": {
+    "paragraph_admin": {
+      "content": "Prefira o admin do app para conteúdo e estilo. Estes campos do tema valem só até você salvar no app."
+    },
+    "enabled": { "label": "Ativar barra fixa" },
+    "display_mode": {
+      "label": "Estilo de exibição",
+      "options": {
+        "bar": "Barra Sticky Add to Cart",
+        "slider": "Sticky Cart com slider",
+        "quickbuy": "Compra rápida"
+      }
+    },
+    "pages_header": { "content": "Mostrar nas páginas" },
+    "show_on_product": { "label": "Páginas de produto" },
+    "show_on_collection": { "label": "Páginas de coleção" },
+    "show_on_home": { "label": "Página inicial" },
+    "show_on_search": { "label": "Resultados da busca" },
+    "show_on_other": { "label": "Outras páginas" },
+    "button_label": { "label": "Texto do botão", "default": "Adicionar ao carrinho" },
+    "show_on_desktop": { "label": "Mostrar no desktop" },
+    "show_title": { "label": "Mostrar título do produto" },
+    "show_price": { "label": "Mostrar preço" },
+    "show_image": { "label": "Mostrar imagem do produto" },
+    "hide_near_form": { "label": "Ocultar quando o ATC principal estiver visível" },
+    "after_add": {
+      "label": "Após adicionar ao carrinho",
+      "options": {
+        "stay": "Permanecer na página",
+        "cart": "Ir ao carrinho",
+        "drawer": "Abrir gaveta do carrinho (se suportado)"
+      }
+    },
+    "colors_header": { "content": "Cores" },
+    "background_color": { "label": "Fundo da barra" },
+    "text_color": { "label": "Cor do texto" },
+    "button_background": { "label": "Fundo do botão" },
+    "button_text_color": { "label": "Texto do botão" }
+  }
+}

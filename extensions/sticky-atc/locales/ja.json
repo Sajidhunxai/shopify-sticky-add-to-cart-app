@@ -1,0 +1,18 @@
+{
+  "general": {
+    "powered_by": "Sticky ATC 提供",
+    "add_to_cart": "カートに追加",
+    "sold_out": "売り切れ",
+    "adding": "追加中…",
+    "added": "追加済み ✓",
+    "try_again": "再試行",
+    "your_cart": "カート",
+    "cart_empty": "カートは空です",
+    "subtotal": "小計",
+    "checkout": "レジに進む",
+    "close": "閉じる",
+    "decrease_quantity": "数量を減らす",
+    "increase_quantity": "数量を増やす",
+    "quantity": "数量"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "Sticky Add to Cart",
+  "settings": {
+    "paragraph_admin": {
+      "content": "Nutze bevorzugt die App-Admin für Inhalt und Stil. Diese Theme-Felder gelten nur, bis du in der App speicherst."
+    },
+    "enabled": { "label": "Sticky-Leiste aktivieren" },
+    "display_mode": {
+      "label": "Anzeigestil",
+      "options": {
+        "bar": "Sticky Add-to-Cart-Leiste",
+        "slider": "Sticky Cart mit Slider",
+        "quickbuy": "Schnellkauf"
+      }
+    },
+    "pages_header": { "content": "Auf Seiten anzeigen" },
+    "show_on_product": { "label": "Produktseiten" },
+    "show_on_collection": { "label": "Kategorieseiten" },
+    "show_on_home": { "label": "Startseite" },
+    "show_on_search": { "label": "Suchergebnisse" },
+    "show_on_other": { "label": "Andere Seiten" },
+    "button_label": { "label": "Button-Text", "default": "In den Warenkorb" },
+    "show_on_desktop": { "label": "Auf Desktop anzeigen" },
+    "show_title": { "label": "Produkttitel anzeigen" },
+    "show_price": { "label": "Preis anzeigen" },
+    "show_image": { "label": "Produktbild anzeigen" },
+    "hide_near_form": { "label": "Ausblenden, wenn Haupt-ATC sichtbar ist" },
+    "after_add": {
+      "label": "Nach dem Hinzufügen",
+      "options": {
+        "stay": "Auf der Seite bleiben",
+        "cart": "Zum Warenkorb",
+        "drawer": "Warenkorb-Drawer öffnen (falls unterstützt)"
+      }
+    },
+    "colors_header": { "content": "Farben" },
+    "background_color": { "label": "Leisten-Hintergrund" },
+    "text_color": { "label": "Textfarbe" },
+    "button_background": { "label": "Button-Hintergrund" },
+    "button_text_color": { "label": "Button-Textfarbe" }
+  }
+}
