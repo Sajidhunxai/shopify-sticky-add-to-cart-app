@@ -1054,6 +1054,11 @@ export default function Index() {
                 <s-list-item>Enable the App embed once in Theme Editor</s-list-item>
                 <s-list-item>Style here, then Save settings</s-list-item>
                 <s-list-item>Test on a real product page after sync</s-list-item>
+                <s-list-item>
+                  To replace the theme cart drawer: set Display style → Cart
+                  drawer, then in the theme set Cart type → Page. Full steps are
+                  under Setup help.
+                </s-list-item>
               </s-unordered-list>
             </s-stack>
           )}

@@ -180,6 +180,48 @@
     el.addEventListener("click", closeSlider);
   });
 
+  /* Open Sticky ATC drawer when shoppers click the theme cart icon (slider mode). */
+  if (displayMode === "slider" && slider) {
+    const cartIconSelector = [
+      "#cart-icon-bubble",
+      "a#cart-icon-bubble",
+      ".header__icon--cart",
+      "a.header__icon--cart",
+      "[data-cart-icon]",
+      "cart-icon-bubble",
+      'a[href="/cart"]',
+      'a[href$="/cart"]',
+      'a[href*="/cart?"]',
+    ].join(", ");
+
+    const isCartIconClick = (target) => {
+      if (!(target instanceof Element)) return false;
+      const link = target.closest(cartIconSelector);
+      if (!link) return false;
+      // Don't hijack cart page / checkout / line-item links inside drawers
+      if (link.closest("[data-satc-slider], cart-drawer, .drawer, #CartDrawer")) {
+        return false;
+      }
+      const href = (link.getAttribute("href") || "").split("?")[0];
+      if (href && !/\/cart\/?$/.test(href) && link.id !== "cart-icon-bubble") {
+        return false;
+      }
+      return true;
+    };
+
+    document.addEventListener(
+      "click",
+      (event) => {
+        if (!isCartIconClick(event.target)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        openSlider();
+      },
+      true,
+    );
+  }
+
   const getQuantity = () => {
     const n = Number(qtyInput?.value || 1);
     return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1;
