@@ -274,38 +274,50 @@
       </div>
     {% endif %}
   </div>
+{% endif %}
 
-  {% if satc_display_mode == 'slider' %}
-    <div class="satc-slider" data-satc-slider hidden>
-      <div class="satc-slider__backdrop" data-satc-slider-close></div>
-      <aside
-        class="satc-slider__panel"
-        role="dialog"
-        aria-label="{{ satc_drawer_title | escape }}"
-        style="--satc-bg: {{ satc_bg }}; --satc-text: {{ satc_text }}; --satc-btn-bg: {{ satc_btn_bg }}; --satc-btn-text: {{ satc_btn_text }}; --satc-accent: {{ satc_accent }};"
-      >
-        <div class="satc-slider__accent" aria-hidden="true"></div>
-        <header class="satc-slider__header">
-          <h2 class="satc-slider__title">{{ satc_drawer_title }}</h2>
-          <button type="button" class="satc-slider__close" data-satc-slider-close aria-label="{{ 'general.close' | t | escape }}">
-            ×
-          </button>
-        </header>
-        <div class="satc-slider__body" data-satc-slider-items>
-          <p class="satc-slider__empty">{{ 'general.cart_empty' | t }}</p>
+{% comment %}
+  Cart drawer must render on every page (not only product pages) so the header
+  cart icon can open Sticky ATC instead of navigating to /cart.
+{% endcomment %}
+{% if satc_enabled and satc_display_mode == 'slider' %}
+  <div
+    class="satc-slider"
+    data-satc-slider
+    data-satc-boot
+    data-display-mode="slider"
+    data-after-add="{{ satc_after_add }}"
+    data-i18n-cart-empty="{{ 'general.cart_empty' | t | escape }}"
+    hidden
+  >
+    <div class="satc-slider__backdrop" data-satc-slider-close></div>
+    <aside
+      class="satc-slider__panel"
+      role="dialog"
+      aria-label="{{ satc_drawer_title | escape }}"
+      style="--satc-bg: {{ satc_bg }}; --satc-text: {{ satc_text }}; --satc-btn-bg: {{ satc_btn_bg }}; --satc-btn-text: {{ satc_btn_text }}; --satc-accent: {{ satc_accent }};"
+    >
+      <div class="satc-slider__accent" aria-hidden="true"></div>
+      <header class="satc-slider__header">
+        <h2 class="satc-slider__title">{{ satc_drawer_title }}</h2>
+        <button type="button" class="satc-slider__close" data-satc-slider-close aria-label="{{ 'general.close' | t | escape }}">
+          ×
+        </button>
+      </header>
+      <div class="satc-slider__body" data-satc-slider-items>
+        <p class="satc-slider__empty">{{ 'general.cart_empty' | t }}</p>
+      </div>
+      <footer class="satc-slider__footer">
+        <div class="satc-slider__total">
+          <span>{{ 'general.subtotal' | t }}</span>
+          <strong data-satc-slider-total>—</strong>
         </div>
-        <footer class="satc-slider__footer">
-          <div class="satc-slider__total">
-            <span>{{ 'general.subtotal' | t }}</span>
-            <strong data-satc-slider-total>—</strong>
-          </div>
-          <a class="satc-slider__checkout" href="{{ routes.cart_url }}" data-satc-slider-checkout>
-            {{ satc_drawer_checkout }}
-          </a>
-        </footer>
-      </aside>
-    </div>
-  {% endif %}
+        <a class="satc-slider__checkout" href="{{ routes.cart_url }}" data-satc-slider-checkout>
+          {{ satc_drawer_checkout }}
+        </a>
+      </footer>
+    </aside>
+  </div>
 {% endif %}
 
 {% schema %}

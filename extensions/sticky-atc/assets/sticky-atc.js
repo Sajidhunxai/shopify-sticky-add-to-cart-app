@@ -1,24 +1,30 @@
 (() => {
   const bar = document.querySelector("[data-satc-bar]");
-  if (!bar) return;
+  const slider = document.querySelector("[data-satc-slider]");
+  const boot = bar || slider;
+  if (!boot) return;
 
-  const button = bar.querySelector("[data-satc-button]");
-  const priceEl = bar.querySelector("[data-satc-price]");
-  const qtyInput = bar.querySelector("[data-satc-qty-input]");
-  const qtyMinus = bar.querySelector("[data-satc-qty-minus]");
-  const qtyPlus = bar.querySelector("[data-satc-qty-plus]");
-  const displayMode = bar.dataset.displayMode || "bar";
+  const button = bar?.querySelector("[data-satc-button]");
+  const priceEl = bar?.querySelector("[data-satc-price]");
+  const qtyInput = bar?.querySelector("[data-satc-qty-input]");
+  const qtyMinus = bar?.querySelector("[data-satc-qty-minus]");
+  const qtyPlus = bar?.querySelector("[data-satc-qty-plus]");
+  const displayMode =
+    bar?.dataset.displayMode || slider?.dataset.displayMode || "bar";
   const i18n = {
-    adding: bar.dataset.i18nAdding || "Adding…",
-    added: bar.dataset.i18nAdded || "Added ✓",
-    tryAgain: bar.dataset.i18nTryAgain || "Try again",
-    cartEmpty: bar.dataset.i18nCartEmpty || "Your cart is empty",
+    adding: bar?.dataset.i18nAdding || "Adding…",
+    added: bar?.dataset.i18nAdded || "Added ✓",
+    tryAgain: bar?.dataset.i18nTryAgain || "Try again",
+    cartEmpty:
+      bar?.dataset.i18nCartEmpty ||
+      slider?.dataset.i18nCartEmpty ||
+      "Your cart is empty",
   };
   const formSelector =
     'form[action*="/cart/add"], form[action$="/cart/add"], product-form form, [data-product-form]';
-  const afterAdd = bar.dataset.afterAdd || "stay";
-  const hideNearForm = bar.dataset.hideNearForm === "true";
-  const productId = bar.dataset.productId;
+  const afterAdd = bar?.dataset.afterAdd || slider?.dataset.afterAdd || "stay";
+  const hideNearForm = bar?.dataset.hideNearForm === "true";
+  const productId = bar?.dataset.productId;
   const isDesktop = () => window.matchMedia("(min-width: 750px)").matches;
   const root =
     window.Shopify?.routes?.root ||
@@ -49,7 +55,7 @@
     );
     if (hidden && hidden.value) return hidden.value;
 
-    return bar.dataset.variantId || "";
+    return bar?.dataset.variantId || "";
   };
 
   const syncPriceFromForm = () => {
@@ -64,58 +70,69 @@
   };
 
   const setVisible = (visible) => {
+    if (!bar) return;
     bar.classList.toggle("is-visible", visible);
   };
 
   const setHiddenNearForm = (hidden) => {
-    // On desktop, only hide when most of the form is still on screen.
+    if (!bar) return;
     bar.classList.toggle("is-hidden-near-form", hidden);
   };
 
   const scrollThreshold = () => {
+    if (!bar) return 0;
     const mobile = Number(bar.dataset.showAfterScroll || 80);
     const desktop = Number(bar.dataset.showAfterScrollDesktop ?? 0);
     return isDesktop() ? desktop : mobile;
   };
 
-  const updateVisibilityFromScroll = () => {
-    setVisible(window.scrollY >= scrollThreshold());
-  };
+  if (bar) {
+    const updateVisibilityFromScroll = () => {
+      setVisible(window.scrollY >= scrollThreshold());
+    };
 
-  window.addEventListener("scroll", updateVisibilityFromScroll, { passive: true });
-  window.addEventListener("resize", updateVisibilityFromScroll, { passive: true });
-  updateVisibilityFromScroll();
+    window.addEventListener("scroll", updateVisibilityFromScroll, {
+      passive: true,
+    });
+    window.addEventListener("resize", updateVisibilityFromScroll, {
+      passive: true,
+    });
+    updateVisibilityFromScroll();
 
-  if (hideNearForm) {
-    const form = document.querySelector(formSelector);
-    if (form && "IntersectionObserver" in window) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          const entry = entries[0];
-          // Desktop: require more of the form in view before hiding the bar,
-          // so the sticky CTA appears earlier while scrolling.
-          const ratio = entry?.intersectionRatio || 0;
-          const hideAt = isDesktop() ? 0.55 : 0.35;
-          setHiddenNearForm(Boolean(entry?.isIntersecting && ratio >= hideAt));
-        },
-        { threshold: [0, 0.25, 0.35, 0.55, 0.75, 1], rootMargin: "0px 0px -10% 0px" },
-      );
-      observer.observe(form);
+    if (hideNearForm) {
+      const form = document.querySelector(formSelector);
+      if (form && "IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            const entry = entries[0];
+            const ratio = entry?.intersectionRatio || 0;
+            const hideAt = isDesktop() ? 0.55 : 0.35;
+            setHiddenNearForm(
+              Boolean(entry?.isIntersecting && ratio >= hideAt),
+            );
+          },
+          {
+            threshold: [0, 0.25, 0.35, 0.55, 0.75, 1],
+            rootMargin: "0px 0px -10% 0px",
+          },
+        );
+        observer.observe(form);
+      }
     }
+
+    document.addEventListener("change", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(formSelector)) {
+        syncPriceFromForm();
+      }
+    });
   }
 
-  document.addEventListener("change", (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) return;
-    if (target.closest(formSelector)) {
-      syncPriceFromForm();
-    }
-  });
-
   /* —— Quick Buy expand/collapse —— */
-  const quickToggle = bar.querySelector("[data-satc-quick-toggle]");
-  const quickPanel = bar.querySelector("[data-satc-quick-panel]");
-  if (displayMode === "quickbuy" && quickToggle && quickPanel) {
+  const quickToggle = bar?.querySelector("[data-satc-quick-toggle]");
+  const quickPanel = bar?.querySelector("[data-satc-quick-panel]");
+  if (displayMode === "quickbuy" && quickToggle && quickPanel && bar) {
     quickToggle.addEventListener("click", () => {
       const open = !bar.classList.contains("is-expanded");
       bar.classList.toggle("is-expanded", open);
@@ -126,29 +143,15 @@
   }
 
   /* —— Cart slider —— */
-  const slider = document.querySelector("[data-satc-slider]");
   const sliderItems = slider?.querySelector("[data-satc-slider-items]");
   const sliderTotal = slider?.querySelector("[data-satc-slider-total]");
-
-  const openSlider = async () => {
-    if (!slider) return;
-    slider.hidden = false;
-    requestAnimationFrame(() => slider.classList.add("is-open"));
-    await refreshSlider();
-  };
-
-  const closeSlider = () => {
-    if (!slider) return;
-    slider.classList.remove("is-open");
-    setTimeout(() => {
-      slider.hidden = true;
-    }, 280);
-  };
 
   const refreshSlider = async () => {
     if (!sliderItems) return;
     try {
-      const res = await fetch(cartUrl(), { headers: { Accept: "application/json" } });
+      const res = await fetch(cartUrl(), {
+        headers: { Accept: "application/json" },
+      });
       if (!res.ok) throw new Error("cart fetch failed");
       const cart = await res.json();
       if (!cart.items?.length) {
@@ -176,17 +179,33 @@
     }
   };
 
+  const openSlider = async () => {
+    if (!slider) return;
+    slider.hidden = false;
+    requestAnimationFrame(() => slider.classList.add("is-open"));
+    await refreshSlider();
+  };
+
+  const closeSlider = () => {
+    if (!slider) return;
+    slider.classList.remove("is-open");
+    setTimeout(() => {
+      slider.hidden = true;
+    }, 280);
+  };
+
   slider?.querySelectorAll("[data-satc-slider-close]").forEach((el) => {
     el.addEventListener("click", closeSlider);
   });
 
-  /* Open Sticky ATC drawer when shoppers click the theme cart icon (slider mode). */
+  /* Open Sticky ATC drawer from theme cart icon (all pages). */
   if (displayMode === "slider" && slider) {
     const cartIconSelector = [
       "#cart-icon-bubble",
       "a#cart-icon-bubble",
       ".header__icon--cart",
       "a.header__icon--cart",
+      ".header__icon--cart a",
       "[data-cart-icon]",
       "cart-icon-bubble",
       'a[href="/cart"]',
@@ -198,12 +217,22 @@
       if (!(target instanceof Element)) return false;
       const link = target.closest(cartIconSelector);
       if (!link) return false;
-      // Don't hijack cart page / checkout / line-item links inside drawers
-      if (link.closest("[data-satc-slider], cart-drawer, .drawer, #CartDrawer")) {
+      if (
+        link.closest(
+          "[data-satc-slider], cart-drawer, .drawer, #CartDrawer, .satc-slider__panel",
+        )
+      ) {
         return false;
       }
+      // Ignore "Checkout" / cart form buttons on /cart page
+      if (link.closest('form[action*="/cart"]')) return false;
       const href = (link.getAttribute("href") || "").split("?")[0];
-      if (href && !/\/cart\/?$/.test(href) && link.id !== "cart-icon-bubble") {
+      if (
+        href &&
+        !/\/cart\/?$/.test(href) &&
+        link.id !== "cart-icon-bubble" &&
+        !link.classList.contains("header__icon--cart")
+      ) {
         return false;
       }
       return true;
@@ -222,6 +251,8 @@
     );
   }
 
+  if (!bar || !button) return;
+
   const getQuantity = () => {
     const n = Number(qtyInput?.value || 1);
     return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1;
@@ -237,7 +268,7 @@
     qtyInput.value = String(getQuantity() + 1);
   });
 
-  button?.addEventListener("click", async () => {
+  button.addEventListener("click", async () => {
     const variantId = getVariantId();
     if (!variantId) {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -268,19 +299,18 @@
         }),
       );
 
-      if (displayMode === "slider") {
-        await openSlider();
+      if (displayMode === "slider" || afterAdd === "drawer") {
+        if (slider) {
+          await openSlider();
+        } else if (afterAdd === "drawer") {
+          document.dispatchEvent(new CustomEvent("theme:cart:open"));
+          document.documentElement.dispatchEvent(
+            new CustomEvent("cart:refresh", { bubbles: true }),
+          );
+        }
       } else if (afterAdd === "cart") {
         window.location.href = `${root}cart`;
         return;
-      } else if (afterAdd === "drawer") {
-        document.dispatchEvent(new CustomEvent("theme:cart:open"));
-        document.documentElement.dispatchEvent(
-          new CustomEvent("cart:refresh", { bubbles: true }),
-        );
-        if (displayMode === "bar") {
-          // also try opening our slider if theme drawer isn't present
-        }
       }
 
       button.textContent = i18n.added;

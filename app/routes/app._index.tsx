@@ -824,8 +824,10 @@ export default function Index() {
                 }
               />
               <s-paragraph>
-                Tip: set Display style to <strong>Cart drawer</strong> to preview
-                the slide-out cart on the right.
+                Tip: set <strong>Display style → Cart drawer</strong> (required).
+                “Open cart drawer” then opens Sticky ATC’s drawer. Also set the
+                theme Cart type to <strong>Page</strong> so the header bag does
+                not jump to /cart.
               </s-paragraph>
             </s-stack>
           )}
