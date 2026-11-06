@@ -1,0 +1,132 @@
+{% comment %}
+  satc-bar — sticky / quick-buy bar markup.
+  Rendered by satc-config. Params: block, hide_branding, satc_* resolved config.
+{% endcomment %}
+{% if satc_enabled and satc_page_ok and product != blank %}
+  {% assign product_image = product.featured_image | default: product.images.first %}
+
+  <div
+    id="satc-bar-{{ block.id }}"
+    class="satc-bar satc-bar--{{ satc_display_mode }} satc-bar--layout-{{ satc_layout }} satc-bar--bg-{{ satc_bg_style }} satc-bar--pos-{{ satc_bar_position }} satc-bar--btn-{{ satc_button_size }} satc-bar--img-{{ satc_image_shape }}{% unless satc_show_shadow %} satc-bar--no-shadow{% endunless %}"
+    data-satc-bar
+    data-display-mode="{{ satc_display_mode }}"
+    data-product-id="{{ product.id }}"
+    data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+    data-after-add="{{ satc_after_add }}"
+    data-hide-near-form="{{ satc_hide_near_form }}"
+    data-desktop="{{ satc_show_desktop }}"
+    data-mobile="{{ satc_show_mobile }}"
+    data-show-after-scroll="{{ satc_scroll }}"
+    data-show-after-scroll-desktop="{{ satc_scroll_desktop }}"
+    data-i18n-adding="{{ 'general.adding' | t | escape }}"
+    data-i18n-added="{{ 'general.added' | t | escape }}"
+    data-i18n-try-again="{{ 'general.try_again' | t | escape }}"
+    data-i18n-cart-empty="{{ 'general.cart_empty' | t | escape }}"
+    style="
+      --satc-bg: {{ satc_bg }};
+      --satc-text: {{ satc_text }};
+      --satc-border-width: {{ satc_border_width }}px;
+      --satc-border-color: {{ satc_border_color }};
+      --satc-bar-radius: {{ satc_bar_radius }}px;
+      --satc-pad-y: {{ satc_pad_y }}px;
+      --satc-pad-x: {{ satc_pad_x }}px;
+      --satc-image-size: {{ satc_image_size }}px;
+      --satc-image-radius: {{ satc_image_radius }}px;
+      --satc-title-size: {{ satc_bar_title_size }}px;
+      --satc-price-size: {{ satc_price_size }}px;
+      --satc-btn-radius: {{ satc_btn_radius }}px;
+      --satc-btn-size: {{ satc_btn_size }}px;
+      --satc-desk-max: {{ satc_desk_max }}px;
+      --satc-desk-bottom: {{ satc_desk_bottom }}px;
+      --satc-edge: {{ satc_desk_bottom }}px;
+      --satc-btn-bg: {{ satc_btn_bg }};
+      --satc-btn-text: {{ satc_btn_text }};
+      --satc-gap: {{ satc_gap }}px;
+      --satc-bg-opacity: {{ satc_bg_opacity | divided_by: 100.0 }};
+      color: var(--satc-text);
+    "
+    {{ block.shopify_attributes }}
+  >
+    {% unless hide_branding == true or hide_branding == 'true' %}
+      <span class="satc-bar__branding" style="color: var(--satc-text);">
+        {{ 'general.powered_by' | t }}
+      </span>
+    {% endunless %}
+
+    {% if satc_display_mode == 'quickbuy' %}
+      <button
+        type="button"
+        class="satc-bar__quick-toggle"
+        data-satc-quick-toggle
+        aria-expanded="false"
+        aria-label="{{ satc_button_label | escape }}"
+        style="background: {{ satc_btn_bg }}; color: {{ satc_btn_text }};"
+      >
+        {{ satc_button_label }}
+      </button>
+      <div class="satc-bar__quick-panel" data-satc-quick-panel hidden>
+    {% endif %}
+
+    {% if satc_show_image == true or satc_show_image == 'true' %}
+      {% if product_image %}
+      <img
+        class="satc-bar__media"
+        src="{{ product_image | image_url: width: 240 }}"
+        alt="{{ product.title | escape }}"
+        width="{{ satc_image_size }}"
+        height="{{ satc_image_size }}"
+        loading="lazy"
+      >
+      {% endif %}
+    {% endif %}
+
+    {% if satc_show_title == true or satc_show_title == 'true' or satc_show_price == true or satc_show_price == 'true' %}
+    <div class="satc-bar__info">
+      {% if satc_show_title == true or satc_show_title == 'true' %}
+        <p class="satc-bar__title" style="color: {{ satc_text }};">{{ product.title }}</p>
+      {% endif %}
+      {% if satc_show_price == true or satc_show_price == 'true' %}
+        <p class="satc-bar__price" data-satc-price style="color: {{ satc_text }};">
+          {{ product.selected_or_first_available_variant.price | money }}
+        </p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if satc_show_qty == true or satc_show_qty == 'true' %}
+      <div class="satc-bar__qty" data-satc-qty>
+        <button type="button" class="satc-bar__qty-btn" data-satc-qty-minus aria-label="{{ 'general.decrease_quantity' | t | escape }}">−</button>
+        <input
+          class="satc-bar__qty-input"
+          data-satc-qty-input
+          type="number"
+          min="1"
+          value="1"
+          aria-label="{{ 'general.quantity' | t | escape }}"
+        >
+        <button type="button" class="satc-bar__qty-btn" data-satc-qty-plus aria-label="{{ 'general.increase_quantity' | t | escape }}">+</button>
+      </div>
+    {% endif %}
+
+    <button
+      type="button"
+      class="satc-bar__button"
+      data-satc-button
+      style="
+        background: {{ satc_btn_bg }};
+        color: {{ satc_btn_text }};
+      "
+      {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
+    >
+      {% if product.selected_or_first_available_variant.available %}
+        {{ satc_button_label }}
+      {% else %}
+        {{ satc_sold_out }}
+      {% endif %}
+    </button>
+
+    {% if satc_display_mode == 'quickbuy' %}
+      </div>
+    {% endif %}
+  </div>
+{% endif %}

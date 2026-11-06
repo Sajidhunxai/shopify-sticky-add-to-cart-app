@@ -105,6 +105,14 @@ export type BarConfig = {
   cartLineQtyEnabled: boolean;
   /** Show remove (×) on drawer cart lines */
   cartLineRemoveEnabled: boolean;
+  /** Cart drawer page/device visibility (independent of sticky bar flags) */
+  drawerShowOnProduct: boolean;
+  drawerShowOnCollection: boolean;
+  drawerShowOnHome: boolean;
+  drawerShowOnSearch: boolean;
+  drawerShowOnOther: boolean;
+  drawerShowDesktop: boolean;
+  drawerShowMobile: boolean;
   announcementEnabled: boolean;
   announcementText: string;
   announcementBg: string;
@@ -115,10 +123,16 @@ export type BarConfig = {
   /** MM:SS countdown, e.g. 15:00 */
   announcementTimer: string;
   announcementFontSize: number;
-  /** @deprecated migrated into rewardTiers */
+  /**
+   * @deprecated Migrated into rewardTiers / rewardEnabled.
+   * Keep until Liquid/JS stop reading data-ship-*; then delete in one cleanup PR.
+   */
   freeShippingEnabled: boolean;
+  /** @deprecated see freeShippingEnabled */
   freeShippingThreshold: number;
+  /** @deprecated see freeShippingEnabled */
   freeShippingText: string;
+  /** @deprecated see freeShippingEnabled */
   freeShippingReachedText: string;
   rewardEnabled: boolean;
   rewardShowOnEmpty: boolean;
@@ -210,6 +224,13 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   drawerBackdropOpacity: 45,
   cartLineQtyEnabled: true,
   cartLineRemoveEnabled: true,
+  drawerShowOnProduct: true,
+  drawerShowOnCollection: true,
+  drawerShowOnHome: true,
+  drawerShowOnSearch: true,
+  drawerShowOnOther: true,
+  drawerShowDesktop: true,
+  drawerShowMobile: true,
   announcementEnabled: false,
   announcementText: "Your products are reserved for {timer}!",
   announcementBg: "#d8009f",
@@ -404,21 +425,44 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
   const afterAdd: AfterAddBehavior =
     afterAddRaw === "cart" || afterAddRaw === "drawer" ? afterAddRaw : "stay";
 
+  // Bool fallbacks match DEFAULT_BAR_CONFIG so a partial FormData cannot
+  // silently flip features off when a key is omitted.
   return {
-    enabled: asBool(formData.get("enabled"), false),
+    enabled: asBool(formData.get("enabled"), DEFAULT_BAR_CONFIG.enabled),
     displayMode: asDisplayMode(formData.get("displayMode")),
-    showImage: asBool(formData.get("showImage"), false),
-    showTitle: asBool(formData.get("showTitle"), false),
-    showPrice: asBool(formData.get("showPrice"), false),
-    showQuantity: asBool(formData.get("showQuantity"), false),
-    showMobile: asBool(formData.get("showMobile"), false),
-    showDesktop: asBool(formData.get("showDesktop"), false),
-    showOnProduct: asBool(formData.get("showOnProduct"), false),
-    showOnCollection: asBool(formData.get("showOnCollection"), false),
-    showOnHome: asBool(formData.get("showOnHome"), false),
-    showOnSearch: asBool(formData.get("showOnSearch"), false),
-    showOnOther: asBool(formData.get("showOnOther"), false),
-    hideNearForm: asBool(formData.get("hideNearForm"), false),
+    showImage: asBool(formData.get("showImage"), DEFAULT_BAR_CONFIG.showImage),
+    showTitle: asBool(formData.get("showTitle"), DEFAULT_BAR_CONFIG.showTitle),
+    showPrice: asBool(formData.get("showPrice"), DEFAULT_BAR_CONFIG.showPrice),
+    showQuantity: asBool(
+      formData.get("showQuantity"),
+      DEFAULT_BAR_CONFIG.showQuantity,
+    ),
+    showMobile: asBool(formData.get("showMobile"), DEFAULT_BAR_CONFIG.showMobile),
+    showDesktop: asBool(
+      formData.get("showDesktop"),
+      DEFAULT_BAR_CONFIG.showDesktop,
+    ),
+    showOnProduct: asBool(
+      formData.get("showOnProduct"),
+      DEFAULT_BAR_CONFIG.showOnProduct,
+    ),
+    showOnCollection: asBool(
+      formData.get("showOnCollection"),
+      DEFAULT_BAR_CONFIG.showOnCollection,
+    ),
+    showOnHome: asBool(formData.get("showOnHome"), DEFAULT_BAR_CONFIG.showOnHome),
+    showOnSearch: asBool(
+      formData.get("showOnSearch"),
+      DEFAULT_BAR_CONFIG.showOnSearch,
+    ),
+    showOnOther: asBool(
+      formData.get("showOnOther"),
+      DEFAULT_BAR_CONFIG.showOnOther,
+    ),
+    hideNearForm: asBool(
+      formData.get("hideNearForm"),
+      DEFAULT_BAR_CONFIG.hideNearForm,
+    ),
     buttonText: asString(formData.get("buttonText"), DEFAULT_BAR_CONFIG.buttonText),
     soldOutText: asString(formData.get("soldOutText"), DEFAULT_BAR_CONFIG.soldOutText),
     afterAdd,
@@ -432,7 +476,7 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
     buttonSize: asButtonSize(formData.get("buttonSize")),
     barPosition: asBarPosition(formData.get("barPosition")),
     contentGap: asNumber(formData.get("contentGap"), DEFAULT_BAR_CONFIG.contentGap),
-    showShadow: asBool(formData.get("showShadow"), false),
+    showShadow: asBool(formData.get("showShadow"), DEFAULT_BAR_CONFIG.showShadow),
     borderWidth: asNumber(formData.get("borderWidth"), DEFAULT_BAR_CONFIG.borderWidth),
     borderColor: asString(formData.get("borderColor"), DEFAULT_BAR_CONFIG.borderColor),
     barRadius: asNumber(formData.get("barRadius"), DEFAULT_BAR_CONFIG.barRadius),
@@ -525,7 +569,10 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       if (b === "none" || b === "thin" || b === "normal" || b === "thick") return b;
       return "none";
     })(),
-    drawerBackdropBlur: asBool(formData.get("drawerBackdropBlur"), true),
+    drawerBackdropBlur: asBool(
+      formData.get("drawerBackdropBlur"),
+      DEFAULT_BAR_CONFIG.drawerBackdropBlur,
+    ),
     drawerBackdropOpacity: Math.min(
       100,
       Math.max(
@@ -536,9 +583,46 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
         ),
       ),
     ),
-    cartLineQtyEnabled: asBool(formData.get("cartLineQtyEnabled"), true),
-    cartLineRemoveEnabled: asBool(formData.get("cartLineRemoveEnabled"), true),
-    announcementEnabled: asBool(formData.get("announcementEnabled"), false),
+    cartLineQtyEnabled: asBool(
+      formData.get("cartLineQtyEnabled"),
+      DEFAULT_BAR_CONFIG.cartLineQtyEnabled,
+    ),
+    cartLineRemoveEnabled: asBool(
+      formData.get("cartLineRemoveEnabled"),
+      DEFAULT_BAR_CONFIG.cartLineRemoveEnabled,
+    ),
+    drawerShowOnProduct: asBool(
+      formData.get("drawerShowOnProduct"),
+      DEFAULT_BAR_CONFIG.drawerShowOnProduct,
+    ),
+    drawerShowOnCollection: asBool(
+      formData.get("drawerShowOnCollection"),
+      DEFAULT_BAR_CONFIG.drawerShowOnCollection,
+    ),
+    drawerShowOnHome: asBool(
+      formData.get("drawerShowOnHome"),
+      DEFAULT_BAR_CONFIG.drawerShowOnHome,
+    ),
+    drawerShowOnSearch: asBool(
+      formData.get("drawerShowOnSearch"),
+      DEFAULT_BAR_CONFIG.drawerShowOnSearch,
+    ),
+    drawerShowOnOther: asBool(
+      formData.get("drawerShowOnOther"),
+      DEFAULT_BAR_CONFIG.drawerShowOnOther,
+    ),
+    drawerShowDesktop: asBool(
+      formData.get("drawerShowDesktop"),
+      DEFAULT_BAR_CONFIG.drawerShowDesktop,
+    ),
+    drawerShowMobile: asBool(
+      formData.get("drawerShowMobile"),
+      DEFAULT_BAR_CONFIG.drawerShowMobile,
+    ),
+    announcementEnabled: asBool(
+      formData.get("announcementEnabled"),
+      DEFAULT_BAR_CONFIG.announcementEnabled,
+    ),
     announcementText: asString(
       formData.get("announcementText"),
       DEFAULT_BAR_CONFIG.announcementText,
@@ -572,7 +656,10 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       formData.get("announcementFontSize"),
       DEFAULT_BAR_CONFIG.announcementFontSize,
     ),
-    freeShippingEnabled: asBool(formData.get("freeShippingEnabled"), false),
+    freeShippingEnabled: asBool(
+      formData.get("freeShippingEnabled"),
+      DEFAULT_BAR_CONFIG.freeShippingEnabled,
+    ),
     freeShippingThreshold: asNumber(
       formData.get("freeShippingThreshold"),
       DEFAULT_BAR_CONFIG.freeShippingThreshold,
@@ -585,8 +672,14 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       formData.get("freeShippingReachedText"),
       DEFAULT_BAR_CONFIG.freeShippingReachedText,
     ),
-    rewardEnabled: asBool(formData.get("rewardEnabled"), false),
-    rewardShowOnEmpty: asBool(formData.get("rewardShowOnEmpty"), false),
+    rewardEnabled: asBool(
+      formData.get("rewardEnabled"),
+      DEFAULT_BAR_CONFIG.rewardEnabled,
+    ),
+    rewardShowOnEmpty: asBool(
+      formData.get("rewardShowOnEmpty"),
+      DEFAULT_BAR_CONFIG.rewardShowOnEmpty,
+    ),
     rewardBg: asString(formData.get("rewardBg"), DEFAULT_BAR_CONFIG.rewardBg),
     rewardFg: asString(formData.get("rewardFg"), DEFAULT_BAR_CONFIG.rewardFg),
     rewardIconColor: asString(
@@ -612,7 +705,7 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
     })(),
     recommendationsEnabled: asBool(
       formData.get("recommendationsEnabled"),
-      false,
+      DEFAULT_BAR_CONFIG.recommendationsEnabled,
     ),
     recommendationsEmptyText: asString(
       formData.get("recommendationsEmptyText"),
@@ -638,7 +731,7 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
     ),
     recommendationsShopNowEnabled: asBool(
       formData.get("recommendationsShopNowEnabled"),
-      false,
+      DEFAULT_BAR_CONFIG.recommendationsShopNowEnabled,
     ),
     recommendationsShopNowText: asString(
       formData.get("recommendationsShopNowText"),
@@ -654,7 +747,10 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
     )
       .replace(/^\/+|\/+$/g, "")
       .replace(/^collections\//i, "") || "all",
-    discountEnabled: asBool(formData.get("discountEnabled"), false),
+    discountEnabled: asBool(
+      formData.get("discountEnabled"),
+      DEFAULT_BAR_CONFIG.discountEnabled,
+    ),
     discountPlaceholder: asString(
       formData.get("discountPlaceholder"),
       DEFAULT_BAR_CONFIG.discountPlaceholder,
@@ -663,10 +759,32 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       formData.get("discountButtonText"),
       DEFAULT_BAR_CONFIG.discountButtonText,
     ),
-    trustBadgesEnabled: asBool(formData.get("trustBadgesEnabled"), false),
+    trustBadgesEnabled: asBool(
+      formData.get("trustBadgesEnabled"),
+      DEFAULT_BAR_CONFIG.trustBadgesEnabled,
+    ),
     trustBadgesText: asString(
       formData.get("trustBadgesText"),
       DEFAULT_BAR_CONFIG.trustBadgesText,
     ),
   };
+}
+
+/** Lightweight structural check before DB/metafield write (Zod can replace later). */
+export function validateBarConfig(config: BarConfig): string[] {
+  const errors: string[] = [];
+  if (!config.buttonText?.trim()) errors.push("buttonText is required");
+  if (!Array.isArray(config.rewardTiers) || config.rewardTiers.length === 0) {
+    errors.push("rewardTiers must be a non-empty array");
+  }
+  if (config.recommendationsMax < 1 || config.recommendationsMax > 8) {
+    errors.push("recommendationsMax must be 1–8");
+  }
+  if (
+    config.drawerBackdropOpacity < 0 ||
+    config.drawerBackdropOpacity > 100
+  ) {
+    errors.push("drawerBackdropOpacity must be 0–100");
+  }
+  return errors;
 }

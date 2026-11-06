@@ -1,0 +1,181 @@
+{% comment %}
+  satc-slider — cart drawer markup, reward tiers JSON seed, recommendation seed.
+  Rendered by satc-config. Loads drawer-only assets (sticky-atc-drawer.js/.css)
+  only when the drawer is actually rendered.
+{% endcomment %}
+{% comment %}
+  Cart drawer must render on every page (not only product pages) so the header
+  cart icon can open Sticky ATC instead of navigating to /cart.
+{% endcomment %}
+{% if satc_enabled and satc_display_mode == 'slider' and satc_drawer_page_ok %}
+  {% assign satc_rec_products = nil %}
+  {% if satc_rec_on == true or satc_rec_on == 'true' %}
+    {% assign satc_rec_col = collections[satc_rec_collection] %}
+    {% if satc_rec_col == blank %}
+      {% assign satc_rec_col = collections.all %}
+    {% endif %}
+    {% if satc_rec_col != blank %}
+      {% assign satc_rec_products = satc_rec_col.products %}
+    {% endif %}
+  {% endif %}
+
+  <div
+    class="satc-slider"
+    data-satc-slider
+    data-satc-boot
+    data-display-mode="slider"
+    data-drawer-desktop="{% if satc_drawer_desktop == true or satc_drawer_desktop == 'true' %}true{% else %}false{% endif %}"
+    data-drawer-mobile="{% if satc_drawer_mobile == true or satc_drawer_mobile == 'true' %}true{% else %}false{% endif %}"
+    data-after-add="{{ satc_after_add }}"
+    data-i18n-cart-empty="{{ 'general.cart_empty' | t | escape }}"
+    data-i18n-adding="{{ 'general.adding' | t | escape }}"
+    data-i18n-added="{{ 'general.added' | t | escape }}"
+    data-i18n-try-again="{{ 'general.try_again' | t | escape }}"
+    data-drawer-title="{{ satc_drawer_title | escape }}"
+    data-ship-enabled="{% if satc_ship_on == true or satc_ship_on == 'true' %}true{% else %}false{% endif %}"
+    data-ship-threshold="{{ satc_ship_threshold }}"
+    data-ship-text="{{ satc_ship_text | escape }}"
+    data-ship-done="{{ satc_ship_done | escape }}"
+    data-reward-enabled="{% if satc_reward_on == true or satc_reward_on == 'true' %}true{% else %}false{% endif %}"
+    data-reward-empty="{% if satc_reward_empty == true or satc_reward_empty == 'true' %}true{% else %}false{% endif %}"
+    data-reward-mode="{{ satc_reward_mode }}"
+    data-reward-done="{{ satc_reward_done | escape }}"
+    data-rec-enabled="{% if satc_rec_on == true or satc_rec_on == 'true' %}true{% else %}false{% endif %}"
+    data-rec-empty="{{ satc_rec_empty | escape }}"
+    data-rec-header="{{ satc_rec_header | escape }}"
+    data-rec-max="{{ satc_rec_max }}"
+    data-rec-add="{{ satc_rec_add | escape }}"
+    data-rec-shop-on="{% if satc_rec_shop_on == true or satc_rec_shop_on == 'true' %}true{% else %}false{% endif %}"
+    data-rec-shop-text="{{ satc_rec_shop_text | escape }}"
+    data-rec-shop-url="{{ satc_rec_shop_url | escape }}"
+    data-rec-collection="{{ satc_rec_collection | escape }}"
+    data-line-qty="{% if satc_line_qty == true or satc_line_qty == 'true' %}true{% else %}false{% endif %}"
+    data-line-remove="{% if satc_line_remove == true or satc_line_remove == 'true' %}true{% else %}false{% endif %}"
+    data-checkout-text="{{ satc_drawer_checkout | escape }}"
+    hidden
+  >
+    <script type="application/json" data-satc-reward-tiers>
+      {% if satc_reward_tiers != blank %}{{ satc_reward_tiers | json }}{% else %}[]{% endif %}
+    </script>
+    <script type="application/json" data-satc-rec-seed>
+      [
+        {%- if satc_rec_products != blank -%}
+          {%- for product in satc_rec_products limit: satc_rec_max -%}
+            {%- assign v = product.selected_or_first_available_variant -%}
+            {
+              "id": {{ product.id | json }},
+              "title": {{ product.title | json }},
+              "url": {{ product.url | json }},
+              "image": {% if product.featured_image %}{{ product.featured_image | image_url: width: 360 | json }}{% else %}""{% endif %},
+              "price": {{ v.price | json }},
+              "variantId": {{ v.id | json }},
+              "available": {{ v.available | json }}
+            }{%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        {%- endif -%}
+      ]
+    </script>
+    <div
+      class="satc-slider__backdrop{% if satc_backdrop_blur == true or satc_backdrop_blur == 'true' %} satc-slider__backdrop--blur{% endif %}"
+      data-satc-slider-close
+      style="--satc-backdrop-opacity: {{ satc_backdrop_opacity | divided_by: 100.0 }};"
+    ></div>
+    <aside
+      class="satc-slider__panel satc-slider__panel--hdr-{{ satc_hdr_h }} satc-slider__panel--close-{{ satc_close_side }} satc-slider__panel--close-size-{{ satc_close_size }} satc-slider__panel--close-border-{{ satc_close_border }}{% if satc_hdr_border == 'thin' %} satc-slider__panel--hdr-border{% endif %}"
+      role="dialog"
+      aria-label="{{ satc_drawer_title | escape }}"
+      style="
+        --satc-bg: {{ satc_bg }};
+        --satc-text: {{ satc_text }};
+        --satc-btn-bg: {{ satc_btn_bg }};
+        --satc-btn-text: {{ satc_btn_text }};
+        --satc-accent: {{ satc_accent }};
+        --satc-hdr-bg: {{ satc_hdr_bg }};
+        --satc-title-align: {{ satc_title_align }};
+        --satc-title-weight: {% if satc_title_weight == 'semibold' %}600{% elsif satc_title_weight == 'bold' %}700{% else %}400{% endif %};
+        --satc-title-size: {{ satc_drawer_title_size }}px;
+        --satc-close-bg: {{ satc_close_bg }};
+        --satc-close-hover: {{ satc_close_hover }};
+        --satc-close-color: {{ satc_close_color }};
+        --satc-btn-radius: {{ satc_btn_radius }}px;
+      "
+    >
+      <div class="satc-slider__accent" aria-hidden="true"></div>
+      <header class="satc-slider__header">
+        <h2 class="satc-slider__title" data-satc-drawer-title>{{ satc_drawer_title }}</h2>
+        <button type="button" class="satc-slider__close" data-satc-slider-close aria-label="{{ 'general.close' | t | escape }}">
+          ×
+        </button>
+      </header>
+      {% if satc_ann_on == true or satc_ann_on == 'true' %}
+        {% if satc_ann_pos != 'after' %}
+          <div
+            class="satc-slider__announcement satc-slider__announcement--{{ satc_ann_height }}"
+            data-satc-announcement
+            data-ann-text="{{ satc_ann_text | escape }}"
+            data-ann-timer="{{ satc_ann_timer | escape }}"
+            style="background: {{ satc_ann_bg }}; color: {{ satc_ann_color }}; border-color: {{ satc_ann_border }}; font-size: {{ satc_ann_size }}px;"
+          >
+            <span data-satc-announcement-label>{{ satc_ann_text }}</span>
+          </div>
+        {% endif %}
+      {% endif %}
+      {% if satc_reward_on == true or satc_reward_on == 'true' or satc_ship_on == true or satc_ship_on == 'true' %}
+        <div
+          class="satc-slider__rewards"
+          data-satc-rewards
+          style="--satc-reward-bg: {{ satc_reward_bg }}; --satc-reward-fg: {{ satc_reward_fg }}; --satc-reward-icon: {{ satc_reward_icon }};"
+        >
+          <div class="satc-slider__rewards-milestones" data-satc-reward-milestones></div>
+          <div class="satc-slider__rewards-track">
+            <span class="satc-slider__rewards-bar" data-satc-reward-bar></span>
+          </div>
+          <p class="satc-slider__rewards-text" data-satc-reward-text></p>
+        </div>
+      {% endif %}
+      <div class="satc-slider__body" data-satc-slider-items>
+        <p class="satc-slider__empty">{{ 'general.cart_empty' | t }}</p>
+      </div>
+      {% if satc_ann_on == true or satc_ann_on == 'true' %}
+        {% if satc_ann_pos == 'after' %}
+          <div
+            class="satc-slider__announcement satc-slider__announcement--{{ satc_ann_height }}"
+            data-satc-announcement
+            data-ann-text="{{ satc_ann_text | escape }}"
+            data-ann-timer="{{ satc_ann_timer | escape }}"
+            style="background: {{ satc_ann_bg }}; color: {{ satc_ann_color }}; border-color: {{ satc_ann_border }}; font-size: {{ satc_ann_size }}px;"
+          >
+            <span data-satc-announcement-label>{{ satc_ann_text }}</span>
+          </div>
+        {% endif %}
+      {% endif %}
+      <footer class="satc-slider__footer">
+        {% if satc_disc_on == true or satc_disc_on == 'true' %}
+          <form class="satc-slider__discount" data-satc-discount>
+            <input
+              type="text"
+              name="discount"
+              class="satc-slider__discount-input"
+              placeholder="{{ satc_disc_ph | escape }}"
+              autocomplete="off"
+            >
+            <button type="submit" class="satc-slider__discount-btn">{{ satc_disc_btn }}</button>
+          </form>
+        {% endif %}
+        <div class="satc-slider__total">
+          <span>{{ 'general.subtotal' | t }}</span>
+          <strong data-satc-slider-total>—</strong>
+        </div>
+        <a class="satc-slider__checkout" href="/checkout" data-satc-slider-checkout>
+          {{ satc_drawer_checkout }}
+        </a>
+        {% if satc_trust_on == true or satc_trust_on == 'true' %}
+          <p class="satc-slider__trust">{{ satc_trust_text }}</p>
+        {% endif %}
+      </footer>
+    </aside>
+  </div>
+
+  {{ 'sticky-atc-drawer.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'sticky-atc-drawer.js' | asset_url }}" defer></script>
+{% endif %}

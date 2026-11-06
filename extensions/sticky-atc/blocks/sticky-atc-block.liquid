@@ -1,72 +1,10 @@
 {% comment %}
   App block version — add via Theme Editor → Add block → Apps
+  Uses the same satc-config + satc-bar as the app embed (bar only, no drawer).
+  Assets load via the schema stylesheet/javascript below.
 {% endcomment %}
 
-{% if block.settings.enabled and request.page_type == 'product' %}
-  {% assign hide_branding = app.metafields.sticky_atc.hide_branding.value %}
-  {% assign product_image = product.featured_image | default: product.images.first %}
-
-  <div
-    id="satc-bar-{{ block.id }}"
-    class="satc-bar"
-    data-satc-bar
-    data-product-id="{{ product.id }}"
-    data-variant-id="{{ product.selected_or_first_available_variant.id }}"
-    data-after-add="{{ block.settings.after_add }}"
-    data-hide-near-form="{{ block.settings.hide_near_form }}"
-    data-desktop="{{ block.settings.show_on_desktop }}"
-    style="
-      background: {{ block.settings.background_color }};
-      color: {{ block.settings.text_color }};
-    "
-    {{ block.shopify_attributes }}
-  >
-    {% unless hide_branding == true or hide_branding == 'true' %}
-      <span class="satc-bar__branding" style="color: {{ block.settings.text_color }};">
-        Powered by Sticky ATC
-      </span>
-    {% endunless %}
-
-    {% if block.settings.show_image and product_image %}
-      <img
-        class="satc-bar__media"
-        src="{{ product_image | image_url: width: 96 }}"
-        alt="{{ product.title | escape }}"
-        width="48"
-        height="48"
-        loading="lazy"
-      >
-    {% endif %}
-
-    <div class="satc-bar__info">
-      {% if block.settings.show_title %}
-        <p class="satc-bar__title">{{ product.title }}</p>
-      {% endif %}
-      {% if block.settings.show_price %}
-        <p class="satc-bar__price" data-satc-price>
-          {{ product.selected_or_first_available_variant.price | money }}
-        </p>
-      {% endif %}
-    </div>
-
-    <button
-      type="button"
-      class="satc-bar__button"
-      data-satc-button
-      style="
-        background: {{ block.settings.button_background }};
-        color: {{ block.settings.button_text_color }};
-      "
-      {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
-    >
-      {% if product.selected_or_first_available_variant.available %}
-        {{ block.settings.button_label }}
-      {% else %}
-        Sold out
-      {% endif %}
-    </button>
-  </div>
-{% endif %}
+{% render 'satc-config', block: block, render_mode: 'bar' %}
 
 {% schema %}
 {

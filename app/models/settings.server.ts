@@ -7,7 +7,12 @@ import {
 } from "./bar-config";
 
 export type { BarConfig, Plan } from "./bar-config";
-export { DEFAULT_BAR_CONFIG, parseBarConfig, barConfigFromFormData } from "./bar-config";
+export {
+  DEFAULT_BAR_CONFIG,
+  parseBarConfig,
+  barConfigFromFormData,
+  validateBarConfig,
+} from "./bar-config";
 
 type AdminGraphql = {
   graphql: (
@@ -115,12 +120,17 @@ export async function syncStorefrontSettings(
   return json;
 }
 
-/** @deprecated use syncStorefrontSettings */
+/**
+ * @deprecated Never call this — it would overwrite storefront config with defaults.
+ * Use syncStorefrontSettings(admin, hideBranding, currentConfig) instead.
+ */
 export async function syncBrandingMetafield(
-  admin: AdminGraphql,
-  hideBranding: boolean,
-) {
-  return syncStorefrontSettings(admin, hideBranding, DEFAULT_BAR_CONFIG);
+  _admin: AdminGraphql,
+  _hideBranding: boolean,
+): Promise<never> {
+  throw new Error(
+    "syncBrandingMetafield is removed. Use syncStorefrontSettings with the shop's current BarConfig.",
+  );
 }
 
 async function getAppInstallationId(admin: AdminGraphql) {
