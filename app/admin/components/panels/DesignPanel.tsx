@@ -30,6 +30,32 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
         ))}
       </div>
 
+      <s-heading>Theme typography</s-heading>
+      <s-paragraph>
+        Use the store theme’s font and text color by default. Turn these off to
+        force custom values below.
+      </s-paragraph>
+      <s-switch
+        label="Use theme font family"
+        checked={config.inheritThemeFont}
+        onChange={(e: Event) =>
+          updateConfig(
+            "inheritThemeFont",
+            (e.currentTarget as HTMLInputElement).checked,
+          )
+        }
+      />
+      <s-switch
+        label="Use theme text color"
+        checked={config.inheritThemeTextColor}
+        onChange={(e: Event) =>
+          updateConfig(
+            "inheritThemeTextColor",
+            (e.currentTarget as HTMLInputElement).checked,
+          )
+        }
+      />
+
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-color-field
           label="Popup / bar background"
@@ -40,7 +66,11 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Title & price text"
+          label={
+            config.inheritThemeTextColor
+              ? "Title & price text (custom fallback)"
+              : "Title & price text"
+          }
           value={config.textColor}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);

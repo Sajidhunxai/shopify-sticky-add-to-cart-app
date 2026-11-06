@@ -77,6 +77,16 @@ export type BarConfig = {
   showAfterScrollDesktop: number;
   backgroundColor: string;
   textColor: string;
+  /**
+   * When true, drawer/bar use the theme body font
+   * (e.g. --font-body-family) instead of a forced stack.
+   */
+  inheritThemeFont: boolean;
+  /**
+   * When true, title/body text color follows the theme
+   * (--color-foreground) instead of textColor.
+   */
+  inheritThemeTextColor: boolean;
   buttonBackground: string;
   buttonTextColor: string;
   /** Accent used in cart drawer highlights / progress UI. */
@@ -203,6 +213,8 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   showAfterScrollDesktop: 0,
   backgroundColor: "#ffffff",
   textColor: "#111111",
+  inheritThemeFont: true,
+  inheritThemeTextColor: true,
   buttonBackground: "#111111",
   buttonTextColor: "#ffffff",
   accentColor: "#111111",
@@ -512,6 +524,14 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       DEFAULT_BAR_CONFIG.backgroundColor,
     ),
     textColor: asString(formData.get("textColor"), DEFAULT_BAR_CONFIG.textColor),
+    inheritThemeFont: asBool(
+      formData.get("inheritThemeFont"),
+      DEFAULT_BAR_CONFIG.inheritThemeFont,
+    ),
+    inheritThemeTextColor: asBool(
+      formData.get("inheritThemeTextColor"),
+      DEFAULT_BAR_CONFIG.inheritThemeTextColor,
+    ),
     buttonBackground: asString(
       formData.get("buttonBackground"),
       DEFAULT_BAR_CONFIG.buttonBackground,

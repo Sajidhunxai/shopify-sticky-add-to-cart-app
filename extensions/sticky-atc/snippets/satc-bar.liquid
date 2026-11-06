@@ -7,7 +7,7 @@
 
   <div
     id="satc-bar-{{ block.id }}"
-    class="satc-bar satc-bar--{{ satc_display_mode }} satc-bar--layout-{{ satc_layout }} satc-bar--bg-{{ satc_bg_style }} satc-bar--pos-{{ satc_bar_position }} satc-bar--btn-{{ satc_button_size }} satc-bar--img-{{ satc_image_shape }}{% unless satc_show_shadow %} satc-bar--no-shadow{% endunless %}"
+    class="satc-bar satc-bar--{{ satc_display_mode }} satc-bar--layout-{{ satc_layout }} satc-bar--bg-{{ satc_bg_style }} satc-bar--pos-{{ satc_bar_position }} satc-bar--btn-{{ satc_button_size }} satc-bar--img-{{ satc_image_shape }}{% unless satc_show_shadow %} satc-bar--no-shadow{% endunless %}{% if satc_theme_font == true or satc_theme_font == 'true' %} satc-bar--theme-font{% endif %}{% if satc_theme_text == true or satc_theme_text == 'true' %} satc-bar--theme-text{% endif %}"
     data-satc-bar
     data-display-mode="{{ satc_display_mode }}"
     data-product-id="{{ product.id }}"
@@ -24,7 +24,8 @@
     data-i18n-cart-empty="{{ 'general.cart_empty' | t | escape }}"
     style="
       --satc-bg: {{ satc_bg }};
-      --satc-text: {{ satc_text }};
+      --satc-text: {% if satc_theme_text == true or satc_theme_text == 'true' %}rgb(var(--color-foreground, 18, 18, 18)){% else %}{{ satc_text }}{% endif %};
+      --satc-font: {% if satc_theme_font == true or satc_theme_font == 'true' %}var(--font-body-family, var(--font-stack-body, inherit)){% else %}inherit{% endif %};
       --satc-border-width: {{ satc_border_width }}px;
       --satc-border-color: {{ satc_border_color }};
       --satc-bar-radius: {{ satc_bar_radius }}px;
@@ -44,6 +45,7 @@
       --satc-gap: {{ satc_gap }}px;
       --satc-bg-opacity: {{ satc_bg_opacity | divided_by: 100.0 }};
       color: var(--satc-text);
+      font-family: var(--satc-font, inherit);
     "
     {{ block.shopify_attributes }}
   >
@@ -83,10 +85,10 @@
     {% if satc_show_title == true or satc_show_title == 'true' or satc_show_price == true or satc_show_price == 'true' %}
     <div class="satc-bar__info">
       {% if satc_show_title == true or satc_show_title == 'true' %}
-        <p class="satc-bar__title" style="color: {{ satc_text }};">{{ product.title }}</p>
+        <p class="satc-bar__title" style="color: var(--satc-text);">{{ product.title }}</p>
       {% endif %}
       {% if satc_show_price == true or satc_show_price == 'true' %}
-        <p class="satc-bar__price" data-satc-price style="color: {{ satc_text }};">
+        <p class="satc-bar__price" data-satc-price style="color: var(--satc-text);">
           {{ product.selected_or_first_available_variant.price | money }}
         </p>
       {% endif %}

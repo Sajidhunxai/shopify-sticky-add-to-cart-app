@@ -285,21 +285,26 @@ export function StudioPreview({
                 style={{
                   background: `rgba(17,17,17,${(config.drawerBackdropOpacity || 45) / 100})`,
                   backdropFilter: config.drawerBackdropBlur
-                    ? "blur(8px)"
+                    ? "blur(16px) saturate(140%)"
                     : undefined,
                   WebkitBackdropFilter: config.drawerBackdropBlur
-                    ? "blur(8px)"
+                    ? "blur(16px) saturate(140%)"
                     : undefined,
                 }}
               />
               <div
                 className={styles.previewSlider}
-                style={{
-                  background: config.backgroundColor,
-                  color: config.textColor,
-                  borderColor: config.borderColor,
-                }}
-              >
+                  style={{
+                    background: config.backgroundColor,
+                    color: config.inheritThemeTextColor
+                      ? "#111111"
+                      : config.textColor,
+                    borderColor: config.borderColor,
+                    fontFamily: config.inheritThemeFont
+                      ? "Georgia, 'Times New Roman', serif"
+                      : "inherit",
+                  }}
+                >
                 <div
                   className={styles.previewSliderAccent}
                   style={{ background: config.accentColor }}

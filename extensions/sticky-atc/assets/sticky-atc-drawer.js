@@ -507,6 +507,14 @@
   const openSlider = async () => {
     if (!slider) return;
     if (!drawerAllowedOnDevice()) return;
+    const backdrop = slider.querySelector("[data-satc-backdrop]");
+    if (
+      backdrop &&
+      slider.dataset.backdropBlur !== "false" &&
+      !backdrop.classList.contains("satc-slider__backdrop--blur")
+    ) {
+      backdrop.classList.add("satc-slider__backdrop--blur");
+    }
     slider.hidden = false;
     requestAnimationFrame(() => slider.classList.add("is-open"));
     startAnnouncementTimer();

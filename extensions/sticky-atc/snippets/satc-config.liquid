@@ -35,6 +35,8 @@
   {% assign satc_sold_out = cfg.soldOutText %}
   {% assign satc_bg = cfg.backgroundColor %}
   {% assign satc_text = cfg.textColor %}
+  {% assign satc_theme_font = cfg.inheritThemeFont %}
+  {% assign satc_theme_text = cfg.inheritThemeTextColor %}
   {% assign satc_btn_bg = cfg.buttonBackground %}
   {% assign satc_btn_text = cfg.buttonTextColor %}
   {% assign satc_show_shadow = cfg.showShadow %}
@@ -144,6 +146,8 @@
   {% assign satc_sold_out = 'general.sold_out' | t %}
   {% assign satc_bg = block.settings.background_color %}
   {% assign satc_text = block.settings.text_color %}
+  {% assign satc_theme_font = true %}
+  {% assign satc_theme_text = true %}
   {% assign satc_btn_bg = block.settings.button_background %}
   {% assign satc_btn_text = block.settings.button_text_color %}
   {% assign satc_show_shadow = true %}
@@ -273,6 +277,8 @@
 {% if satc_rec_collection == blank %}{% assign satc_rec_collection = 'all' %}{% endif %}
 {% if satc_backdrop_opacity == blank %}{% assign satc_backdrop_opacity = 45 %}{% endif %}
 {% if satc_backdrop_blur == nil %}{% assign satc_backdrop_blur = true %}{% endif %}
+{% if satc_theme_font == nil %}{% assign satc_theme_font = true %}{% endif %}
+{% if satc_theme_text == nil %}{% assign satc_theme_text = true %}{% endif %}
 {% if satc_line_qty == nil %}{% assign satc_line_qty = true %}{% endif %}
 {% if satc_line_remove == nil %}{% assign satc_line_remove = true %}{% endif %}
 {% if satc_drawer_on_product == nil %}{% assign satc_drawer_on_product = true %}{% endif %}
@@ -354,7 +360,9 @@
   satc_show_shadow: satc_show_shadow,
   satc_show_title: satc_show_title,
   satc_sold_out: satc_sold_out,
-  satc_text: satc_text
+  satc_text: satc_text,
+  satc_theme_font: satc_theme_font,
+  satc_theme_text: satc_theme_text
 %}
 
 {% unless render_mode == 'bar' %}
@@ -420,6 +428,8 @@
     satc_ship_text: satc_ship_text,
     satc_ship_threshold: satc_ship_threshold,
     satc_text: satc_text,
+    satc_theme_font: satc_theme_font,
+    satc_theme_text: satc_theme_text,
     satc_title_align: satc_title_align,
     satc_title_weight: satc_title_weight,
     satc_trust_on: satc_trust_on,
