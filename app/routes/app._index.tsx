@@ -108,7 +108,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (intent === "save") {
     const config = barConfigFromFormData(formData);
     const settings = await saveBarConfig(session.shop, config);
-    await syncStorefrontSettings(admin, settings.hideBranding, config);
+    try {
+      await syncStorefrontSettings(admin, settings.hideBranding, config);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to sync storefront metafields";
+      return { ok: false, message: `Saved locally, but storefront sync failed: ${message}` };
+    }
     return { ok: true, message: "Settings saved and synced to storefront." };
   }
 
@@ -722,6 +728,32 @@ export default function Index() {
                 />
               </s-grid>
 
+              <s-heading>Drawer backdrop</s-heading>
+              <s-switch
+                label="Blur page behind drawer"
+                checked={config.drawerBackdropBlur}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "drawerBackdropBlur",
+                    (e.currentTarget as HTMLInputElement).checked,
+                  )
+                }
+              />
+              <s-number-field
+                label="Backdrop darkness (0–100)"
+                value={String(config.drawerBackdropOpacity)}
+                min={0}
+                max={100}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "drawerBackdropOpacity",
+                    Number((e.currentTarget as HTMLInputElement).value),
+                  )
+                }
+              />
+
               <s-heading>Sticky bar button text</s-heading>
               <s-text-field
                 label="Add to cart button text"
@@ -908,7 +940,7 @@ export default function Index() {
                   }
                 />
                 <s-switch
-                  label="Show quantity selector"
+                  label="Show quantity selector on sticky bar"
                   checked={config.showQuantity}
                   onChange={(e: Event) =>
                     updateConfig(
@@ -919,6 +951,36 @@ export default function Index() {
                   }
                 />
               </div>
+
+              <s-heading>Cart drawer line items</s-heading>
+              <s-paragraph>
+                Controls for products already in the cart drawer.
+              </s-paragraph>
+              <div className={styles.toggleRow}>
+                <s-switch
+                  label="Show quantity +/- on cart lines"
+                  checked={config.cartLineQtyEnabled}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "cartLineQtyEnabled",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+                <s-switch
+                  label="Show remove (×) on cart lines"
+                  checked={config.cartLineRemoveEnabled}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "cartLineRemoveEnabled",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+              </div>
+
               <s-grid gridTemplateColumns="1fr 1fr" gap="base">
                 <s-number-field
                   label="Image size"
@@ -1842,9 +1904,28 @@ export default function Index() {
               )}
 
               {config.displayMode === "slider" && config.enabled && (
+                <div style={{ position: "relative" }}>
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      borderRadius: 12,
+                      background: `rgba(17,17,17,${(config.drawerBackdropOpacity || 45) / 100})`,
+                      backdropFilter: config.drawerBackdropBlur
+                        ? "blur(8px)"
+                        : undefined,
+                      WebkitBackdropFilter: config.drawerBackdropBlur
+                        ? "blur(8px)"
+                        : undefined,
+                      pointerEvents: "none",
+                      zIndex: 0,
+                    }}
+                  />
                 <div
                   className={styles.previewSlider}
                   style={{
+                    position: "relative",
+                    zIndex: 1,
                     background: config.backgroundColor,
                     color: config.textColor,
                     borderColor: config.borderColor,
@@ -2181,9 +2262,40 @@ export default function Index() {
                         <p style={{ color: config.textColor }}>
                           Classic Canvas Sneaker
                         </p>
-                        <span style={{ color: config.textColor }}>Qty 1</span>
+                        {config.cartLineQtyEnabled ? (
+                          <div
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              marginTop: 4,
+                              border: "1px solid rgba(0,0,0,0.15)",
+                              borderRadius: 6,
+                              fontSize: 10,
+                            }}
+                          >
+                            <span style={{ padding: "2px 6px" }}>−</span>
+                            <span style={{ padding: "2px 6px" }}>1</span>
+                            <span style={{ padding: "2px 6px" }}>+</span>
+                          </div>
+                        ) : (
+                          <span style={{ color: config.textColor }}>Qty 1</span>
+                        )}
                       </div>
-                      <strong style={{ color: config.textColor }}>$68.00</strong>
+                      <div style={{ textAlign: "right" }}>
+                        {config.cartLineRemoveEnabled && (
+                          <div
+                            style={{
+                              color: config.textColor,
+                              fontSize: 14,
+                              lineHeight: 1,
+                              opacity: 0.7,
+                            }}
+                          >
+                            ×
+                          </div>
+                        )}
+                        <strong style={{ color: config.textColor }}>$68.00</strong>
+                      </div>
                     </div>
                   )}
                   {config.announcementEnabled &&
@@ -2223,6 +2335,7 @@ export default function Index() {
                       </div>
                     </div>
                   )}
+                </div>
                 </div>
               )}
             </div>

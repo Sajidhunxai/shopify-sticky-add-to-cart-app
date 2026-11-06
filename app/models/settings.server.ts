@@ -105,7 +105,14 @@ export async function syncStorefrontSettings(
     },
   );
 
-  return response.json();
+  const json = await response.json();
+  const errors = json?.data?.metafieldsSet?.userErrors;
+  if (Array.isArray(errors) && errors.length) {
+    throw new Error(
+      errors.map((e: { message?: string }) => e.message || "metafield error").join("; "),
+    );
+  }
+  return json;
 }
 
 /** @deprecated use syncStorefrontSettings */

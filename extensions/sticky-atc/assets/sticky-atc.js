@@ -32,6 +32,7 @@
 
   const cartUrl = () => `${root}cart.js`;
   const addUrl = () => `${root}cart/add.js`;
+  const changeUrl = () => `${root}cart/change.js`;
   const money = (cents) => {
     try {
       if (window.Shopify?.formatMoney) {
@@ -318,6 +319,80 @@
       ${recEnabled ? renderRecCards(products) : ""}`;
   };
 
+  const lineQtyEnabled = slider?.dataset.lineQty !== "false";
+  const lineRemoveEnabled = slider?.dataset.lineRemove !== "false";
+
+  const changeLineQty = async (lineKey, quantity) => {
+    if (!lineKey) return;
+    try {
+      const res = await fetch(changeUrl(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ id: lineKey, quantity: Math.max(0, Number(quantity) || 0) }),
+      });
+      if (!res.ok) throw new Error("cart change failed");
+      await refreshSlider();
+    } catch (err) {
+      console.error("[Sticky ATC] cart change", err);
+    }
+  };
+
+  const bindLineControls = () => {
+    sliderItems?.querySelectorAll("[data-satc-line-minus]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const key = btn.getAttribute("data-line-key");
+        const qty = Number(btn.getAttribute("data-qty") || 1);
+        changeLineQty(key, qty - 1);
+      });
+    });
+    sliderItems?.querySelectorAll("[data-satc-line-plus]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const key = btn.getAttribute("data-line-key");
+        const qty = Number(btn.getAttribute("data-qty") || 1);
+        changeLineQty(key, qty + 1);
+      });
+    });
+    sliderItems?.querySelectorAll("[data-satc-line-remove]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const key = btn.getAttribute("data-line-key");
+        changeLineQty(key, 0);
+      });
+    });
+  };
+
+  const renderCartLines = (items) =>
+    items
+      .map((item) => {
+        const key = item.key || String(item.id);
+        const qty = Number(item.quantity) || 1;
+        const qtyControls = lineQtyEnabled
+          ? `<div class="satc-slider__line-qty" data-satc-line-qty>
+              <button type="button" class="satc-slider__line-qty-btn" data-satc-line-minus data-line-key="${escapeHtml(key)}" data-qty="${qty}" aria-label="Decrease">−</button>
+              <span class="satc-slider__line-qty-val">${qty}</span>
+              <button type="button" class="satc-slider__line-qty-btn" data-satc-line-plus data-line-key="${escapeHtml(key)}" data-qty="${qty}" aria-label="Increase">+</button>
+            </div>`
+          : `<p class="satc-slider__item-meta">Qty ${qty}</p>`;
+        const removeBtn = lineRemoveEnabled
+          ? `<button type="button" class="satc-slider__line-remove" data-satc-line-remove data-line-key="${escapeHtml(key)}" aria-label="Remove">×</button>`
+          : "";
+        return `
+          <div class="satc-slider__item" data-satc-line data-line-key="${escapeHtml(key)}">
+            <img src="${escapeHtml(item.image || "")}" alt="" width="56" height="56" loading="lazy">
+            <div class="satc-slider__item-main">
+              <p class="satc-slider__item-title">${escapeHtml(item.product_title || item.title || "")}</p>
+              ${qtyControls}
+            </div>
+            <div class="satc-slider__item-side">
+              ${removeBtn}
+              <div class="satc-slider__item-price">${money(item.final_line_price ?? item.line_price)}</div>
+            </div>
+          </div>`;
+      })
+      .join("");
+
   const addRecToCart = async (variantId, btn) => {
     if (!variantId) return;
     const label = btn?.textContent || recAddText;
@@ -455,22 +530,18 @@
             );
           });
       } else {
-        sliderItems.innerHTML = cart.items
-          .map(
-            (item) => `
-          <div class="satc-slider__item">
-            <img src="${item.image || ""}" alt="" width="56" height="56" loading="lazy">
-            <div>
-              <p class="satc-slider__item-title">${escapeHtml(item.product_title || item.title || "")}</p>
-              <p class="satc-slider__item-meta">Qty ${item.quantity}</p>
-            </div>
-            <div class="satc-slider__item-price">${money(item.final_line_price ?? item.line_price)}</div>
-          </div>`,
-          )
-          .join("");
+        sliderItems.innerHTML = renderCartLines(cart.items);
+        bindLineControls();
       }
       if (sliderTotal) {
         sliderTotal.textContent = money(cart.total_price);
+      }
+      const checkoutEl = slider?.querySelector("[data-satc-slider-checkout]");
+      if (checkoutEl) {
+        const base = String(slider?.dataset.checkoutText || "Checkout").trim();
+        checkoutEl.textContent = cart.items?.length
+          ? `${base} — ${money(cart.total_price)}`
+          : base;
       }
       const footer = slider?.querySelector(".satc-slider__footer");
       if (footer) {

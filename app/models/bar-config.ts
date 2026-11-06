@@ -97,6 +97,14 @@ export type BarConfig = {
   drawerCloseColor: string;
   drawerCloseIconSize: "small" | "medium" | "large";
   drawerCloseBorder: "none" | "thin" | "normal" | "thick";
+  /** Blur the page behind the open cart drawer */
+  drawerBackdropBlur: boolean;
+  /** 0–100 overlay darkness behind the drawer */
+  drawerBackdropOpacity: number;
+  /** Show +/- quantity controls on drawer cart lines */
+  cartLineQtyEnabled: boolean;
+  /** Show remove (×) on drawer cart lines */
+  cartLineRemoveEnabled: boolean;
   announcementEnabled: boolean;
   announcementText: string;
   announcementBg: string;
@@ -198,6 +206,10 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   drawerCloseColor: "#111111",
   drawerCloseIconSize: "medium",
   drawerCloseBorder: "none",
+  drawerBackdropBlur: true,
+  drawerBackdropOpacity: 45,
+  cartLineQtyEnabled: true,
+  cartLineRemoveEnabled: true,
   announcementEnabled: false,
   announcementText: "Your products are reserved for {timer}!",
   announcementBg: "#d8009f",
@@ -513,6 +525,19 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       if (b === "none" || b === "thin" || b === "normal" || b === "thick") return b;
       return "none";
     })(),
+    drawerBackdropBlur: asBool(formData.get("drawerBackdropBlur"), true),
+    drawerBackdropOpacity: Math.min(
+      100,
+      Math.max(
+        0,
+        asNumber(
+          formData.get("drawerBackdropOpacity"),
+          DEFAULT_BAR_CONFIG.drawerBackdropOpacity,
+        ),
+      ),
+    ),
+    cartLineQtyEnabled: asBool(formData.get("cartLineQtyEnabled"), true),
+    cartLineRemoveEnabled: asBool(formData.get("cartLineRemoveEnabled"), true),
     announcementEnabled: asBool(formData.get("announcementEnabled"), false),
     announcementText: asString(
       formData.get("announcementText"),

@@ -66,6 +66,10 @@
   {% assign satc_close_color = cfg.drawerCloseColor %}
   {% assign satc_close_size = cfg.drawerCloseIconSize %}
   {% assign satc_close_border = cfg.drawerCloseBorder %}
+  {% assign satc_backdrop_blur = cfg.drawerBackdropBlur %}
+  {% assign satc_backdrop_opacity = cfg.drawerBackdropOpacity %}
+  {% assign satc_line_qty = cfg.cartLineQtyEnabled %}
+  {% assign satc_line_remove = cfg.cartLineRemoveEnabled %}
   {% assign satc_ann_on = cfg.announcementEnabled %}
   {% assign satc_ann_text = cfg.announcementText %}
   {% assign satc_ann_bg = cfg.announcementBg %}
@@ -164,6 +168,10 @@
   {% assign satc_close_color = satc_text %}
   {% assign satc_close_size = 'medium' %}
   {% assign satc_close_border = 'none' %}
+  {% assign satc_backdrop_blur = true %}
+  {% assign satc_backdrop_opacity = 45 %}
+  {% assign satc_line_qty = true %}
+  {% assign satc_line_remove = true %}
   {% assign satc_ann_on = false %}
   {% assign satc_ann_text = '' %}
   {% assign satc_ann_bg = satc_accent %}
@@ -239,6 +247,10 @@
 {% if satc_rec_shop_text == blank %}{% assign satc_rec_shop_text = 'Shop now' %}{% endif %}
 {% if satc_rec_shop_url == blank %}{% assign satc_rec_shop_url = '/collections/all' %}{% endif %}
 {% if satc_rec_collection == blank %}{% assign satc_rec_collection = 'all' %}{% endif %}
+{% if satc_backdrop_opacity == blank %}{% assign satc_backdrop_opacity = 45 %}{% endif %}
+{% if satc_backdrop_blur == blank %}{% assign satc_backdrop_blur = true %}{% endif %}
+{% if satc_line_qty == blank %}{% assign satc_line_qty = true %}{% endif %}
+{% if satc_line_remove == blank %}{% assign satc_line_remove = true %}{% endif %}
 
 {% assign satc_rec_products = nil %}
 {% if satc_rec_on == true or satc_rec_on == 'true' %}
@@ -425,6 +437,9 @@
     data-rec-shop-text="{{ satc_rec_shop_text | escape }}"
     data-rec-shop-url="{{ satc_rec_shop_url | escape }}"
     data-rec-collection="{{ satc_rec_collection | escape }}"
+    data-line-qty="{% if satc_line_qty == true or satc_line_qty == 'true' %}true{% else %}false{% endif %}"
+    data-line-remove="{% if satc_line_remove == true or satc_line_remove == 'true' %}true{% else %}false{% endif %}"
+    data-checkout-text="{{ satc_drawer_checkout | escape }}"
     hidden
   >
     <script type="application/json" data-satc-rec-seed>
@@ -445,7 +460,11 @@
         {%- endif -%}
       ]
     </script>
-    <div class="satc-slider__backdrop" data-satc-slider-close></div>
+    <div
+      class="satc-slider__backdrop{% if satc_backdrop_blur == true or satc_backdrop_blur == 'true' %} satc-slider__backdrop--blur{% endif %}"
+      data-satc-slider-close
+      style="--satc-backdrop-opacity: {{ satc_backdrop_opacity | divided_by: 100.0 }};"
+    ></div>
     <aside
       class="satc-slider__panel satc-slider__panel--hdr-{{ satc_hdr_h }} satc-slider__panel--close-{{ satc_close_side }} satc-slider__panel--close-size-{{ satc_close_size }} satc-slider__panel--close-border-{{ satc_close_border }}{% if satc_hdr_border == 'thin' %} satc-slider__panel--hdr-border{% endif %}"
       role="dialog"
@@ -463,6 +482,7 @@
         --satc-close-bg: {{ satc_close_bg }};
         --satc-close-hover: {{ satc_close_hover }};
         --satc-close-color: {{ satc_close_color }};
+        --satc-btn-radius: {{ satc_btn_radius }}px;
       "
     >
       <div class="satc-slider__accent" aria-hidden="true"></div>
@@ -531,7 +551,7 @@
           <span>{{ 'general.subtotal' | t }}</span>
           <strong data-satc-slider-total>—</strong>
         </div>
-        <a class="satc-slider__checkout" href="{{ routes.cart_url }}" data-satc-slider-checkout>
+        <a class="satc-slider__checkout" href="/checkout" data-satc-slider-checkout>
           {{ satc_drawer_checkout }}
         </a>
         {% if satc_trust_on == true or satc_trust_on == 'true' %}
