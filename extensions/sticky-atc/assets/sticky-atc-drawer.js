@@ -373,9 +373,21 @@
         .map((tier) => {
           const goal = Number(tier.minAmount) || 0;
           const reached = progressValue >= goal;
-          return `<div class="satc-slider__reward-milestone${reached ? " is-reached" : ""}">
+          const label = escapeHtml(tier.description || "Reward");
+          let labelHtml = label;
+          if (tier.rewardType === "product" && reached) {
+            const href =
+              tier.productUrl ||
+              (tier.productHandle
+                ? `${root}products/${encodeURIComponent(String(tier.productHandle).replace(/^\/+|\/+$/g, ""))}`
+                : "");
+            if (href) {
+              labelHtml = `<a href="${escapeHtml(href)}">${escapeHtml(tier.productTitle || tier.description || "Product")}</a>`;
+            }
+          }
+          return `<div class="satc-slider__reward-milestone${reached ? " is-reached" : ""}" data-reward-type="${escapeHtml(tier.rewardType || "custom")}">
             <span class="satc-slider__reward-dot" aria-hidden="true"></span>
-            <span class="satc-slider__reward-label">${escapeHtml(tier.description || "Reward")}</span>
+            <span class="satc-slider__reward-label">${labelHtml}</span>
           </div>`;
         })
         .join("");

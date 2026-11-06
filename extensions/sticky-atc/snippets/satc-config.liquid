@@ -104,9 +104,11 @@
   {% assign satc_ship_done = cfg.freeShippingReachedText %}
   {% assign satc_reward_on = cfg.rewardEnabled %}
   {% assign satc_reward_empty = cfg.rewardShowOnEmpty %}
+  {% assign satc_reward_theme = cfg.rewardUseThemeColors %}
   {% assign satc_reward_bg = cfg.rewardBg %}
   {% assign satc_reward_fg = cfg.rewardFg %}
   {% assign satc_reward_icon = cfg.rewardIconColor %}
+  {% assign satc_reward_text = cfg.rewardTextColor %}
   {% assign satc_reward_done = cfg.rewardCompleteText %}
   {% assign satc_reward_mode = cfg.rewardCalcMode %}
   {% assign satc_reward_tiers = cfg.rewardTiers %}
@@ -215,9 +217,11 @@
   {% assign satc_ship_done = "You've unlocked free shipping!" %}
   {% assign satc_reward_on = false %}
   {% assign satc_reward_empty = true %}
+  {% assign satc_reward_theme = false %}
   {% assign satc_reward_bg = '#F0F2FF' %}
   {% assign satc_reward_fg = '#B3009F' %}
   {% assign satc_reward_icon = '#79be30' %}
+  {% assign satc_reward_text = '#111111' %}
   {% assign satc_reward_done = 'Free shipping unlocked!' %}
   {% assign satc_reward_mode = 'total' %}
   {% assign satc_reward_tiers = nil %}
@@ -262,9 +266,11 @@
 {% if satc_show_on_home == nil %}{% assign satc_show_on_home = false %}{% endif %}
 {% if satc_show_on_search == nil %}{% assign satc_show_on_search = false %}{% endif %}
 {% if satc_show_on_other == nil %}{% assign satc_show_on_other = false %}{% endif %}
+{% if satc_reward_theme == nil %}{% assign satc_reward_theme = false %}{% endif %}
 {% if satc_reward_bg == blank %}{% assign satc_reward_bg = '#F0F2FF' %}{% endif %}
 {% if satc_reward_fg == blank %}{% assign satc_reward_fg = '#B3009F' %}{% endif %}
 {% if satc_reward_icon == blank %}{% assign satc_reward_icon = '#79be30' %}{% endif %}
+{% if satc_reward_text == blank %}{% assign satc_reward_text = '#111111' %}{% endif %}
 {% if satc_reward_done == blank %}{% assign satc_reward_done = 'Free shipping unlocked!' %}{% endif %}
 {% if satc_reward_mode == blank %}{% assign satc_reward_mode = 'total' %}{% endif %}
 {% if satc_reward_empty == nil %}{% assign satc_reward_empty = true %}{% endif %}
@@ -420,6 +426,8 @@
     satc_reward_empty: satc_reward_empty,
     satc_reward_fg: satc_reward_fg,
     satc_reward_icon: satc_reward_icon,
+    satc_reward_text: satc_reward_text,
+    satc_reward_theme: satc_reward_theme,
     satc_reward_mode: satc_reward_mode,
     satc_reward_on: satc_reward_on,
     satc_reward_tiers: satc_reward_tiers,

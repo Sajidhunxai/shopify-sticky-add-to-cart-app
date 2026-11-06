@@ -384,10 +384,22 @@ export function StudioPreview({
                       tiers,
                       previewValue,
                     );
+                    const rBg = config.rewardUseThemeColors
+                      ? "#eef2ff"
+                      : config.rewardBg;
+                    const rFg = config.rewardUseThemeColors
+                      ? "#4f46e5"
+                      : config.rewardFg;
+                    const rIcon = config.rewardUseThemeColors
+                      ? "#4f46e5"
+                      : config.rewardIconColor;
+                    const rText = config.rewardUseThemeColors
+                      ? "#111111"
+                      : config.rewardTextColor || "#111111";
                     return (
                       <div
                         style={{
-                          background: config.rewardBg,
+                          background: rBg,
                           padding: "8px 8px 6px",
                           borderBottom: "1px solid rgba(0,0,0,0.06)",
                         }}
@@ -418,11 +430,9 @@ export function StudioPreview({
                                     width: 12,
                                     height: 12,
                                     borderRadius: "50%",
-                                    background: reached
-                                      ? config.rewardIconColor
-                                      : "#fff",
+                                    background: reached ? rIcon : "#fff",
                                     border: reached
-                                      ? `2px solid ${config.rewardIconColor}`
+                                      ? `2px solid ${rIcon}`
                                       : "2px solid rgba(0,0,0,0.15)",
                                     boxSizing: "border-box",
                                   }}
@@ -435,7 +445,7 @@ export function StudioPreview({
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
                                     whiteSpace: "nowrap",
-                                    color: config.textColor,
+                                    color: rText,
                                   }}
                                 >
                                   {tier.description}
@@ -456,7 +466,7 @@ export function StudioPreview({
                             style={{
                               height: "100%",
                               width: `${Math.round(pct)}%`,
-                              background: config.rewardFg,
+                              background: rFg,
                               borderRadius: 999,
                             }}
                           />
@@ -467,7 +477,7 @@ export function StudioPreview({
                             fontSize: 10,
                             fontWeight: 600,
                             textAlign: "center",
-                            color: config.textColor,
+                            color: rText,
                             lineHeight: 1.3,
                           }}
                         >

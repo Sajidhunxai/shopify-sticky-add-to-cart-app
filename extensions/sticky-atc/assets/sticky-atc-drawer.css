@@ -197,7 +197,7 @@
 
 .satc-slider__rewards {
   padding: 12px 14px 10px;
-  background: var(--satc-reward-bg, #f0f2ff);
+  background: var(--satc-reward-bg, #f0f2ff) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
@@ -228,18 +228,23 @@
 }
 
 .satc-slider__reward-milestone.is-reached .satc-slider__reward-dot {
-  background: var(--satc-reward-icon, #79be30);
-  border-color: var(--satc-reward-icon, #79be30);
+  background: var(--satc-reward-icon, #79be30) !important;
+  border-color: var(--satc-reward-icon, #79be30) !important;
 }
 
 .satc-slider__reward-label {
   font-size: 9px;
   line-height: 1.2;
   font-weight: 650;
-  color: var(--satc-text, #111);
+  color: var(--satc-reward-text, var(--satc-text, #111)) !important;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+}
+
+.satc-slider__reward-label a {
+  color: inherit !important;
+  text-decoration: underline;
 }
 
 .satc-slider__rewards-track {
@@ -254,7 +259,7 @@
   height: 100%;
   width: 0%;
   border-radius: 999px;
-  background: var(--satc-reward-fg, #b3009f);
+  background: var(--satc-reward-fg, #b3009f) !important;
   transition: width 0.25s ease;
 }
 
@@ -262,7 +267,7 @@
   margin: 8px 0 0;
   font-size: 12px;
   font-weight: 600;
-  color: var(--satc-text, #111) !important;
+  color: var(--satc-reward-text, var(--satc-text, #111)) !important;
   text-align: center;
   line-height: 1.35;
 }

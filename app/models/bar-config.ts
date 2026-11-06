@@ -19,12 +19,19 @@ export type BarPosition =
   | "left"
   | "right";
 
+export type RewardType = "shipping" | "discount" | "product" | "custom";
+
 export type RewardTier = {
   enabled: boolean;
   minAmount: number;
   description: string;
   /** Supports [AMOUNT] for remaining amount/qty */
   titleBefore: string;
+  rewardType: RewardType;
+  /** Used when rewardType is product */
+  productHandle: string;
+  productTitle: string;
+  productUrl: string;
 };
 
 export type BarConfig = {
@@ -146,9 +153,12 @@ export type BarConfig = {
   freeShippingReachedText: string;
   rewardEnabled: boolean;
   rewardShowOnEmpty: boolean;
+  /** When true, rewards strip uses theme accent / foreground tokens */
+  rewardUseThemeColors: boolean;
   rewardBg: string;
   rewardFg: string;
   rewardIconColor: string;
+  rewardTextColor: string;
   rewardCompleteText: string;
   rewardCalcMode: "total" | "quantity";
   rewardTiers: RewardTier[];
@@ -258,9 +268,11 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   freeShippingReachedText: "You've unlocked free shipping!",
   rewardEnabled: true,
   rewardShowOnEmpty: true,
+  rewardUseThemeColors: false,
   rewardBg: "#F0F2FF",
   rewardFg: "#B3009F",
   rewardIconColor: "#79be30",
+  rewardTextColor: "#111111",
   rewardCompleteText: "Free shipping unlocked!",
   rewardCalcMode: "total",
   rewardTiers: [
@@ -269,24 +281,40 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
       minAmount: 100,
       description: "Free Shipping",
       titleBefore: "You're [AMOUNT] away from free shipping!",
+      rewardType: "shipping",
+      productHandle: "",
+      productTitle: "",
+      productUrl: "",
     },
     {
       enabled: true,
       minAmount: 150,
       description: "Free Express",
       titleBefore: "You're [AMOUNT] away from free express shipping!",
+      rewardType: "shipping",
+      productHandle: "",
+      productTitle: "",
+      productUrl: "",
     },
     {
       enabled: false,
       minAmount: 200,
       description: "Free Gift",
       titleBefore: "You're [AMOUNT] away from a free gift!",
+      rewardType: "product",
+      productHandle: "",
+      productTitle: "",
+      productUrl: "",
     },
     {
       enabled: false,
       minAmount: 250,
       description: "VIP Reward",
       titleBefore: "You're [AMOUNT] away from VIP reward!",
+      rewardType: "custom",
+      productHandle: "",
+      productTitle: "",
+      productUrl: "",
     },
   ],
   recommendationsEnabled: true,
@@ -370,9 +398,24 @@ function asBarPosition(value: FormDataEntryValue | null | undefined): BarPositio
   }
 }
 
+function asRewardType(value: unknown, fallback: RewardType): RewardType {
+  const raw = String(value || "");
+  if (
+    raw === "shipping" ||
+    raw === "discount" ||
+    raw === "product" ||
+    raw === "custom"
+  ) {
+    return raw;
+  }
+  return fallback;
+}
+
 function normalizeRewardTiers(input: unknown): RewardTier[] {
   const defaults = DEFAULT_BAR_CONFIG.rewardTiers;
-  if (!Array.isArray(input) || input.length === 0) return defaults.map((t) => ({ ...t }));
+  if (!Array.isArray(input) || input.length === 0) {
+    return defaults.map((t) => ({ ...t }));
+  }
   return defaults.map((fallback, index) => {
     const row = (input[index] || {}) as Partial<RewardTier>;
     return {
@@ -382,9 +425,22 @@ function normalizeRewardTiers(input: unknown): RewardTier[] {
         : fallback.minAmount,
       description: String(row.description || fallback.description),
       titleBefore: String(row.titleBefore || fallback.titleBefore),
+      rewardType: asRewardType(row.rewardType, fallback.rewardType),
+      productHandle: String(row.productHandle || fallback.productHandle || ""),
+      productTitle: String(row.productTitle || fallback.productTitle || ""),
+      productUrl: String(row.productUrl || fallback.productUrl || ""),
     };
   });
 }
+
+/** Default palette for “Reset reward colors”. */
+export const DEFAULT_REWARD_COLORS = {
+  rewardUseThemeColors: false,
+  rewardBg: "#F0F2FF",
+  rewardFg: "#B3009F",
+  rewardIconColor: "#79be30",
+  rewardTextColor: "#111111",
+} as const;
 
 export function parseBarConfig(raw: string | null | undefined): BarConfig {
   if (!raw) return { ...DEFAULT_BAR_CONFIG, rewardTiers: DEFAULT_BAR_CONFIG.rewardTiers.map((t) => ({ ...t })) };
@@ -411,6 +467,7 @@ export function parseBarConfig(raw: string | null | undefined): BarConfig {
         parsed.freeShippingReachedText || merged.rewardCompleteText;
       merged.rewardTiers = [
         {
+          ...DEFAULT_BAR_CONFIG.rewardTiers[0],
           enabled: true,
           minAmount: Number(parsed.freeShippingThreshold) || 100,
           description: "Free Shipping",
@@ -419,6 +476,7 @@ export function parseBarConfig(raw: string | null | undefined): BarConfig {
               /\{\{\s*amount_remaining\s*\}\}/gi,
               "[AMOUNT]",
             ) || "You're [AMOUNT] away from free shipping!",
+          rewardType: "shipping",
         },
         ...DEFAULT_BAR_CONFIG.rewardTiers.slice(1).map((t) => ({ ...t })),
       ];
@@ -700,11 +758,19 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       formData.get("rewardShowOnEmpty"),
       DEFAULT_BAR_CONFIG.rewardShowOnEmpty,
     ),
+    rewardUseThemeColors: asBool(
+      formData.get("rewardUseThemeColors"),
+      DEFAULT_BAR_CONFIG.rewardUseThemeColors,
+    ),
     rewardBg: asString(formData.get("rewardBg"), DEFAULT_BAR_CONFIG.rewardBg),
     rewardFg: asString(formData.get("rewardFg"), DEFAULT_BAR_CONFIG.rewardFg),
     rewardIconColor: asString(
       formData.get("rewardIconColor"),
       DEFAULT_BAR_CONFIG.rewardIconColor,
+    ),
+    rewardTextColor: asString(
+      formData.get("rewardTextColor"),
+      DEFAULT_BAR_CONFIG.rewardTextColor,
     ),
     rewardCompleteText: asString(
       formData.get("rewardCompleteText"),

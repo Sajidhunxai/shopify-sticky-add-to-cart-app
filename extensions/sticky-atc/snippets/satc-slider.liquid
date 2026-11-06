@@ -127,7 +127,7 @@
         <div
           class="satc-slider__rewards"
           data-satc-rewards
-          style="--satc-reward-bg: {{ satc_reward_bg }}; --satc-reward-fg: {{ satc_reward_fg }}; --satc-reward-icon: {{ satc_reward_icon }};"
+          style="{% if satc_reward_theme == true or satc_reward_theme == 'true' %}--satc-reward-bg: color-mix(in srgb, rgb(var(--color-button, var(--color-base-accent-1, 27, 57, 254))) 18%, #fff); --satc-reward-fg: rgb(var(--color-button, var(--color-base-accent-1, 179, 0, 159))); --satc-reward-icon: rgb(var(--color-button, var(--color-base-accent-1, 121, 190, 48))); --satc-reward-text: rgb(var(--color-foreground, 17, 17, 17));{% else %}--satc-reward-bg: {{ satc_reward_bg }}; --satc-reward-fg: {{ satc_reward_fg }}; --satc-reward-icon: {{ satc_reward_icon }}; --satc-reward-text: {{ satc_reward_text }};{% endif %}"
         >
           <div class="satc-slider__rewards-milestones" data-satc-reward-milestones></div>
           <div class="satc-slider__rewards-track">

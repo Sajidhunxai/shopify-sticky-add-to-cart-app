@@ -35,26 +35,43 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
         Use the store theme’s font and text color by default. Turn these off to
         force custom values below.
       </s-paragraph>
-      <s-switch
-        label="Use theme font family"
-        checked={config.inheritThemeFont}
-        onChange={(e: Event) =>
-          updateConfig(
-            "inheritThemeFont",
-            (e.currentTarget as HTMLInputElement).checked,
-          )
-        }
-      />
-      <s-switch
-        label="Use theme text color"
-        checked={config.inheritThemeTextColor}
-        onChange={(e: Event) =>
-          updateConfig(
-            "inheritThemeTextColor",
-            (e.currentTarget as HTMLInputElement).checked,
-          )
-        }
-      />
+      <s-stack direction="inline" gap="base">
+        <s-switch
+          label="Use theme font family"
+          checked={config.inheritThemeFont}
+          onChange={(e: Event) =>
+            updateConfig(
+              "inheritThemeFont",
+              (e.currentTarget as HTMLInputElement).checked,
+            )
+          }
+        />
+        <s-switch
+          label="Use theme text color"
+          checked={config.inheritThemeTextColor}
+          onChange={(e: Event) =>
+            updateConfig(
+              "inheritThemeTextColor",
+              (e.currentTarget as HTMLInputElement).checked,
+            )
+          }
+        />
+        <s-button
+          variant="tertiary"
+          onClick={() => {
+            updateConfig("inheritThemeFont", true);
+            updateConfig("inheritThemeTextColor", true);
+            updateConfig("backgroundColor", "#ffffff");
+            updateConfig("textColor", "#111111");
+            updateConfig("buttonBackground", "#111111");
+            updateConfig("buttonTextColor", "#ffffff");
+            updateConfig("accentColor", "#111111");
+            updateConfig("borderColor", "#e5e7eb");
+          }}
+        >
+          Reset design colors
+        </s-button>
+      </s-stack>
 
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-color-field
