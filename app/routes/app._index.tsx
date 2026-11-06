@@ -24,6 +24,70 @@ import {
 } from "../models/settings.server";
 import styles from "../styles/dashboard.module.css";
 
+type NavId =
+  | "design"
+  | "header"
+  | "display"
+  | "cart-items"
+  | "announcements"
+  | "rewards"
+  | "recommendations"
+  | "discounts"
+  | "cart-summary"
+  | "trust"
+  | "pages"
+  | "behavior"
+  | "plan"
+  | "setup";
+
+type NavItem = {
+  id: NavId;
+  label: string;
+  soon?: boolean;
+};
+
+type NavGroup = {
+  title: string;
+  items: NavItem[];
+};
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    title: "General",
+    items: [
+      { id: "design", label: "Design" },
+      { id: "header", label: "Header & text" },
+      { id: "display", label: "Display style" },
+    ],
+  },
+  {
+    title: "Body",
+    items: [
+      { id: "cart-items", label: "Cart items" },
+      { id: "announcements", label: "Announcements", soon: true },
+      { id: "rewards", label: "Free shipping / rewards", soon: true },
+      { id: "recommendations", label: "Recommendations", soon: true },
+      { id: "discounts", label: "Discount codes", soon: true },
+    ],
+  },
+  {
+    title: "Footer",
+    items: [
+      { id: "cart-summary", label: "Cart summary" },
+      { id: "trust", label: "Trust badges", soon: true },
+    ],
+  },
+  {
+    title: "Settings",
+    items: [
+      { id: "pages", label: "Pages & devices" },
+      { id: "behavior", label: "Behavior" },
+      { id: "plan", label: "Plan & billing" },
+      { id: "setup", label: "Setup" },
+    ],
+  },
+];
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const settings = await getShopSettings(session.shop);
@@ -79,6 +143,18 @@ function updateConfig<K extends keyof BarConfig>(
   setConfig((prev) => ({ ...prev, [key]: value }));
 }
 
+function colorFromEvent(e: Event): string {
+  const target = e.currentTarget as HTMLInputElement & { value?: string };
+  const fromTarget = String(target?.value || "").trim();
+  if (fromTarget) return fromTarget;
+  const detail = (e as CustomEvent).detail;
+  if (typeof detail === "string" && detail.trim()) return detail.trim();
+  if (detail && typeof detail === "object" && "value" in detail) {
+    return String((detail as { value: unknown }).value || "").trim();
+  }
+  return "";
+}
+
 function previewPositionStyle(
   position: BarConfig["barPosition"],
   edge: number,
@@ -99,9 +175,9 @@ function previewPositionStyle(
     case "top-right":
       return { ...floating, top: offset, bottom: "auto", right: offset };
     case "bottom-left":
-      return { ...floating, bottom: offset, top: "auto", left: offset };
+      return { ...floating, bottom: offset, left: offset };
     case "bottom-right":
-      return { ...floating, bottom: offset, top: "auto", right: offset };
+      return { ...floating, bottom: offset, right: offset };
     case "left":
       return {
         ...floating,
@@ -118,10 +194,23 @@ function previewPositionStyle(
         right: offset,
         transform: "translateY(-50%)",
       };
-    case "bottom":
     default:
-      return { bottom: offset, top: "auto", left: 12, right: 12 };
+      return { bottom: offset, left: 12, right: 12 };
   }
+}
+
+function ComingSoon({ title, blurb }: { title: string; blurb: string }) {
+  return (
+    <div className={styles.soonCard}>
+      <s-badge tone="info">Coming soon</s-badge>
+      <h3 className={styles.panelTitle}>{title}</h3>
+      <p className={styles.soonText}>{blurb}</p>
+      <p className={styles.soonHint}>
+        Menu item is ready in the sidebar. Storefront feature will ship in a
+        later update.
+      </p>
+    </div>
+  );
 }
 
 export default function Index() {
@@ -132,8 +221,10 @@ export default function Index() {
   const submit = useSubmit();
   const shopify = useAppBridge();
   const busy = navigation.state !== "idle";
-  const [config, setConfig] = useState<BarConfig>(initialConfig);
   const isPro = plan === "pro";
+
+  const [config, setConfig] = useState<BarConfig>(initialConfig);
+  const [nav, setNav] = useState<NavId>("design");
 
   useEffect(() => {
     setConfig(initialConfig);
@@ -200,6 +291,10 @@ export default function Index() {
     ...previewPositionStyle(config.barPosition, config.desktopBottomOffset),
   };
 
+  const activeLabel =
+    NAV_GROUPS.flatMap((g) => g.items).find((i) => i.id === nav)?.label ||
+    "Design";
+
   return (
     <s-page heading="Sticky Add to Cart">
       <s-button
@@ -216,863 +311,936 @@ export default function Index() {
         heading={config.enabled ? "Sticky bar ready" : "Sticky bar is off"}
       >
         {config.enabled
-          ? "Keep the App embed enabled in the Theme Editor. Content and style below sync to the storefront when you save."
-          : "Enable the sticky bar in Content settings, then save to publish changes."}
+          ? "Use the left menu like UpCart — edit Design, Header, Cart items, and more. Save to sync the storefront."
+          : "Turn the sticky bar on under Cart items / Setup, then save."}
       </s-banner>
 
-      <s-section heading="Live preview">
-        <s-paragraph>
-          Changes update instantly here. Click <strong>Save settings</strong> to
-          push them to your storefront.
-        </s-paragraph>
-
-        <div className={styles.modeGrid} role="radiogroup" aria-label="Display style">
-          {(
-            [
-              {
-                id: "bar" as const,
-                title: "Sticky Add to Cart Bar",
-                blurb: "Classic sticky bar with image, price, and CTA",
-              },
-              {
-                id: "slider" as const,
-                title: "Sticky Cart + Slider",
-                blurb: "Sticky bar opens a cart drawer after add",
-              },
-              {
-                id: "quickbuy" as const,
-                title: "Quick Buy Cart",
-                blurb: "Floating quick-buy button that expands",
-              },
-            ] as const
-          ).map((mode) => (
-            <button
-              key={mode.id}
-              type="button"
-              className={`${styles.modeCard} ${
-                config.displayMode === mode.id ? styles.modeCardActive : ""
-              }`}
-              onClick={() => updateConfig(setConfig, "displayMode", mode.id)}
-              aria-pressed={config.displayMode === mode.id}
+      <div className={styles.studio}>
+        <aside className={styles.studioNav} aria-label="Settings menu">
+          <label className={styles.navSelectLabel}>
+            Display mode
+            <select
+              className={styles.navSelect}
+              value={config.displayMode}
+              onChange={(e) =>
+                updateConfig(
+                  setConfig,
+                  "displayMode",
+                  e.target.value as BarConfig["displayMode"],
+                )
+              }
             >
-              <strong>{mode.title}</strong>
-              <span>{mode.blurb}</span>
-            </button>
-          ))}
-        </div>
+              <option value="bar">Sticky Add to Cart Bar</option>
+              <option value="slider">Sticky Cart + Drawer</option>
+              <option value="quickbuy">Quick Buy Cart</option>
+            </select>
+          </label>
 
-        <div className={styles.previewShell}>
-          <div className={styles.previewChrome}>
-            <span className={styles.previewDot} />
-            <span className={styles.previewDot} />
-            <span className={styles.previewDot} />
-            <span className={styles.previewUrl}>{shop}/products/demo</span>
-          </div>
-          <div
-            className={`${styles.previewStage} ${
-              config.displayMode === "slider" ? styles.previewStageSlider : ""
-            }`}
-          >
-            <div className={styles.previewProduct}>
-              <div className={styles.previewThumb} />
-              <div>
-                <p className={styles.previewTitle}>Classic Canvas Sneaker</p>
-                <p className={styles.previewSubtitle}>
-                  {config.displayMode === "quickbuy"
-                    ? "Quick Buy preview"
-                    : config.displayMode === "slider"
-                      ? "Bar + cart slider preview"
-                      : "Product page mock · scroll preview"}
+          {NAV_GROUPS.map((group) => (
+            <div key={group.title} className={styles.navGroup}>
+              <p className={styles.navGroupTitle}>{group.title}</p>
+              {group.items.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`${styles.navItem} ${
+                    nav === item.id ? styles.navItemActive : ""
+                  }`}
+                  onClick={() => setNav(item.id)}
+                >
+                  <span>{item.label}</span>
+                  {item.soon ? (
+                    <span className={styles.navSoon}>Soon</span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+          ))}
+        </aside>
+
+        <section className={styles.studioPanel}>
+          <header className={styles.panelHeader}>
+            <h2 className={styles.panelTitle}>{activeLabel}</h2>
+            <p className={styles.panelSub}>
+              Changes update the preview instantly. Click Save settings to
+              publish.
+            </p>
+          </header>
+
+          {nav === "design" && (
+            <s-stack gap="base">
+              <div className={styles.colorLegend}>
+                {(
+                  [
+                    ["Popup background", config.backgroundColor],
+                    ["Title & price", config.textColor],
+                    ["Button", config.buttonBackground],
+                    ["Button text", config.buttonTextColor],
+                    ["Accent", config.accentColor],
+                    ["Border", config.borderColor],
+                  ] as const
+                ).map(([label, hex]) => (
+                  <div key={label} className={styles.colorSwatch}>
+                    <span
+                      className={styles.colorSwatchDot}
+                      style={{ background: hex }}
+                    />
+                    <div className={styles.colorSwatchMeta}>
+                      <strong>{label}</strong>
+                      <span>{hex}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+                <s-color-field
+                  label="Popup / bar background"
+                  value={config.backgroundColor}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value) updateConfig(setConfig, "backgroundColor", value);
+                  }}
+                />
+                <s-color-field
+                  label="Title & price text"
+                  value={config.textColor}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value) updateConfig(setConfig, "textColor", value);
+                  }}
+                />
+                <s-color-field
+                  label="Button color"
+                  value={config.buttonBackground}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value)
+                      updateConfig(setConfig, "buttonBackground", value);
+                  }}
+                />
+                <s-color-field
+                  label="Button text color"
+                  value={config.buttonTextColor}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value)
+                      updateConfig(setConfig, "buttonTextColor", value);
+                  }}
+                />
+                <s-color-field
+                  label="Accent color (drawer highlights)"
+                  value={config.accentColor}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value) updateConfig(setConfig, "accentColor", value);
+                  }}
+                />
+                <s-color-field
+                  label="Border color"
+                  value={config.borderColor}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value) updateConfig(setConfig, "borderColor", value);
+                  }}
+                />
+                <s-select
+                  label="Background style"
+                  value={config.backgroundStyle}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "backgroundStyle",
+                      (e.currentTarget as HTMLSelectElement)
+                        .value as BarConfig["backgroundStyle"],
+                    )
+                  }
+                >
+                  <s-option value="solid">Solid color</s-option>
+                  <s-option value="blur">Glass blur</s-option>
+                  <s-option value="gradient">Soft gradient</s-option>
+                </s-select>
+                <s-number-field
+                  label="Background opacity %"
+                  value={String(config.backgroundOpacity)}
+                  min={40}
+                  max={100}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "backgroundOpacity",
+                      Number((e.currentTarget as HTMLInputElement).value),
+                    )
+                  }
+                />
+                <s-number-field
+                  label="Corner radius (bar)"
+                  value={String(config.barRadius)}
+                  min={0}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "barRadius",
+                      Number((e.currentTarget as HTMLInputElement).value),
+                    )
+                  }
+                />
+                <s-number-field
+                  label="Button corner radius"
+                  value={String(config.buttonRadius)}
+                  min={0}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "buttonRadius",
+                      Number((e.currentTarget as HTMLInputElement).value),
+                    )
+                  }
+                />
+              </s-grid>
+              <s-switch
+                label="Show shadow"
+                checked={config.showShadow}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "showShadow",
+                    (e.currentTarget as HTMLInputElement).checked,
+                  )
+                }
+              />
+            </s-stack>
+          )}
+
+          {nav === "header" && (
+            <s-stack gap="base">
+              <s-text-field
+                label="Add to cart button text"
+                value={config.buttonText}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "buttonText",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-text-field
+                label="Sold out text"
+                value={config.soldOutText}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "soldOutText",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-text-field
+                label="Cart drawer title"
+                value={config.drawerTitle}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "drawerTitle",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-text-field
+                label="Checkout button text"
+                value={config.drawerCheckoutText}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "drawerCheckoutText",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+            </s-stack>
+          )}
+
+          {nav === "display" && (
+            <s-stack gap="base">
+              <div className={styles.modeGrid} role="radiogroup" aria-label="Display style">
+                {(
+                  [
+                    {
+                      id: "bar" as const,
+                      title: "Sticky bar",
+                      blurb: "Classic sticky Add to cart bar",
+                    },
+                    {
+                      id: "slider" as const,
+                      title: "Cart drawer",
+                      blurb: "Bar + slide-out cart after add",
+                    },
+                    {
+                      id: "quickbuy" as const,
+                      title: "Quick buy",
+                      blurb: "Floating button that expands",
+                    },
+                  ] as const
+                ).map((mode) => (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    className={`${styles.modeCard} ${
+                      config.displayMode === mode.id ? styles.modeCardActive : ""
+                    }`}
+                    onClick={() =>
+                      updateConfig(setConfig, "displayMode", mode.id)
+                    }
+                    aria-pressed={config.displayMode === mode.id}
+                  >
+                    <strong>{mode.title}</strong>
+                    <span>{mode.blurb}</span>
+                  </button>
+                ))}
+              </div>
+              <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+                <s-select
+                  label="Bar layout"
+                  value={config.layout}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "layout",
+                      (e.currentTarget as HTMLSelectElement)
+                        .value as BarConfig["layout"],
+                    )
+                  }
+                >
+                  <s-option value="row">Row</s-option>
+                  <s-option value="compact">Compact pill</s-option>
+                  <s-option value="stacked">Stacked</s-option>
+                </s-select>
+                <s-select
+                  label="Bar position"
+                  value={config.barPosition}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "barPosition",
+                      (e.currentTarget as HTMLSelectElement)
+                        .value as BarConfig["barPosition"],
+                    )
+                  }
+                >
+                  <s-option value="bottom">Bottom center</s-option>
+                  <s-option value="bottom-left">Bottom left</s-option>
+                  <s-option value="bottom-right">Bottom right</s-option>
+                  <s-option value="top">Top center</s-option>
+                  <s-option value="top-left">Top left</s-option>
+                  <s-option value="top-right">Top right</s-option>
+                  <s-option value="left">Middle left</s-option>
+                  <s-option value="right">Middle right</s-option>
+                </s-select>
+                <s-select
+                  label="Image shape"
+                  value={config.imageShape}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "imageShape",
+                      (e.currentTarget as HTMLSelectElement)
+                        .value as BarConfig["imageShape"],
+                    )
+                  }
+                >
+                  <s-option value="rounded">Rounded</s-option>
+                  <s-option value="circle">Circle</s-option>
+                  <s-option value="square">Square</s-option>
+                </s-select>
+                <s-select
+                  label="Button size"
+                  value={config.buttonSize}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "buttonSize",
+                      (e.currentTarget as HTMLSelectElement)
+                        .value as BarConfig["buttonSize"],
+                    )
+                  }
+                >
+                  <s-option value="normal">Normal</s-option>
+                  <s-option value="large">Large</s-option>
+                  <s-option value="full">Full width</s-option>
+                </s-select>
+              </s-grid>
+            </s-stack>
+          )}
+
+          {nav === "cart-items" && (
+            <s-stack gap="base">
+              <div className={styles.toggleRow}>
+                <s-switch
+                  label="Enable sticky bar"
+                  checked={config.enabled}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "enabled",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+                <s-switch
+                  label="Show product image"
+                  checked={config.showImage}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showImage",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+                <s-switch
+                  label="Show product title"
+                  checked={config.showTitle}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showTitle",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+                <s-switch
+                  label="Show price"
+                  checked={config.showPrice}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showPrice",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+                <s-switch
+                  label="Show quantity selector"
+                  checked={config.showQuantity}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showQuantity",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+              </div>
+              <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+                <s-number-field
+                  label="Image size"
+                  value={String(config.imageSize)}
+                  min={32}
+                  max={120}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "imageSize",
+                      Number((e.currentTarget as HTMLInputElement).value),
+                    )
+                  }
+                />
+                <s-number-field
+                  label="Content gap"
+                  value={String(config.contentGap)}
+                  min={4}
+                  max={32}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "contentGap",
+                      Number((e.currentTarget as HTMLInputElement).value),
+                    )
+                  }
+                />
+              </s-grid>
+            </s-stack>
+          )}
+
+          {nav === "announcements" && (
+            <ComingSoon
+              title="Announcements"
+              blurb="Promo banners and countdown messages inside the cart drawer — like UpCart’s header announcement."
+            />
+          )}
+          {nav === "rewards" && (
+            <ComingSoon
+              title="Free shipping / rewards"
+              blurb="Progress bar toward free shipping or tiered rewards in the drawer."
+            />
+          )}
+          {nav === "recommendations" && (
+            <ComingSoon
+              title="Recommendations & upsells"
+              blurb="Product recommendations and one-click upsells in the cart drawer."
+            />
+          )}
+          {nav === "discounts" && (
+            <ComingSoon
+              title="Discount codes"
+              blurb="Let shoppers apply discount codes directly in the sticky cart drawer."
+            />
+          )}
+          {nav === "trust" && (
+            <ComingSoon
+              title="Trust badges"
+              blurb="Payment icons and trust badges under the checkout button."
+            />
+          )}
+
+          {nav === "cart-summary" && (
+            <s-stack gap="base">
+              <s-select
+                label="After adding to cart"
+                value={config.afterAdd}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "afterAdd",
+                    (e.currentTarget as HTMLSelectElement)
+                      .value as BarConfig["afterAdd"],
+                  )
+                }
+              >
+                <s-option value="stay">Stay on page</s-option>
+                <s-option value="cart">Go to cart</s-option>
+                <s-option value="drawer">Open cart drawer (if supported)</s-option>
+              </s-select>
+              <s-text-field
+                label="Checkout button text"
+                value={config.drawerCheckoutText}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "drawerCheckoutText",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-paragraph>
+                Tip: set Display style to <strong>Cart drawer</strong> to preview
+                the slide-out cart on the right.
+              </s-paragraph>
+            </s-stack>
+          )}
+
+          {nav === "pages" && (
+            <s-stack gap="base">
+              <div className={styles.toggleRow}>
+                <s-switch
+                  label="Product pages"
+                  checked={config.showOnProduct}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showOnProduct",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+                <s-switch
+                  label="Collection pages"
+                  checked={config.showOnCollection}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showOnCollection",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+                <s-switch
+                  label="Homepage"
+                  checked={config.showOnHome}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showOnHome",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+                <s-switch
+                  label="Search results"
+                  checked={config.showOnSearch}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showOnSearch",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+                <s-switch
+                  label="Other pages"
+                  checked={config.showOnOther}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showOnOther",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+                <s-switch
+                  label="Show on mobile"
+                  checked={config.showMobile}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showMobile",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+                <s-switch
+                  label="Show on desktop"
+                  checked={config.showDesktop}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showDesktop",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+              </div>
+            </s-stack>
+          )}
+
+          {nav === "behavior" && (
+            <s-stack gap="base">
+              <s-switch
+                label="Hide when main Add to cart is visible"
+                checked={config.hideNearForm}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "hideNearForm",
+                    (e.currentTarget as HTMLInputElement).checked,
+                  )
+                }
+              />
+              <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+                <s-number-field
+                  label="Show after scroll — mobile (px)"
+                  value={String(config.showAfterScroll)}
+                  min={0}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showAfterScroll",
+                      Number((e.currentTarget as HTMLInputElement).value),
+                    )
+                  }
+                />
+                <s-number-field
+                  label="Show after scroll — desktop (px)"
+                  value={String(config.showAfterScrollDesktop)}
+                  min={0}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "showAfterScrollDesktop",
+                      Number((e.currentTarget as HTMLInputElement).value),
+                    )
+                  }
+                />
+                <s-number-field
+                  label="Edge offset (px)"
+                  value={String(config.desktopBottomOffset)}
+                  min={0}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "desktopBottomOffset",
+                      Number((e.currentTarget as HTMLInputElement).value),
+                    )
+                  }
+                />
+                <s-number-field
+                  label="Desktop max width"
+                  value={String(config.desktopMaxWidth)}
+                  min={280}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "desktopMaxWidth",
+                      Number((e.currentTarget as HTMLInputElement).value),
+                    )
+                  }
+                />
+              </s-grid>
+            </s-stack>
+          )}
+
+          {nav === "plan" && (
+            <s-stack gap="base">
+              <div className={styles.planCard}>
+                <s-stack direction="inline" gap="small-200">
+                  <s-badge tone={isPro ? "success" : "info"}>
+                    {isPro ? "Pro" : "Free"}
+                  </s-badge>
+                  <s-badge tone={hideBranding ? "success" : "caution"}>
+                    {hideBranding ? "Branding hidden" : "Branding visible"}
+                  </s-badge>
+                </s-stack>
+                <p className={styles.planPrice}>
+                  {isPro ? "$6.99" : "$0"}
+                  <span>/mo</span>
+                </p>
+                <p>
+                  {isPro
+                    ? "Pro removes the “Powered by Sticky ATC” label and keeps full style controls."
+                    : "Free includes the sticky bar with a small branding label. Upgrade to remove branding."}
                 </p>
               </div>
-            </div>
-            <button type="button" className={styles.previewNativeBtn}>
-              Native Add to cart
-            </button>
-
-            {config.displayMode === "quickbuy" ? (
-              <div
-                className={`${styles.previewQuick} ${
-                  config.enabled ? "" : styles.previewBarDisabled
-                }`}
-                style={{
-                  background: config.buttonBackground,
-                  color: config.buttonTextColor,
-                  borderRadius: `${Math.max(config.buttonRadius, 20)}px`,
-                  fontSize: `${config.buttonFontSize}px`,
-                  boxShadow: config.showShadow
-                    ? "0 10px 28px rgba(0,0,0,0.18)"
-                    : "none",
-                }}
-              >
-                {config.buttonText}
-              </div>
-            ) : (
-              <div
-                className={`${styles.previewBar} ${
-                  config.enabled ? "" : styles.previewBarDisabled
-                } ${config.layout === "compact" ? styles.previewBarCompact : ""}`}
-                style={previewBarStyle}
-              >
-                {!hideBranding && (
-                  <span
-                    className={styles.previewBrand}
-                    style={{ color: config.textColor }}
+              {isPro ? (
+                <Form method="post">
+                  <input type="hidden" name="intent" value="downgrade" />
+                  <s-button
+                    type="submit"
+                    variant="secondary"
+                    {...(busy ? { loading: true } : {})}
                   >
-                    Powered by Sticky ATC
-                  </span>
-                )}
-                {config.showImage && (
-                  <div
-                    className={styles.previewMedia}
-                    style={{
-                      width: config.imageSize,
-                      height: config.imageSize,
-                      borderRadius: previewImageRadius,
-                      background: "linear-gradient(135deg, #94a3b8, #64748b)",
-                    }}
-                  />
-                )}
-                <div className={styles.previewInfo}>
-                  {config.showTitle && (
-                    <p
-                      className={styles.previewBarTitle}
-                      style={{ fontSize: `${config.titleFontSize}px` }}
-                    >
-                      Classic Canvas Sneaker
-                    </p>
-                  )}
-                  {config.showPrice && (
-                    <p
-                      className={styles.previewBarPrice}
-                      style={{ fontSize: `${config.priceFontSize}px` }}
-                    >
-                      $68.00
-                    </p>
-                  )}
+                    Switch to Free
+                  </s-button>
+                </Form>
+              ) : (
+                <Form method="post">
+                  <input type="hidden" name="intent" value="upgrade" />
+                  <s-button type="submit" {...(busy ? { loading: true } : {})}>
+                    Upgrade to Pro — $6.99/mo
+                  </s-button>
+                </Form>
+              )}
+            </s-stack>
+          )}
+
+          {nav === "setup" && (
+            <s-stack gap="base">
+              <s-paragraph>
+                Store: <strong>{shop}</strong>
+              </s-paragraph>
+              <s-stack direction="inline" gap="base">
+                <s-button
+                  href={`https://${shop}/admin/themes/current/editor`}
+                  target="_blank"
+                  variant="secondary"
+                >
+                  Open Theme Editor
+                </s-button>
+                <Form method="post">
+                  <input type="hidden" name="intent" value="sync" />
+                  <s-button
+                    type="submit"
+                    variant="tertiary"
+                    {...(busy ? { loading: true } : {})}
+                  >
+                    Sync storefront
+                  </s-button>
+                </Form>
+                <s-button href="/app/additional" variant="tertiary">
+                  Setup help
+                </s-button>
+              </s-stack>
+              <s-unordered-list>
+                <s-list-item>Enable the App embed once in Theme Editor</s-list-item>
+                <s-list-item>Style here, then Save settings</s-list-item>
+                <s-list-item>Test on a real product page after sync</s-list-item>
+              </s-unordered-list>
+            </s-stack>
+          )}
+        </section>
+
+        <aside className={styles.studioPreview} aria-label="Live preview">
+          <div className={styles.previewShell}>
+            <div className={styles.previewChrome}>
+              <span className={styles.previewDot} />
+              <span className={styles.previewDot} />
+              <span className={styles.previewDot} />
+              <span className={styles.previewUrl}>{shop}/products/demo</span>
+            </div>
+            <div
+              className={`${styles.previewStage} ${
+                config.displayMode === "slider" ? styles.previewStageSlider : ""
+              }`}
+            >
+              <div className={styles.previewProduct}>
+                <div className={styles.previewThumb} />
+                <div>
+                  <p className={styles.previewTitle}>Classic Canvas Sneaker</p>
+                  <p className={styles.previewSubtitle}>
+                    {config.displayMode === "quickbuy"
+                      ? "Quick Buy preview"
+                      : config.displayMode === "slider"
+                        ? "Bar + cart drawer preview"
+                        : "Product page mock"}
+                  </p>
                 </div>
-                {config.showQuantity && (
-                  <div className={styles.previewQty}>
-                    <span>−</span>
-                    <strong>1</strong>
-                    <span>+</span>
-                  </div>
-                )}
-                <button
-                  type="button"
-                  className={styles.previewBarButton}
+              </div>
+              <button type="button" className={styles.previewNativeBtn}>
+                Native Add to cart
+              </button>
+
+              {config.displayMode === "quickbuy" ? (
+                <div
+                  className={`${styles.previewQuick} ${
+                    config.enabled ? "" : styles.previewBarDisabled
+                  }`}
                   style={{
                     background: config.buttonBackground,
                     color: config.buttonTextColor,
-                    borderRadius: `${config.buttonRadius}px`,
+                    borderRadius: `${Math.max(config.buttonRadius, 20)}px`,
                     fontSize: `${config.buttonFontSize}px`,
-                    padding:
-                      config.buttonSize === "large"
-                        ? "14px 22px"
-                        : "10px 16px",
-                    width:
-                      config.buttonSize === "full" || config.layout === "stacked"
-                        ? "100%"
-                        : undefined,
+                    boxShadow: config.showShadow
+                      ? "0 10px 28px rgba(0,0,0,0.18)"
+                      : "none",
                   }}
                 >
                   {config.buttonText}
-                </button>
-              </div>
-            )}
-
-            {config.displayMode === "slider" && config.enabled && (
-              <div className={styles.previewSlider}>
-                <div className={styles.previewSliderHeader}>
-                  <strong>Your cart</strong>
-                  <span>×</span>
                 </div>
-                <div className={styles.previewSliderItem}>
-                  <div className={styles.previewSliderThumb} />
-                  <div>
-                    <p>Classic Canvas Sneaker</p>
-                    <span>Qty 1</span>
+              ) : (
+                <div
+                  className={`${styles.previewBar} ${
+                    config.enabled ? "" : styles.previewBarDisabled
+                  } ${config.layout === "compact" ? styles.previewBarCompact : ""}`}
+                  style={previewBarStyle}
+                >
+                  {!hideBranding && (
+                    <span
+                      className={styles.previewBrand}
+                      style={{ color: config.textColor }}
+                    >
+                      Powered by Sticky ATC
+                    </span>
+                  )}
+                  {config.showImage && (
+                    <div
+                      className={styles.previewMedia}
+                      style={{
+                        width: config.imageSize,
+                        height: config.imageSize,
+                        borderRadius: previewImageRadius,
+                        background: "linear-gradient(135deg, #94a3b8, #64748b)",
+                      }}
+                    />
+                  )}
+                  <div className={styles.previewInfo}>
+                    {config.showTitle && (
+                      <p
+                        className={styles.previewBarTitle}
+                        style={{
+                          fontSize: `${config.titleFontSize}px`,
+                          color: config.textColor,
+                        }}
+                      >
+                        Classic Canvas Sneaker
+                      </p>
+                    )}
+                    {config.showPrice && (
+                      <p
+                        className={styles.previewBarPrice}
+                        style={{
+                          fontSize: `${config.priceFontSize}px`,
+                          color: config.textColor,
+                        }}
+                      >
+                        $68.00
+                      </p>
+                    )}
                   </div>
-                  <strong>$68.00</strong>
-                </div>
-                <div className={styles.previewSliderFooter}>
-                  <div>
-                    <span>Subtotal</span>
-                    <strong>$68.00</strong>
-                  </div>
-                  <div
-                    className={styles.previewSliderCheckout}
+                  {config.showQuantity && (
+                    <div
+                      className={styles.previewQty}
+                      style={{ color: config.textColor }}
+                    >
+                      <span>−</span>
+                      <strong>1</strong>
+                      <span>+</span>
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    className={styles.previewBarButton}
                     style={{
                       background: config.buttonBackground,
                       color: config.buttonTextColor,
                       borderRadius: `${config.buttonRadius}px`,
+                      fontSize: `${config.buttonFontSize}px`,
+                      padding:
+                        config.buttonSize === "large"
+                          ? "14px 22px"
+                          : "10px 16px",
+                      width:
+                        config.buttonSize === "full" ||
+                        config.layout === "stacked"
+                          ? "100%"
+                          : undefined,
                     }}
                   >
-                    Checkout
+                    {config.buttonText}
+                  </button>
+                </div>
+              )}
+
+              {config.displayMode === "slider" && config.enabled && (
+                <div
+                  className={styles.previewSlider}
+                  style={{
+                    background: config.backgroundColor,
+                    color: config.textColor,
+                    borderColor: config.borderColor,
+                  }}
+                >
+                  <div
+                    className={styles.previewSliderAccent}
+                    style={{ background: config.accentColor }}
+                  />
+                  <div className={styles.previewSliderHeader}>
+                    <strong style={{ color: config.textColor }}>
+                      {config.drawerTitle || "Your cart"} (1)
+                    </strong>
+                    <span style={{ color: config.textColor }}>×</span>
+                  </div>
+                  <div className={styles.previewSliderItem}>
+                    <div className={styles.previewSliderThumb} />
+                    <div>
+                      <p style={{ color: config.textColor }}>
+                        Classic Canvas Sneaker
+                      </p>
+                      <span style={{ color: config.textColor }}>Qty 1</span>
+                    </div>
+                    <strong style={{ color: config.textColor }}>$68.00</strong>
+                  </div>
+                  <div className={styles.previewSliderFooter}>
+                    <div style={{ color: config.textColor }}>
+                      <span>Subtotal</span>
+                      <strong>$68.00</strong>
+                    </div>
+                    <div
+                      className={styles.previewSliderCheckout}
+                      style={{
+                        background: config.buttonBackground,
+                        color: config.buttonTextColor,
+                        borderRadius: `${config.buttonRadius}px`,
+                      }}
+                    >
+                      {config.drawerCheckoutText || "Checkout"}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      </s-section>
-
-      <s-section heading="Enable on storefront">
-        <s-paragraph>
-          Store: <strong>{shop}</strong>. Keep the App embed ON in Theme Editor,
-          then control content and style here.
-        </s-paragraph>
-        <s-stack direction="inline" gap="base">
-          <s-button
-            href={`https://${shop}/admin/themes/current/editor`}
-            target="_blank"
-            variant="secondary"
-          >
-            Open Theme Editor
-          </s-button>
-          <Form method="post">
-            <input type="hidden" name="intent" value="sync" />
-            <s-button
-              type="submit"
-              variant="tertiary"
-              {...(busy ? { loading: true } : {})}
-            >
-              Sync storefront
-            </s-button>
-          </Form>
-        </s-stack>
-      </s-section>
-
-      <s-section heading="Content">
-        <div className={styles.toggleRow}>
-          <s-switch
-            label="Enable sticky bar"
-            checked={config.enabled}
-            onChange={(e: Event) =>
-              updateConfig(
-                setConfig,
-                "enabled",
-                (e.currentTarget as HTMLInputElement).checked,
-              )
-            }
-          />
-          <s-switch
-            label="Show product image"
-            checked={config.showImage}
-            onChange={(e: Event) =>
-              updateConfig(
-                setConfig,
-                "showImage",
-                (e.currentTarget as HTMLInputElement).checked,
-              )
-            }
-          />
-          <s-switch
-            label="Show product title"
-            checked={config.showTitle}
-            onChange={(e: Event) =>
-              updateConfig(
-                setConfig,
-                "showTitle",
-                (e.currentTarget as HTMLInputElement).checked,
-              )
-            }
-          />
-          <s-switch
-            label="Show price"
-            checked={config.showPrice}
-            onChange={(e: Event) =>
-              updateConfig(
-                setConfig,
-                "showPrice",
-                (e.currentTarget as HTMLInputElement).checked,
-              )
-            }
-          />
-          <s-switch
-            label="Show quantity selector"
-            checked={config.showQuantity}
-            onChange={(e: Event) =>
-              updateConfig(
-                setConfig,
-                "showQuantity",
-                (e.currentTarget as HTMLInputElement).checked,
-              )
-            }
-          />
-          <s-switch
-            label="Show on mobile"
-            checked={config.showMobile}
-            onChange={(e: Event) =>
-              updateConfig(
-                setConfig,
-                "showMobile",
-                (e.currentTarget as HTMLInputElement).checked,
-              )
-            }
-          />
-          <s-switch
-            label="Show on desktop"
-            checked={config.showDesktop}
-            onChange={(e: Event) =>
-              updateConfig(
-                setConfig,
-                "showDesktop",
-                (e.currentTarget as HTMLInputElement).checked,
-              )
-            }
-          />
-          <s-switch
-            label="Hide when main Add to cart is visible"
-            checked={config.hideNearForm}
-            onChange={(e: Event) =>
-              updateConfig(
-                setConfig,
-                "hideNearForm",
-                (e.currentTarget as HTMLInputElement).checked,
-              )
-            }
-          />
-        </div>
-
-        <s-stack gap="base" paddingBlockStart="base">
-          <s-heading>Show on pages</s-heading>
-          <s-paragraph>
-            Choose which storefront templates can display the sticky bar. The
-            bar needs a product on the page, so product pages work best.
-          </s-paragraph>
-          <div className={styles.toggleRow}>
-            <s-switch
-              label="Product pages"
-              checked={config.showOnProduct}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "showOnProduct",
-                  (e.currentTarget as HTMLInputElement).checked,
-                )
-              }
-            />
-            <s-switch
-              label="Collection pages"
-              checked={config.showOnCollection}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "showOnCollection",
-                  (e.currentTarget as HTMLInputElement).checked,
-                )
-              }
-            />
-            <s-switch
-              label="Homepage"
-              checked={config.showOnHome}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "showOnHome",
-                  (e.currentTarget as HTMLInputElement).checked,
-                )
-              }
-            />
-            <s-switch
-              label="Search results"
-              checked={config.showOnSearch}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "showOnSearch",
-                  (e.currentTarget as HTMLInputElement).checked,
-                )
-              }
-            />
-            <s-switch
-              label="Other pages (cart, blog, pages…)"
-              checked={config.showOnOther}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "showOnOther",
-                  (e.currentTarget as HTMLInputElement).checked,
-                )
-              }
-            />
-          </div>
-        </s-stack>
-
-        <s-stack gap="base" paddingBlockStart="base">
-          <s-grid gridTemplateColumns="1fr 1fr" gap="base">
-            <s-text-field
-              label="Button text"
-              value={config.buttonText}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "buttonText",
-                  (e.currentTarget as HTMLInputElement).value,
-                )
-              }
-            />
-            <s-text-field
-              label="Sold out text"
-              value={config.soldOutText}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "soldOutText",
-                  (e.currentTarget as HTMLInputElement).value,
-                )
-              }
-            />
-          </s-grid>
-          <s-select
-            label="After adding to cart"
-            value={config.afterAdd}
-            onChange={(e: Event) =>
-              updateConfig(
-                setConfig,
-                "afterAdd",
-                (e.currentTarget as HTMLSelectElement).value as BarConfig["afterAdd"],
-              )
-            }
-          >
-            <s-option value="stay">Stay on page</s-option>
-            <s-option value="cart">Go to cart</s-option>
-            <s-option value="drawer">Open cart drawer (if supported)</s-option>
-          </s-select>
-        </s-stack>
-      </s-section>
-
-      <s-section heading="Style & layout">
-        <s-stack gap="base">
-          <s-grid gridTemplateColumns="1fr 1fr" gap="base">
-            <s-select
-              label="Background style"
-              value={config.backgroundStyle}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "backgroundStyle",
-                  (e.currentTarget as HTMLSelectElement)
-                    .value as BarConfig["backgroundStyle"],
-                )
-              }
-            >
-              <s-option value="solid">Solid color</s-option>
-              <s-option value="blur">Glass blur</s-option>
-              <s-option value="gradient">Soft gradient</s-option>
-            </s-select>
-            <s-select
-              label="Bar layout"
-              value={config.layout}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "layout",
-                  (e.currentTarget as HTMLSelectElement)
-                    .value as BarConfig["layout"],
-                )
-              }
-            >
-              <s-option value="row">Row (image · title · button)</s-option>
-              <s-option value="compact">Compact (floating pill, no title)</s-option>
-              <s-option value="stacked">Stacked (button full width)</s-option>
-            </s-select>
-            <s-select
-              label="Image shape"
-              value={config.imageShape}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "imageShape",
-                  (e.currentTarget as HTMLSelectElement)
-                    .value as BarConfig["imageShape"],
-                )
-              }
-            >
-              <s-option value="rounded">Rounded</s-option>
-              <s-option value="circle">Circle</s-option>
-              <s-option value="square">Square</s-option>
-            </s-select>
-            <s-select
-              label="Button size"
-              value={config.buttonSize}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "buttonSize",
-                  (e.currentTarget as HTMLSelectElement)
-                    .value as BarConfig["buttonSize"],
-                )
-              }
-            >
-              <s-option value="normal">Normal</s-option>
-              <s-option value="large">Large</s-option>
-              <s-option value="full">Full width</s-option>
-            </s-select>
-            <s-select
-              label="Bar position"
-              value={config.barPosition}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "barPosition",
-                  (e.currentTarget as HTMLSelectElement)
-                    .value as BarConfig["barPosition"],
-                )
-              }
-            >
-              <s-option value="bottom">Bottom center</s-option>
-              <s-option value="bottom-left">Bottom left</s-option>
-              <s-option value="bottom-right">Bottom right</s-option>
-              <s-option value="top">Top center</s-option>
-              <s-option value="top-left">Top left</s-option>
-              <s-option value="top-right">Top right</s-option>
-              <s-option value="left">Middle left</s-option>
-              <s-option value="right">Middle right</s-option>
-            </s-select>
-          </s-grid>
-
-          <s-switch
-            label="Show shadow"
-            checked={config.showShadow}
-            onChange={(e: Event) =>
-              updateConfig(
-                setConfig,
-                "showShadow",
-                (e.currentTarget as HTMLInputElement).checked,
-              )
-            }
-          />
-        </s-stack>
-
-        <s-stack gap="base" paddingBlockStart="base">
-          <s-grid
-            gridTemplateColumns="repeat(auto-fit, minmax(140px, 1fr))"
-            gap="base"
-          >
-            <s-number-field
-              label="Background opacity %"
-              value={String(config.backgroundOpacity)}
-              min={40}
-              max={100}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "backgroundOpacity",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Content gap"
-              value={String(config.contentGap)}
-              min={4}
-              max={32}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "contentGap",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Border width (px)"
-              value={String(config.borderWidth)}
-              min={0}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "borderWidth",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Bar corner radius"
-              value={String(config.barRadius)}
-              min={0}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "barRadius",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Button corner radius"
-              value={String(config.buttonRadius)}
-              min={0}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "buttonRadius",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Image corner radius"
-              value={String(config.imageRadius)}
-              min={0}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "imageRadius",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Padding Y"
-              value={String(config.paddingY)}
-              min={0}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "paddingY",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Padding X"
-              value={String(config.paddingX)}
-              min={0}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "paddingX",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Product image size"
-              value={String(config.imageSize)}
-              min={32}
-              max={120}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "imageSize",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Title font size"
-              value={String(config.titleFontSize)}
-              min={10}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "titleFontSize",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Price font size"
-              value={String(config.priceFontSize)}
-              min={10}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "priceFontSize",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Button font size"
-              value={String(config.buttonFontSize)}
-              min={10}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "buttonFontSize",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Desktop max width"
-              value={String(config.desktopMaxWidth)}
-              min={280}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "desktopMaxWidth",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Edge offset (px)"
-              value={String(config.desktopBottomOffset)}
-              min={0}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "desktopBottomOffset",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Show after scroll — mobile (px)"
-              value={String(config.showAfterScroll)}
-              min={0}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "showAfterScroll",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-            <s-number-field
-              label="Show after scroll — desktop (px)"
-              value={String(config.showAfterScrollDesktop)}
-              min={0}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "showAfterScrollDesktop",
-                  Number((e.currentTarget as HTMLInputElement).value),
-                )
-              }
-            />
-          </s-grid>
-
-          <s-grid gridTemplateColumns="1fr 1fr" gap="base">
-            <s-color-field
-              label="Bar background"
-              value={config.backgroundColor}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "backgroundColor",
-                  (e.currentTarget as HTMLInputElement).value,
-                )
-              }
-            />
-            <s-color-field
-              label="Border color"
-              value={config.borderColor}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "borderColor",
-                  (e.currentTarget as HTMLInputElement).value,
-                )
-              }
-            />
-            <s-color-field
-              label="Text color"
-              value={config.textColor}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "textColor",
-                  (e.currentTarget as HTMLInputElement).value,
-                )
-              }
-            />
-            <s-color-field
-              label="Button background"
-              value={config.buttonBackground}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "buttonBackground",
-                  (e.currentTarget as HTMLInputElement).value,
-                )
-              }
-            />
-            <s-color-field
-              label="Button text color"
-              value={config.buttonTextColor}
-              onChange={(e: Event) =>
-                updateConfig(
-                  setConfig,
-                  "buttonTextColor",
-                  (e.currentTarget as HTMLInputElement).value,
-                )
-              }
-            />
-          </s-grid>
-        </s-stack>
-      </s-section>
-
-      <s-section heading="Plan & billing">
-        <div className={styles.planCard}>
-          <s-stack direction="inline" gap="small-200">
-            <s-badge tone={isPro ? "success" : "info"}>
-              {isPro ? "Pro" : "Free"}
-            </s-badge>
-            <s-badge tone={hideBranding ? "success" : "caution"}>
-              {hideBranding ? "Branding hidden" : "Branding visible"}
-            </s-badge>
-          </s-stack>
-          <p className={styles.planPrice}>
-            {isPro ? "$6.99" : "$0"}
-            <span>/mo</span>
-          </p>
-          <p>
-            {isPro
-              ? "Pro removes the “Powered by Sticky ATC” label and keeps full style controls."
-              : "Free includes the sticky bar with a small branding label. Upgrade to remove branding."}
-          </p>
-        </div>
-        <s-stack direction="inline" gap="base" paddingBlockStart="base">
-          {isPro ? (
-            <Form method="post">
-              <input type="hidden" name="intent" value="downgrade" />
-              <s-button
-                type="submit"
-                variant="secondary"
-                {...(busy ? { loading: true } : {})}
-              >
-                Switch to Free
-              </s-button>
-            </Form>
-          ) : (
-            <Form method="post">
-              <input type="hidden" name="intent" value="upgrade" />
-              <s-button type="submit" {...(busy ? { loading: true } : {})}>
-                Upgrade to Pro — $6.99/mo
-              </s-button>
-            </Form>
-          )}
-        </s-stack>
-        <s-paragraph>
-          Demo billing for now. Connect the Shopify Billing API before App Store
-          launch. If Dev Dashboard shows a public distribution error, set the app
-          to custom distribution while testing.
-        </s-paragraph>
-      </s-section>
-
-      <s-section slot="aside" heading="Quick tips">
-        <s-unordered-list>
-          <s-list-item>Enable the App embed once, then style here</s-list-item>
-          <s-list-item>Use the live preview before saving</s-list-item>
-          <s-list-item>Test on a real product page after sync</s-list-item>
-          <s-list-item>Pro hides branding on the storefront bar</s-list-item>
-        </s-unordered-list>
-      </s-section>
-
-      <s-section slot="aside" heading="Need help?">
-        <s-paragraph>
-          Bar not showing? Check the Setup help page for the most common fixes.
-        </s-paragraph>
-        <s-button href="/app/additional" variant="secondary">
-          Open setup help
-        </s-button>
-      </s-section>
+        </aside>
+      </div>
     </s-page>
   );
 }

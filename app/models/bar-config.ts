@@ -71,6 +71,12 @@ export type BarConfig = {
   textColor: string;
   buttonBackground: string;
   buttonTextColor: string;
+  /** Accent used in cart drawer highlights / progress UI. */
+  accentColor: string;
+  /** Cart drawer header title (slider mode). */
+  drawerTitle: string;
+  /** Cart drawer checkout button label. */
+  drawerCheckoutText: string;
 };
 
 export const DEFAULT_BAR_CONFIG: BarConfig = {
@@ -118,6 +124,9 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   textColor: "#111111",
   buttonBackground: "#111111",
   buttonTextColor: "#ffffff",
+  accentColor: "#111111",
+  drawerTitle: "Your cart",
+  drawerCheckoutText: "Checkout",
 };
 
 function asBool(value: FormDataEntryValue | null | undefined, fallback: boolean) {
@@ -271,6 +280,12 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
     buttonTextColor: asString(
       formData.get("buttonTextColor"),
       DEFAULT_BAR_CONFIG.buttonTextColor,
+    ),
+    accentColor: asString(formData.get("accentColor"), DEFAULT_BAR_CONFIG.accentColor),
+    drawerTitle: asString(formData.get("drawerTitle"), DEFAULT_BAR_CONFIG.drawerTitle),
+    drawerCheckoutText: asString(
+      formData.get("drawerCheckoutText"),
+      DEFAULT_BAR_CONFIG.drawerCheckoutText,
     ),
   };
 }

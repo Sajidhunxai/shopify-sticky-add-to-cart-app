@@ -51,6 +51,9 @@
   {% assign satc_border_color = cfg.borderColor %}
   {% assign satc_image_radius = cfg.imageRadius %}
   {% assign satc_show_qty = cfg.showQuantity %}
+  {% assign satc_accent = cfg.accentColor %}
+  {% assign satc_drawer_title = cfg.drawerTitle %}
+  {% assign satc_drawer_checkout = cfg.drawerCheckoutText %}
 {% else %}
   {% assign satc_enabled = block.settings.enabled %}
   {% assign satc_display_mode = block.settings.display_mode %}
@@ -99,9 +102,19 @@
   {% assign satc_border_color = '#e5e7eb' %}
   {% assign satc_image_radius = 8 %}
   {% assign satc_show_qty = false %}
+  {% assign satc_accent = satc_btn_bg %}
+  {% assign satc_drawer_title = 'general.your_cart' | t %}
+  {% assign satc_drawer_checkout = 'general.checkout' | t %}
 {% endif %}
 
 {% if satc_display_mode == blank %}{% assign satc_display_mode = 'bar' %}{% endif %}
+{% if satc_accent == blank %}{% assign satc_accent = satc_btn_bg %}{% endif %}
+{% if satc_drawer_title == blank or satc_drawer_title == 'Your cart' %}
+  {% assign satc_drawer_title = 'general.your_cart' | t %}
+{% endif %}
+{% if satc_drawer_checkout == blank or satc_drawer_checkout == 'Checkout' %}
+  {% assign satc_drawer_checkout = 'general.checkout' | t %}
+{% endif %}
 {% if satc_scroll_desktop == blank %}{% assign satc_scroll_desktop = 0 %}{% endif %}
 {% if satc_bg_style == blank %}{% assign satc_bg_style = 'solid' %}{% endif %}
 {% if satc_bg_opacity == blank %}{% assign satc_bg_opacity = 100 %}{% endif %}
@@ -215,10 +228,10 @@
     {% if satc_show_title == true or satc_show_title == 'true' or satc_show_price == true or satc_show_price == 'true' %}
     <div class="satc-bar__info">
       {% if satc_show_title == true or satc_show_title == 'true' %}
-        <p class="satc-bar__title">{{ product.title }}</p>
+        <p class="satc-bar__title" style="color: {{ satc_text }};">{{ product.title }}</p>
       {% endif %}
       {% if satc_show_price == true or satc_show_price == 'true' %}
-        <p class="satc-bar__price" data-satc-price>
+        <p class="satc-bar__price" data-satc-price style="color: {{ satc_text }};">
           {{ product.selected_or_first_available_variant.price | money }}
         </p>
       {% endif %}
@@ -268,11 +281,12 @@
       <aside
         class="satc-slider__panel"
         role="dialog"
-        aria-label="{{ 'general.your_cart' | t | escape }}"
-        style="--satc-bg: {{ satc_bg }}; --satc-text: {{ satc_text }}; --satc-btn-bg: {{ satc_btn_bg }}; --satc-btn-text: {{ satc_btn_text }};"
+        aria-label="{{ satc_drawer_title | escape }}"
+        style="--satc-bg: {{ satc_bg }}; --satc-text: {{ satc_text }}; --satc-btn-bg: {{ satc_btn_bg }}; --satc-btn-text: {{ satc_btn_text }}; --satc-accent: {{ satc_accent }};"
       >
+        <div class="satc-slider__accent" aria-hidden="true"></div>
         <header class="satc-slider__header">
-          <h2 class="satc-slider__title">{{ 'general.your_cart' | t }}</h2>
+          <h2 class="satc-slider__title">{{ satc_drawer_title }}</h2>
           <button type="button" class="satc-slider__close" data-satc-slider-close aria-label="{{ 'general.close' | t | escape }}">
             ×
           </button>
@@ -286,7 +300,7 @@
             <strong data-satc-slider-total>—</strong>
           </div>
           <a class="satc-slider__checkout" href="{{ routes.cart_url }}" data-satc-slider-checkout>
-            {{ 'general.checkout' | t }}
+            {{ satc_drawer_checkout }}
           </a>
         </footer>
       </aside>
