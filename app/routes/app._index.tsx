@@ -311,7 +311,7 @@ export default function Index() {
         heading={config.enabled ? "Sticky bar ready" : "Sticky bar is off"}
       >
         {config.enabled
-          ? "Use the left menu like UpCart — edit Design, Header, Cart items, and more. Save to sync the storefront."
+          ? "Use the left menu to edit Design, Header, Cart items, and more. Save to sync the storefront."
           : "Turn the sticky bar on under Cart items / Setup, then save."}
       </s-banner>
 
@@ -766,7 +766,7 @@ export default function Index() {
           {nav === "announcements" && (
             <ComingSoon
               title="Announcements"
-              blurb="Promo banners and countdown messages inside the cart drawer — like UpCart’s header announcement."
+              blurb="Promo banners and countdown messages inside the cart drawer."
             />
           )}
           {nav === "rewards" && (
