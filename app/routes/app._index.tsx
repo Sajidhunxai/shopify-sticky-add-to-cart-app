@@ -56,7 +56,7 @@ const NAV_GROUPS: NavGroup[] = [
     title: "General",
     items: [
       { id: "design", label: "Design" },
-      { id: "header", label: "Header & text" },
+      { id: "header", label: "Header" },
       { id: "display", label: "Display style" },
     ],
   },
@@ -65,9 +65,9 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: "cart-items", label: "Cart items" },
       { id: "announcements", label: "Announcements", soon: true },
-      { id: "rewards", label: "Free shipping / rewards", soon: true },
-      { id: "recommendations", label: "Recommendations", soon: true },
-      { id: "discounts", label: "Discount codes", soon: true },
+      { id: "rewards", label: "Tiered rewards" },
+      { id: "recommendations", label: "Recommendations" },
+      { id: "discounts", label: "Discount codes" },
     ],
   },
   {
@@ -225,6 +225,7 @@ export default function Index() {
 
   const [config, setConfig] = useState<BarConfig>(initialConfig);
   const [nav, setNav] = useState<NavId>("design");
+  const [previewEmpty, setPreviewEmpty] = useState(false);
 
   useEffect(() => {
     setConfig(initialConfig);
@@ -240,9 +241,26 @@ export default function Index() {
     const fd = new FormData();
     fd.set("intent", "save");
     (Object.keys(config) as (keyof BarConfig)[]).forEach((key) => {
-      fd.set(key, String(config[key]));
+      const value = config[key];
+      if (key === "rewardTiers") {
+        fd.set(key, JSON.stringify(value));
+        return;
+      }
+      fd.set(key, String(value));
     });
     submit(fd, { method: "post" });
+  };
+
+  const updateRewardTier = (
+    index: number,
+    patch: Partial<BarConfig["rewardTiers"][number]>,
+  ) => {
+    setConfig((prev) => {
+      const rewardTiers = prev.rewardTiers.map((tier, i) =>
+        i === index ? { ...tier, ...patch } : tier,
+      );
+      return { ...prev, rewardTiers };
+    });
   };
 
   const hexToRgba = (hex: string, opacityPct: number) => {
@@ -514,6 +532,197 @@ export default function Index() {
 
           {nav === "header" && (
             <s-stack gap="base">
+              <s-heading>General</s-heading>
+              <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+                <s-select
+                  label="Height"
+                  value={config.drawerHeaderHeight}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "drawerHeaderHeight",
+                      (e.currentTarget as HTMLSelectElement).value as
+                        | "slim"
+                        | "tall",
+                    )
+                  }
+                >
+                  <s-option value="slim">Slim</s-option>
+                  <s-option value="tall">Tall</s-option>
+                </s-select>
+                <s-select
+                  label="Bottom border"
+                  value={config.drawerHeaderBorder}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "drawerHeaderBorder",
+                      (e.currentTarget as HTMLSelectElement).value as
+                        | "none"
+                        | "thin",
+                    )
+                  }
+                >
+                  <s-option value="none">None</s-option>
+                  <s-option value="thin">Thin</s-option>
+                </s-select>
+                <s-color-field
+                  label="Header background"
+                  value={config.drawerHeaderBg}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value) updateConfig(setConfig, "drawerHeaderBg", value);
+                  }}
+                />
+              </s-grid>
+
+              <s-heading>Title</s-heading>
+              <s-text-field
+                label="Text (use {{cart_quantity}} for item count)"
+                value={config.drawerTitle}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "drawerTitle",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+                <s-select
+                  label="Alignment"
+                  value={config.drawerTitleAlign}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "drawerTitleAlign",
+                      (e.currentTarget as HTMLSelectElement).value as
+                        | "left"
+                        | "center",
+                    )
+                  }
+                >
+                  <s-option value="left">Side</s-option>
+                  <s-option value="center">Center</s-option>
+                </s-select>
+                <s-select
+                  label="Font weight"
+                  value={config.drawerTitleWeight}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "drawerTitleWeight",
+                      (e.currentTarget as HTMLSelectElement).value as
+                        | "normal"
+                        | "semibold"
+                        | "bold",
+                    )
+                  }
+                >
+                  <s-option value="normal">Normal</s-option>
+                  <s-option value="semibold">Semibold</s-option>
+                  <s-option value="bold">Bold</s-option>
+                </s-select>
+                <s-number-field
+                  label="Font size"
+                  value={String(config.drawerTitleSize)}
+                  min={12}
+                  max={28}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "drawerTitleSize",
+                      Number((e.currentTarget as HTMLInputElement).value),
+                    )
+                  }
+                />
+              </s-grid>
+
+              <s-heading>Close button</s-heading>
+              <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+                <s-select
+                  label="Location"
+                  value={config.drawerCloseSide}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "drawerCloseSide",
+                      (e.currentTarget as HTMLSelectElement).value as
+                        | "left"
+                        | "right",
+                    )
+                  }
+                >
+                  <s-option value="left">Left</s-option>
+                  <s-option value="right">Right</s-option>
+                </s-select>
+                <s-select
+                  label="Icon size"
+                  value={config.drawerCloseIconSize}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "drawerCloseIconSize",
+                      (e.currentTarget as HTMLSelectElement).value as
+                        | "small"
+                        | "medium"
+                        | "large",
+                    )
+                  }
+                >
+                  <s-option value="small">Small</s-option>
+                  <s-option value="medium">Medium</s-option>
+                  <s-option value="large">Large</s-option>
+                </s-select>
+                <s-select
+                  label="Border"
+                  value={config.drawerCloseBorder}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "drawerCloseBorder",
+                      (e.currentTarget as HTMLSelectElement).value as
+                        | "none"
+                        | "thin"
+                        | "normal"
+                        | "thick",
+                    )
+                  }
+                >
+                  <s-option value="none">None</s-option>
+                  <s-option value="thin">Thin</s-option>
+                  <s-option value="normal">Normal</s-option>
+                  <s-option value="thick">Thick</s-option>
+                </s-select>
+                <s-color-field
+                  label="Icon color"
+                  value={config.drawerCloseColor}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value)
+                      updateConfig(setConfig, "drawerCloseColor", value);
+                  }}
+                />
+                <s-color-field
+                  label="Background color"
+                  value={config.drawerCloseBg}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value) updateConfig(setConfig, "drawerCloseBg", value);
+                  }}
+                />
+                <s-color-field
+                  label="Background hover color"
+                  value={config.drawerCloseHoverBg}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value)
+                      updateConfig(setConfig, "drawerCloseHoverBg", value);
+                  }}
+                />
+              </s-grid>
+
+              <s-heading>Sticky bar button text</s-heading>
               <s-text-field
                 label="Add to cart button text"
                 value={config.buttonText}
@@ -532,28 +741,6 @@ export default function Index() {
                   updateConfig(
                     setConfig,
                     "soldOutText",
-                    (e.currentTarget as HTMLInputElement).value,
-                  )
-                }
-              />
-              <s-text-field
-                label="Cart drawer title"
-                value={config.drawerTitle}
-                onChange={(e: Event) =>
-                  updateConfig(
-                    setConfig,
-                    "drawerTitle",
-                    (e.currentTarget as HTMLInputElement).value,
-                  )
-                }
-              />
-              <s-text-field
-                label="Checkout button text"
-                value={config.drawerCheckoutText}
-                onChange={(e: Event) =>
-                  updateConfig(
-                    setConfig,
-                    "drawerCheckoutText",
                     (e.currentTarget as HTMLInputElement).value,
                   )
                 }
@@ -764,34 +951,472 @@ export default function Index() {
           )}
 
           {nav === "announcements" && (
-            <ComingSoon
-              title="Announcements"
-              blurb="Promo banners and countdown messages inside the cart drawer."
-            />
+            <s-stack gap="base">
+              <s-stack direction="inline" gap="base">
+                <s-badge tone={config.announcementEnabled ? "success" : "neutral"}>
+                  {config.announcementEnabled ? "Active" : "Disabled"}
+                </s-badge>
+                <s-switch
+                  label={
+                    config.announcementEnabled
+                      ? "Disable announcement"
+                      : "Enable announcement"
+                  }
+                  checked={config.announcementEnabled}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "announcementEnabled",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+              </s-stack>
+
+              <s-select
+                label="Height"
+                value={config.announcementHeight}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "announcementHeight",
+                    (e.currentTarget as HTMLSelectElement).value as
+                      | "slim"
+                      | "normal"
+                      | "thick",
+                  )
+                }
+              >
+                <s-option value="slim">Slim</s-option>
+                <s-option value="normal">Normal</s-option>
+                <s-option value="thick">Thick</s-option>
+              </s-select>
+
+              <s-select
+                label="Position"
+                value={config.announcementPosition}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "announcementPosition",
+                    (e.currentTarget as HTMLSelectElement).value as
+                      | "before"
+                      | "after",
+                  )
+                }
+              >
+                <s-option value="before">Before products</s-option>
+                <s-option value="after">After products</s-option>
+              </s-select>
+
+              <s-text-field
+                label="Timer duration (MM:SS)"
+                value={config.announcementTimer}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "announcementTimer",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-paragraph>
+                Use MM:SS format (example: 15:00). Put <strong>{"{timer}"}</strong>{" "}
+                in the announcement text to show the countdown.
+              </s-paragraph>
+
+              <s-text-field
+                label="Announcement text"
+                value={config.announcementText}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "announcementText",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+
+              <s-number-field
+                label="Font size"
+                value={String(config.announcementFontSize)}
+                min={10}
+                max={24}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "announcementFontSize",
+                    Number((e.currentTarget as HTMLInputElement).value),
+                  )
+                }
+              />
+
+              <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+                <s-color-field
+                  label="Background color"
+                  value={config.announcementBg}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value) updateConfig(setConfig, "announcementBg", value);
+                  }}
+                />
+                <s-color-field
+                  label="Border color"
+                  value={config.announcementBorderColor}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value)
+                      updateConfig(setConfig, "announcementBorderColor", value);
+                  }}
+                />
+                <s-color-field
+                  label="Text color"
+                  value={config.announcementTextColor}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value)
+                      updateConfig(setConfig, "announcementTextColor", value);
+                  }}
+                />
+              </s-grid>
+            </s-stack>
           )}
           {nav === "rewards" && (
-            <ComingSoon
-              title="Free shipping / rewards"
-              blurb="Progress bar toward free shipping or tiered rewards in the drawer."
-            />
+            <s-stack gap="base">
+              <s-stack direction="inline" gap="base">
+                <s-badge tone={config.rewardEnabled ? "success" : "neutral"}>
+                  {config.rewardEnabled ? "Active" : "Disabled"}
+                </s-badge>
+                <s-switch
+                  label={
+                    config.rewardEnabled
+                      ? "Disable tiered rewards"
+                      : "Enable tiered rewards"
+                  }
+                  checked={config.rewardEnabled}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "rewardEnabled",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+              </s-stack>
+
+              <s-switch
+                label="Show rewards on empty cart"
+                checked={config.rewardShowOnEmpty}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "rewardShowOnEmpty",
+                    (e.currentTarget as HTMLInputElement).checked,
+                  )
+                }
+              />
+
+              <s-heading>Colors</s-heading>
+              <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+                <s-color-field
+                  label="Background"
+                  value={config.rewardBg}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value) updateConfig(setConfig, "rewardBg", value);
+                  }}
+                />
+                <s-color-field
+                  label="Progress / foreground"
+                  value={config.rewardFg}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value) updateConfig(setConfig, "rewardFg", value);
+                  }}
+                />
+                <s-color-field
+                  label="Reward tier icon"
+                  value={config.rewardIconColor}
+                  onChange={(e: Event) => {
+                    const value = colorFromEvent(e);
+                    if (value) updateConfig(setConfig, "rewardIconColor", value);
+                  }}
+                />
+              </s-grid>
+
+              <s-text-field
+                label="Text after completing full rewards bar"
+                value={config.rewardCompleteText}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "rewardCompleteText",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+
+              <s-select
+                label="Rewards calculation"
+                value={config.rewardCalcMode}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "rewardCalcMode",
+                    (e.currentTarget as HTMLSelectElement).value as
+                      | "total"
+                      | "quantity",
+                  )
+                }
+              >
+                <s-option value="total">Cart total ($)</s-option>
+                <s-option value="quantity">Cart quantity (#)</s-option>
+              </s-select>
+
+              <s-heading>Tiers</s-heading>
+              {config.rewardTiers.map((tier, index) => (
+                <div key={`tier-${index}`} className={styles.tierCard}>
+                  <s-stack direction="inline" gap="base">
+                    <strong>Tier {index + 1}</strong>
+                    <s-switch
+                      label="Enabled"
+                      checked={tier.enabled}
+                      onChange={(e: Event) =>
+                        updateRewardTier(index, {
+                          enabled: (e.currentTarget as HTMLInputElement).checked,
+                        })
+                      }
+                    />
+                  </s-stack>
+                  <s-number-field
+                    label={
+                      config.rewardCalcMode === "quantity"
+                        ? "Minimum quantity"
+                        : "Minimum amount"
+                    }
+                    value={String(tier.minAmount)}
+                    min={1}
+                    onChange={(e: Event) =>
+                      updateRewardTier(index, {
+                        minAmount: Number(
+                          (e.currentTarget as HTMLInputElement).value,
+                        ),
+                      })
+                    }
+                  />
+                  <s-text-field
+                    label="Reward description"
+                    value={tier.description}
+                    onChange={(e: Event) =>
+                      updateRewardTier(index, {
+                        description: (e.currentTarget as HTMLInputElement).value,
+                      })
+                    }
+                  />
+                  <s-text-field
+                    label="Title before achieving (use [AMOUNT])"
+                    value={tier.titleBefore}
+                    onChange={(e: Event) =>
+                      updateRewardTier(index, {
+                        titleBefore: (e.currentTarget as HTMLInputElement).value,
+                      })
+                    }
+                  />
+                </div>
+              ))}
+            </s-stack>
           )}
           {nav === "recommendations" && (
-            <ComingSoon
-              title="Recommendations & upsells"
-              blurb="Product recommendations and one-click upsells in the cart drawer."
-            />
+            <s-stack gap="base">
+              <s-stack direction="inline" gap="base">
+                <s-badge
+                  tone={config.recommendationsEnabled ? "success" : "neutral"}
+                >
+                  {config.recommendationsEnabled ? "Active" : "Disabled"}
+                </s-badge>
+                <s-switch
+                  label={
+                    config.recommendationsEnabled
+                      ? "Disable recommendations"
+                      : "Enable recommendations"
+                  }
+                  checked={config.recommendationsEnabled}
+                  onChange={(e: Event) =>
+                    updateConfig(
+                      setConfig,
+                      "recommendationsEnabled",
+                      (e.currentTarget as HTMLInputElement).checked,
+                    )
+                  }
+                />
+              </s-stack>
+
+              <s-paragraph>
+                When the cart is empty, the drawer shows an empty message and
+                product recommendations customers can add in one click.
+              </s-paragraph>
+
+              <s-text-field
+                label="Empty cart helper text"
+                value={config.recommendationsEmptyText}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "recommendationsEmptyText",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-text-field
+                label="Recommendations header"
+                value={config.recommendationsHeader}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "recommendationsHeader",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-number-field
+                label="Maximum recommendations"
+                value={String(config.recommendationsMax)}
+                min={1}
+                max={8}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "recommendationsMax",
+                    Number((e.currentTarget as HTMLInputElement).value),
+                  )
+                }
+              />
+              <s-text-field
+                label="Add button text"
+                value={config.recommendationsAddText}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "recommendationsAddText",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-text-field
+                label="Collection handle"
+                value={config.recommendationsCollection}
+                details="Products shown when the cart is empty (e.g. all, bestsellers)."
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "recommendationsCollection",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+
+              <s-heading>Shop now button</s-heading>
+              <s-switch
+                label="Show Shop now button on empty cart"
+                checked={config.recommendationsShopNowEnabled}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "recommendationsShopNowEnabled",
+                    (e.currentTarget as HTMLInputElement).checked,
+                  )
+                }
+              />
+              <s-text-field
+                label="Button text"
+                value={config.recommendationsShopNowText}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "recommendationsShopNowText",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-text-field
+                label="Button URL"
+                value={config.recommendationsShopNowUrl}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "recommendationsShopNowUrl",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+            </s-stack>
           )}
           {nav === "discounts" && (
-            <ComingSoon
-              title="Discount codes"
-              blurb="Let shoppers apply discount codes directly in the sticky cart drawer."
-            />
+            <s-stack gap="base">
+              <s-switch
+                label="Show discount code field"
+                checked={config.discountEnabled}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "discountEnabled",
+                    (e.currentTarget as HTMLInputElement).checked,
+                  )
+                }
+              />
+              <s-text-field
+                label="Input placeholder"
+                value={config.discountPlaceholder}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "discountPlaceholder",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-text-field
+                label="Apply button text"
+                value={config.discountButtonText}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "discountButtonText",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+              <s-paragraph>
+                Applying a code sends shoppers through Shopify’s discount URL,
+                then they can return to checkout.
+              </s-paragraph>
+            </s-stack>
           )}
           {nav === "trust" && (
-            <ComingSoon
-              title="Trust badges"
-              blurb="Payment icons and trust badges under the checkout button."
-            />
+            <s-stack gap="base">
+              <s-switch
+                label="Show trust badges under checkout"
+                checked={config.trustBadgesEnabled}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "trustBadgesEnabled",
+                    (e.currentTarget as HTMLInputElement).checked,
+                  )
+                }
+              />
+              <s-text-field
+                label="Trust text"
+                value={config.trustBadgesText}
+                onChange={(e: Event) =>
+                  updateConfig(
+                    setConfig,
+                    "trustBadgesText",
+                    (e.currentTarget as HTMLInputElement).value,
+                  )
+                }
+              />
+            </s-stack>
           )}
 
           {nav === "cart-summary" && (
@@ -1074,6 +1699,25 @@ export default function Index() {
               <span className={styles.previewDot} />
               <span className={styles.previewUrl}>{shop}/products/demo</span>
             </div>
+            {config.displayMode === "slider" && (
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 12px 0",
+                  fontSize: 12,
+                  color: "#4b5563",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={previewEmpty || nav === "recommendations"}
+                  onChange={(e) => setPreviewEmpty(e.target.checked)}
+                />
+                Show empty cart
+              </label>
+            )}
             <div
               className={`${styles.previewStage} ${
                 config.displayMode === "slider" ? styles.previewStageSlider : ""
@@ -1210,38 +1854,375 @@ export default function Index() {
                     className={styles.previewSliderAccent}
                     style={{ background: config.accentColor }}
                   />
-                  <div className={styles.previewSliderHeader}>
-                    <strong style={{ color: config.textColor }}>
-                      {config.drawerTitle || "Your cart"} (1)
-                    </strong>
-                    <span style={{ color: config.textColor }}>×</span>
-                  </div>
-                  <div className={styles.previewSliderItem}>
-                    <div className={styles.previewSliderThumb} />
-                    <div>
-                      <p style={{ color: config.textColor }}>
-                        Classic Canvas Sneaker
-                      </p>
-                      <span style={{ color: config.textColor }}>Qty 1</span>
-                    </div>
-                    <strong style={{ color: config.textColor }}>$68.00</strong>
-                  </div>
-                  <div className={styles.previewSliderFooter}>
-                    <div style={{ color: config.textColor }}>
-                      <span>Subtotal</span>
-                      <strong>$68.00</strong>
-                    </div>
-                    <div
-                      className={styles.previewSliderCheckout}
+                  <div
+                    className={styles.previewSliderHeader}
+                    style={{
+                      background: config.drawerHeaderBg,
+                      borderBottom:
+                        config.drawerHeaderBorder === "thin"
+                          ? "1px solid rgba(0,0,0,0.1)"
+                          : "none",
+                      flexDirection:
+                        config.drawerCloseSide === "left"
+                          ? "row-reverse"
+                          : "row",
+                    }}
+                  >
+                    <strong
                       style={{
-                        background: config.buttonBackground,
-                        color: config.buttonTextColor,
-                        borderRadius: `${config.buttonRadius}px`,
+                        color: config.textColor,
+                        fontSize: `${config.drawerTitleSize}px`,
+                        fontWeight:
+                          config.drawerTitleWeight === "bold"
+                            ? 700
+                            : config.drawerTitleWeight === "semibold"
+                              ? 600
+                              : 400,
+                        textAlign: config.drawerTitleAlign,
+                        flex: 1,
                       }}
                     >
-                      {config.drawerCheckoutText || "Checkout"}
-                    </div>
+                      {(config.drawerTitle || "YOUR CART ({{cart_quantity}})").replace(
+                        /\{\{\s*cart_quantity\s*\}\}/gi,
+                        previewEmpty || nav === "recommendations" ? "0" : "1",
+                      )}
+                    </strong>
+                    <span style={{ color: config.drawerCloseColor }}>×</span>
                   </div>
+                  {config.announcementEnabled &&
+                    config.announcementPosition === "before" && (
+                      <div
+                        style={{
+                          background: config.announcementBg,
+                          color: config.announcementTextColor,
+                          borderBottom: `2px solid ${config.announcementBorderColor}`,
+                          fontSize: Math.max(9, config.announcementFontSize - 4),
+                          fontWeight: 600,
+                          padding:
+                            config.announcementHeight === "thick"
+                              ? "10px 8px"
+                              : config.announcementHeight === "slim"
+                                ? "4px 8px"
+                                : "6px 8px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {config.announcementText.replace(
+                          /\{timer\}|\{\{\s*timer\s*\}\}/gi,
+                          config.announcementTimer || "15:00",
+                        )}
+                      </div>
+                    )}
+                  {config.rewardEnabled &&
+                    (config.rewardShowOnEmpty ||
+                      !(previewEmpty || nav === "recommendations")) &&
+                    (() => {
+                      const tiers = config.rewardTiers
+                        .filter((t) => t.enabled)
+                        .slice()
+                        .sort(
+                          (a, b) =>
+                            (Number(a.minAmount) || 0) -
+                            (Number(b.minAmount) || 0),
+                        );
+                      if (!tiers.length) return null;
+                      const isEmptyPreview =
+                        previewEmpty || nav === "recommendations";
+                      const previewValue = isEmptyPreview
+                        ? 0
+                        : config.rewardCalcMode === "quantity"
+                          ? 1
+                          : 68;
+                      const goals = tiers.map((t) => Number(t.minAmount) || 0);
+                      let pct = 100;
+                      let prev = 0;
+                      for (let i = 0; i < goals.length; i++) {
+                        const goal = goals[i];
+                        if (previewValue < goal) {
+                          const segStart = (i / goals.length) * 100;
+                          const segEnd = ((i + 1) / goals.length) * 100;
+                          const within =
+                            (previewValue - prev) /
+                            Math.max(goal - prev, 0.0001);
+                          pct = segStart + within * (segEnd - segStart);
+                          break;
+                        }
+                        prev = goal;
+                      }
+                      const next = tiers.find(
+                        (t) => previewValue < (Number(t.minAmount) || 0),
+                      );
+                      let message = config.rewardCompleteText;
+                      if (next) {
+                        const remaining =
+                          (Number(next.minAmount) || 0) - previewValue;
+                        const label =
+                          config.rewardCalcMode === "quantity"
+                            ? String(Math.ceil(remaining))
+                            : `$${remaining.toFixed(2)}`;
+                        message = (next.titleBefore || "You're [AMOUNT] away!")
+                          .replace(/\[AMOUNT\]/gi, label)
+                          .replace(
+                            /\{\{\s*amount_remaining\s*\}\}/gi,
+                            label,
+                          );
+                      }
+                      return (
+                        <div
+                          style={{
+                            background: config.rewardBg,
+                            padding: "8px 8px 6px",
+                            borderBottom: "1px solid rgba(0,0,0,0.06)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              gap: 4,
+                              marginBottom: 6,
+                            }}
+                          >
+                            {tiers.map((tier) => {
+                              const reached =
+                                previewValue >= (Number(tier.minAmount) || 0);
+                              return (
+                                <div
+                                  key={tier.description + tier.minAmount}
+                                  style={{
+                                    flex: 1,
+                                    textAlign: "center",
+                                    minWidth: 0,
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      display: "inline-block",
+                                      width: 12,
+                                      height: 12,
+                                      borderRadius: "50%",
+                                      background: reached
+                                        ? config.rewardIconColor
+                                        : "#fff",
+                                      border: reached
+                                        ? `2px solid ${config.rewardIconColor}`
+                                        : "2px solid rgba(0,0,0,0.15)",
+                                      boxSizing: "border-box",
+                                    }}
+                                  />
+                                  <div
+                                    style={{
+                                      fontSize: 8,
+                                      fontWeight: 650,
+                                      lineHeight: 1.2,
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                      color: config.textColor,
+                                    }}
+                                  >
+                                    {tier.description}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <div
+                            style={{
+                              height: 6,
+                              borderRadius: 999,
+                              background: "rgba(0,0,0,0.08)",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <div
+                              style={{
+                                height: "100%",
+                                width: `${Math.round(pct)}%`,
+                                background: config.rewardFg,
+                                borderRadius: 999,
+                              }}
+                            />
+                          </div>
+                          <p
+                            style={{
+                              margin: "6px 0 0",
+                              fontSize: 10,
+                              fontWeight: 600,
+                              textAlign: "center",
+                              color: config.textColor,
+                              lineHeight: 1.3,
+                            }}
+                          >
+                            {message}
+                          </p>
+                        </div>
+                      );
+                    })()}
+                  {previewEmpty || nav === "recommendations" ? (
+                    <div style={{ padding: "14px 10px 8px" }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          textAlign: "center",
+                          fontWeight: 700,
+                          fontSize: 13,
+                          color: config.textColor,
+                        }}
+                      >
+                        Your cart is empty
+                      </p>
+                      <p
+                        style={{
+                          margin: "6px 0 0",
+                          textAlign: "center",
+                          fontSize: 11,
+                          opacity: 0.75,
+                          color: config.textColor,
+                        }}
+                      >
+                        {config.recommendationsEmptyText}
+                      </p>
+                      {config.recommendationsShopNowEnabled && (
+                        <div
+                          style={{
+                            marginTop: 10,
+                            textAlign: "center",
+                            fontSize: 11,
+                            fontWeight: 650,
+                            color: config.buttonTextColor,
+                            background: config.buttonBackground,
+                            display: "inline-block",
+                            width: "100%",
+                            padding: "8px 0",
+                            borderRadius: `${config.buttonRadius}px`,
+                          }}
+                        >
+                          {config.recommendationsShopNowText}
+                        </div>
+                      )}
+                      {config.recommendationsEnabled && (
+                        <div style={{ marginTop: 14 }}>
+                          <strong
+                            style={{
+                              display: "block",
+                              fontSize: 12,
+                              marginBottom: 8,
+                              color: config.textColor,
+                            }}
+                          >
+                            {config.recommendationsHeader}
+                          </strong>
+                          {Array.from({
+                            length: Math.min(3, config.recommendationsMax),
+                          }).map((_, i) => (
+                            <div
+                              key={`rec-preview-${i}`}
+                              style={{
+                                display: "grid",
+                                gridTemplateColumns: "44px 1fr auto",
+                                gap: 8,
+                                alignItems: "center",
+                                marginBottom: 8,
+                                padding: 6,
+                                border: "1px solid rgba(0,0,0,0.08)",
+                                borderRadius: 8,
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: 44,
+                                  height: 44,
+                                  borderRadius: 6,
+                                  background: "rgba(0,0,0,0.08)",
+                                }}
+                              />
+                              <div style={{ minWidth: 0 }}>
+                                <p
+                                  style={{
+                                    margin: 0,
+                                    fontSize: 10,
+                                    fontWeight: 650,
+                                    color: config.textColor,
+                                  }}
+                                >
+                                  Recommended product {i + 1}
+                                </p>
+                                <span
+                                  style={{
+                                    fontSize: 10,
+                                    color: config.textColor,
+                                  }}
+                                >
+                                  $49.99
+                                </span>
+                              </div>
+                              <span
+                                style={{
+                                  fontSize: 10,
+                                  fontWeight: 700,
+                                  padding: "6px 8px",
+                                  borderRadius: `${config.buttonRadius}px`,
+                                  background: config.accentColor,
+                                  color: config.buttonTextColor,
+                                }}
+                              >
+                                {config.recommendationsAddText}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className={styles.previewSliderItem}>
+                      <div className={styles.previewSliderThumb} />
+                      <div>
+                        <p style={{ color: config.textColor }}>
+                          Classic Canvas Sneaker
+                        </p>
+                        <span style={{ color: config.textColor }}>Qty 1</span>
+                      </div>
+                      <strong style={{ color: config.textColor }}>$68.00</strong>
+                    </div>
+                  )}
+                  {config.announcementEnabled &&
+                    config.announcementPosition === "after" && (
+                      <div
+                        style={{
+                          background: config.announcementBg,
+                          color: config.announcementTextColor,
+                          borderBottom: `2px solid ${config.announcementBorderColor}`,
+                          fontSize: Math.max(9, config.announcementFontSize - 4),
+                          fontWeight: 600,
+                          padding: "6px 8px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {config.announcementText.replace(
+                          /\{timer\}|\{\{\s*timer\s*\}\}/gi,
+                          config.announcementTimer || "15:00",
+                        )}
+                      </div>
+                    )}
+                  {!(previewEmpty || nav === "recommendations") && (
+                    <div className={styles.previewSliderFooter}>
+                      <div style={{ color: config.textColor }}>
+                        <span>Subtotal</span>
+                        <strong>$68.00</strong>
+                      </div>
+                      <div
+                        className={styles.previewSliderCheckout}
+                        style={{
+                          background: config.buttonBackground,
+                          color: config.buttonTextColor,
+                          borderRadius: `${config.buttonRadius}px`,
+                        }}
+                      >
+                        {config.drawerCheckoutText || "Checkout"}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

@@ -146,6 +146,294 @@
   const sliderItems = slider?.querySelector("[data-satc-slider-items]");
   const sliderTotal = slider?.querySelector("[data-satc-slider-total]");
 
+  const titleEl = slider?.querySelector("[data-satc-drawer-title]");
+  const titleTemplate =
+    slider?.dataset.drawerTitle || titleEl?.textContent || "Your cart";
+  const rewardRoot = slider?.querySelector("[data-satc-rewards]");
+  const rewardEnabled = slider?.dataset.rewardEnabled === "true";
+  const rewardShowEmpty = slider?.dataset.rewardEmpty !== "false";
+  const rewardMode = slider?.dataset.rewardMode === "quantity" ? "quantity" : "total";
+  const rewardDoneText =
+    slider?.dataset.rewardDone || "Free shipping unlocked!";
+  let rewardTiers = [];
+  try {
+    rewardTiers = JSON.parse(slider?.dataset.rewardTiers || "[]");
+  } catch (_) {
+    rewardTiers = [];
+  }
+  if (!Array.isArray(rewardTiers) || !rewardTiers.length) {
+    // Fallback: legacy single free-shipping threshold
+    if (slider?.dataset.shipEnabled === "true") {
+      rewardTiers = [
+        {
+          enabled: true,
+          minAmount: Number(slider.dataset.shipThreshold || 100),
+          description: "Free Shipping",
+          titleBefore:
+            slider.dataset.shipText ||
+            "You're [AMOUNT] away from free shipping!",
+        },
+      ];
+    }
+  }
+  const activeTiers = rewardTiers
+    .filter((t) => t && t.enabled !== false)
+    .slice()
+    .sort((a, b) => (Number(a.minAmount) || 0) - (Number(b.minAmount) || 0));
+  const rewardMilestonesEl = slider?.querySelector(
+    "[data-satc-reward-milestones]",
+  );
+  const rewardBarEl = slider?.querySelector("[data-satc-reward-bar]");
+  const rewardTextEl = slider?.querySelector("[data-satc-reward-text]");
+
+  const formatTitle = (qty) =>
+    String(titleTemplate).replace(/\{\{\s*cart_quantity\s*\}\}/gi, String(qty));
+
+  const escapeHtml = (str) =>
+    String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+
+  const recEnabled = slider?.dataset.recEnabled === "true";
+  const recEmptyText =
+    slider?.dataset.recEmpty || "Add your favorite items to your cart.";
+  const recHeader = slider?.dataset.recHeader || "You may also like";
+  const recMax = Math.min(8, Math.max(1, Number(slider?.dataset.recMax || 3)));
+  const recAddText = slider?.dataset.recAdd || "Add";
+  const recShopOn = slider?.dataset.recShopOn === "true";
+  const recShopText = slider?.dataset.recShopText || "Shop now";
+  const recShopUrl = slider?.dataset.recShopUrl || "/collections/all";
+  const recCollection = slider?.dataset.recCollection || "all";
+  let recSeed = [];
+  try {
+    const seedEl = slider?.querySelector("[data-satc-rec-seed]");
+    recSeed = JSON.parse(seedEl?.textContent || "[]");
+  } catch (_) {
+    recSeed = [];
+  }
+  if (!Array.isArray(recSeed)) recSeed = [];
+
+  const fetchCollectionProducts = async () => {
+    const handle = encodeURIComponent(recCollection || "all");
+    const url = `${root}collections/${handle}/products.json?limit=${recMax}`;
+    try {
+      const res = await fetch(url, { headers: { Accept: "application/json" } });
+      if (!res.ok) throw new Error("collection fetch failed");
+      const data = await res.json();
+      const products = Array.isArray(data.products) ? data.products : [];
+      return products.slice(0, recMax).map((p) => {
+        const variant = (p.variants || []).find((v) => v.available) || p.variants?.[0];
+        const img =
+          p.images?.[0]?.src ||
+          p.image?.src ||
+          (typeof p.images?.[0] === "string" ? p.images[0] : "") ||
+          "";
+        return {
+          id: p.id,
+          title: p.title,
+          url: p.url || `/products/${p.handle}`,
+          image: img,
+          price: Math.round(Number(variant?.price || p.price || 0) * 100),
+          variantId: variant?.id,
+          available: variant ? variant.available !== false : true,
+        };
+      });
+    } catch (_) {
+      return [];
+    }
+  };
+
+  const normalizeSeedProducts = (list) =>
+    (list || [])
+      .filter((p) => p && p.variantId)
+      .slice(0, recMax)
+      .map((p) => ({
+        id: p.id,
+        title: p.title || "Product",
+        url: p.url || "#",
+        image: p.image || "",
+        price: Number(p.price) || 0,
+        variantId: p.variantId,
+        available: p.available !== false,
+      }));
+
+  const renderRecCards = (products) => {
+    if (!products.length) return "";
+    return `
+      <div class="satc-slider__recs" data-satc-recs>
+        <h3 class="satc-slider__recs-title">${escapeHtml(recHeader)}</h3>
+        <div class="satc-slider__recs-list">
+          ${products
+            .map(
+              (p) => `
+            <div class="satc-slider__rec" data-satc-rec>
+              <a class="satc-slider__rec-media" href="${escapeHtml(p.url)}">
+                ${
+                  p.image
+                    ? `<img src="${escapeHtml(p.image)}" alt="" width="72" height="72" loading="lazy">`
+                    : `<span class="satc-slider__rec-placeholder"></span>`
+                }
+              </a>
+              <div class="satc-slider__rec-info">
+                <a class="satc-slider__rec-name" href="${escapeHtml(p.url)}">${escapeHtml(p.title)}</a>
+                <p class="satc-slider__rec-price">${money(p.price)}</p>
+              </div>
+              <button
+                type="button"
+                class="satc-slider__rec-add"
+                data-satc-rec-add
+                data-variant-id="${escapeHtml(p.variantId)}"
+                ${p.available ? "" : "disabled"}
+              >${escapeHtml(recAddText)}</button>
+            </div>`,
+            )
+            .join("")}
+        </div>
+      </div>`;
+  };
+
+  const renderEmptyCart = async () => {
+    let products = normalizeSeedProducts(recSeed);
+    if (recEnabled && products.length < 1) {
+      products = await fetchCollectionProducts();
+    } else if (recEnabled) {
+      products = products.slice(0, recMax);
+    } else {
+      products = [];
+    }
+
+    const shopBtn =
+      recShopOn
+        ? `<a class="satc-slider__empty-shop" href="${escapeHtml(recShopUrl)}">${escapeHtml(recShopText)}</a>`
+        : "";
+
+    return `
+      <div class="satc-slider__empty-state">
+        <p class="satc-slider__empty">${escapeHtml(i18n.cartEmpty)}</p>
+        <p class="satc-slider__empty-sub">${escapeHtml(recEmptyText)}</p>
+        ${shopBtn}
+      </div>
+      ${recEnabled ? renderRecCards(products) : ""}`;
+  };
+
+  const addRecToCart = async (variantId, btn) => {
+    if (!variantId) return;
+    const label = btn?.textContent || recAddText;
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = i18n.adding;
+    }
+    try {
+      const res = await fetch(addUrl(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ id: Number(variantId), quantity: 1 }),
+      });
+      if (!res.ok) throw new Error("add failed");
+      if (btn) btn.textContent = i18n.added;
+      await refreshSlider();
+      openSlider();
+    } catch (err) {
+      console.error("[Sticky ATC] rec add", err);
+      if (btn) {
+        btn.textContent = i18n.tryAgain;
+        btn.disabled = false;
+      }
+      return;
+    }
+    if (btn) {
+      setTimeout(() => {
+        btn.textContent = label;
+        btn.disabled = false;
+      }, 900);
+    }
+  };
+
+  /** Equal segments per tier (UpCart-style), fill within current segment. */
+  const rewardProgressPct = (value, tiers) => {
+    if (!tiers.length) return 0;
+    const goals = tiers.map((t) => Number(t.minAmount) || 0);
+    const last = goals[goals.length - 1];
+    if (value >= last) return 100;
+    let prev = 0;
+    for (let i = 0; i < goals.length; i++) {
+      const goal = goals[i];
+      const segStart = (i / goals.length) * 100;
+      const segEnd = ((i + 1) / goals.length) * 100;
+      if (value <= goal) {
+        const within = (value - prev) / Math.max(goal - prev, 0.0001);
+        return Math.min(100, segStart + within * (segEnd - segStart));
+      }
+      prev = goal;
+    }
+    return 100;
+  };
+
+  const updateRewards = (cart) => {
+    if (!rewardRoot || (!rewardEnabled && slider?.dataset.shipEnabled !== "true")) {
+      return;
+    }
+    const itemCount = cart.item_count ?? cart.items?.length ?? 0;
+    const totalCents = cart.total_price || 0;
+    const progressValue =
+      rewardMode === "quantity" ? itemCount : totalCents / 100;
+
+    if (!rewardShowEmpty && itemCount === 0) {
+      rewardRoot.hidden = true;
+      return;
+    }
+    rewardRoot.hidden = false;
+
+    if (!activeTiers.length) {
+      rewardRoot.hidden = true;
+      return;
+    }
+
+    const pct = Math.round(rewardProgressPct(progressValue, activeTiers));
+    if (rewardBarEl) rewardBarEl.style.width = `${pct}%`;
+
+    if (rewardMilestonesEl) {
+      rewardMilestonesEl.innerHTML = activeTiers
+        .map((tier) => {
+          const goal = Number(tier.minAmount) || 0;
+          const reached = progressValue >= goal;
+          return `<div class="satc-slider__reward-milestone${reached ? " is-reached" : ""}">
+            <span class="satc-slider__reward-dot" aria-hidden="true"></span>
+            <span class="satc-slider__reward-label">${escapeHtml(tier.description || "Reward")}</span>
+          </div>`;
+        })
+        .join("");
+    }
+
+    if (rewardTextEl) {
+      const next = activeTiers.find(
+        (t) => progressValue < (Number(t.minAmount) || 0),
+      );
+      if (!next) {
+        rewardTextEl.textContent = rewardDoneText;
+      } else {
+        const remainingRaw = Math.max(
+          0,
+          (Number(next.minAmount) || 0) - progressValue,
+        );
+        const remainingLabel =
+          rewardMode === "quantity"
+            ? `${Math.ceil(remainingRaw)}`
+            : money(Math.round(remainingRaw * 100));
+        rewardTextEl.textContent = String(
+          next.titleBefore || "You're [AMOUNT] away!",
+        )
+          .replace(/\[AMOUNT\]/gi, remainingLabel)
+          .replace(/\{\{\s*amount_remaining\s*\}\}/gi, remainingLabel);
+      }
+    }
+  };
+
   const refreshSlider = async () => {
     if (!sliderItems) return;
     try {
@@ -154,8 +442,18 @@
       });
       if (!res.ok) throw new Error("cart fetch failed");
       const cart = await res.json();
+      const itemCount = cart.item_count ?? cart.items?.length ?? 0;
+      if (titleEl) titleEl.textContent = formatTitle(itemCount);
+
       if (!cart.items?.length) {
-        sliderItems.innerHTML = `<p class="satc-slider__empty">${i18n.cartEmpty}</p>`;
+        sliderItems.innerHTML = await renderEmptyCart();
+        sliderItems
+          .querySelectorAll("[data-satc-rec-add]")
+          .forEach((btn) => {
+            btn.addEventListener("click", () =>
+              addRecToCart(btn.getAttribute("data-variant-id"), btn),
+            );
+          });
       } else {
         sliderItems.innerHTML = cart.items
           .map(
@@ -163,7 +461,7 @@
           <div class="satc-slider__item">
             <img src="${item.image || ""}" alt="" width="56" height="56" loading="lazy">
             <div>
-              <p class="satc-slider__item-title">${item.product_title || item.title || ""}</p>
+              <p class="satc-slider__item-title">${escapeHtml(item.product_title || item.title || "")}</p>
               <p class="satc-slider__item-meta">Qty ${item.quantity}</p>
             </div>
             <div class="satc-slider__item-price">${money(item.final_line_price ?? item.line_price)}</div>
@@ -174,15 +472,69 @@
       if (sliderTotal) {
         sliderTotal.textContent = money(cart.total_price);
       }
+      const footer = slider?.querySelector(".satc-slider__footer");
+      if (footer) {
+        footer.classList.toggle("is-empty", !cart.items?.length);
+      }
+      updateRewards(cart);
     } catch (error) {
       console.error("[Sticky ATC] slider", error);
     }
+  };
+
+  slider?.querySelector("[data-satc-discount]")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!(form instanceof HTMLFormElement)) return;
+    const input = form.querySelector('input[name="discount"]');
+    const code = String(input && "value" in input ? input.value : "")
+      .trim()
+      .toUpperCase();
+    if (!code) return;
+    window.location.href = `${root}discount/${encodeURIComponent(code)}`;
+  });
+
+  let annTimerId = null;
+  const startAnnouncementTimer = () => {
+    if (annTimerId) {
+      clearInterval(annTimerId);
+      annTimerId = null;
+    }
+    const ann = slider?.querySelector("[data-satc-announcement]");
+    const label = ann?.querySelector("[data-satc-announcement-label]");
+    if (!ann || !label) return;
+
+    const template = ann.dataset.annText || label.textContent || "";
+    const timerRaw = ann.dataset.annTimer || "15:00";
+    const parts = timerRaw.split(":");
+    let total =
+      Number(parts[0] || 0) * 60 + Number(parts[1] || 0);
+    if (!Number.isFinite(total) || total <= 0) total = 15 * 60;
+
+    const tick = () => {
+      const m = Math.floor(Math.max(0, total) / 60);
+      const s = Math.max(0, total) % 60;
+      const clock = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+      label.textContent = String(template)
+        .replace(/\{timer\}/gi, clock)
+        .replace(/\{\{\s*timer\s*\}\}/gi, clock);
+      if (total <= 0) {
+        clearInterval(annTimerId);
+        annTimerId = null;
+        return;
+      }
+      total -= 1;
+    };
+
+    tick();
+    annTimerId = setInterval(tick, 1000);
   };
 
   const openSlider = async () => {
     if (!slider) return;
     slider.hidden = false;
     requestAnimationFrame(() => slider.classList.add("is-open"));
+    startAnnouncementTimer();
     await refreshSlider();
   };
 

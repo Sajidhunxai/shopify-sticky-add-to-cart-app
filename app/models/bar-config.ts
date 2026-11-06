@@ -19,6 +19,14 @@ export type BarPosition =
   | "left"
   | "right";
 
+export type RewardTier = {
+  enabled: boolean;
+  minAmount: number;
+  description: string;
+  /** Supports [AMOUNT] for remaining amount/qty */
+  titleBefore: string;
+};
+
 export type BarConfig = {
   enabled: boolean;
   displayMode: DisplayMode;
@@ -73,10 +81,61 @@ export type BarConfig = {
   buttonTextColor: string;
   /** Accent used in cart drawer highlights / progress UI. */
   accentColor: string;
-  /** Cart drawer header title (slider mode). */
+  /** Cart drawer header title. Supports {{cart_quantity}}. */
   drawerTitle: string;
   /** Cart drawer checkout button label. */
   drawerCheckoutText: string;
+  drawerHeaderHeight: "slim" | "tall";
+  drawerHeaderBorder: "none" | "thin";
+  drawerHeaderBg: string;
+  drawerTitleAlign: "left" | "center";
+  drawerTitleWeight: "normal" | "semibold" | "bold";
+  drawerTitleSize: number;
+  drawerCloseSide: "left" | "right";
+  drawerCloseBg: string;
+  drawerCloseHoverBg: string;
+  drawerCloseColor: string;
+  drawerCloseIconSize: "small" | "medium" | "large";
+  drawerCloseBorder: "none" | "thin" | "normal" | "thick";
+  announcementEnabled: boolean;
+  announcementText: string;
+  announcementBg: string;
+  announcementTextColor: string;
+  announcementBorderColor: string;
+  announcementHeight: "slim" | "normal" | "thick";
+  announcementPosition: "before" | "after";
+  /** MM:SS countdown, e.g. 15:00 */
+  announcementTimer: string;
+  announcementFontSize: number;
+  /** @deprecated migrated into rewardTiers */
+  freeShippingEnabled: boolean;
+  freeShippingThreshold: number;
+  freeShippingText: string;
+  freeShippingReachedText: string;
+  rewardEnabled: boolean;
+  rewardShowOnEmpty: boolean;
+  rewardBg: string;
+  rewardFg: string;
+  rewardIconColor: string;
+  rewardCompleteText: string;
+  rewardCalcMode: "total" | "quantity";
+  rewardTiers: RewardTier[];
+  recommendationsEnabled: boolean;
+  /** Shown under “Your cart is empty” */
+  recommendationsEmptyText: string;
+  recommendationsHeader: string;
+  recommendationsMax: number;
+  recommendationsAddText: string;
+  recommendationsShopNowEnabled: boolean;
+  recommendationsShopNowText: string;
+  recommendationsShopNowUrl: string;
+  /** Collection handle for empty-cart products (e.g. all, bestsellers) */
+  recommendationsCollection: string;
+  discountEnabled: boolean;
+  discountPlaceholder: string;
+  discountButtonText: string;
+  trustBadgesEnabled: boolean;
+  trustBadgesText: string;
 };
 
 export const DEFAULT_BAR_CONFIG: BarConfig = {
@@ -125,8 +184,80 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   buttonBackground: "#111111",
   buttonTextColor: "#ffffff",
   accentColor: "#111111",
-  drawerTitle: "Your cart",
+  drawerTitle: "YOUR CART ({{cart_quantity}})",
   drawerCheckoutText: "Checkout",
+  drawerHeaderHeight: "slim",
+  drawerHeaderBorder: "thin",
+  drawerHeaderBg: "#ffffff",
+  drawerTitleAlign: "left",
+  drawerTitleWeight: "bold",
+  drawerTitleSize: 14,
+  drawerCloseSide: "right",
+  drawerCloseBg: "transparent",
+  drawerCloseHoverBg: "#f3f4f6",
+  drawerCloseColor: "#111111",
+  drawerCloseIconSize: "medium",
+  drawerCloseBorder: "none",
+  announcementEnabled: false,
+  announcementText: "Your products are reserved for {timer}!",
+  announcementBg: "#d8009f",
+  announcementTextColor: "#ffffff",
+  announcementBorderColor: "#ffffff",
+  announcementHeight: "normal",
+  announcementPosition: "before",
+  announcementTimer: "15:00",
+  announcementFontSize: 14,
+  freeShippingEnabled: false,
+  freeShippingThreshold: 100,
+  freeShippingText: "You're {{amount_remaining}} away from free shipping!",
+  freeShippingReachedText: "You've unlocked free shipping!",
+  rewardEnabled: true,
+  rewardShowOnEmpty: true,
+  rewardBg: "#F0F2FF",
+  rewardFg: "#B3009F",
+  rewardIconColor: "#79be30",
+  rewardCompleteText: "Free shipping unlocked!",
+  rewardCalcMode: "total",
+  rewardTiers: [
+    {
+      enabled: true,
+      minAmount: 100,
+      description: "Free Shipping",
+      titleBefore: "You're [AMOUNT] away from free shipping!",
+    },
+    {
+      enabled: true,
+      minAmount: 150,
+      description: "Free Express",
+      titleBefore: "You're [AMOUNT] away from free express shipping!",
+    },
+    {
+      enabled: false,
+      minAmount: 200,
+      description: "Free Gift",
+      titleBefore: "You're [AMOUNT] away from a free gift!",
+    },
+    {
+      enabled: false,
+      minAmount: 250,
+      description: "VIP Reward",
+      titleBefore: "You're [AMOUNT] away from VIP reward!",
+    },
+  ],
+  recommendationsEnabled: true,
+  recommendationsEmptyText: "Add your favorite items to your cart.",
+  recommendationsHeader: "You may also like",
+  recommendationsMax: 3,
+  recommendationsAddText: "Add",
+  recommendationsShopNowEnabled: false,
+  recommendationsShopNowText: "Shop now",
+  recommendationsShopNowUrl: "/collections/all",
+  recommendationsCollection: "all",
+  discountEnabled: false,
+  discountPlaceholder: "Discount code",
+  discountButtonText: "Apply",
+  trustBadgesEnabled: false,
+  trustBadgesText: "Secure checkout · Free returns · 24/7 support",
 };
 
 function asBool(value: FormDataEntryValue | null | undefined, fallback: boolean) {
@@ -194,13 +325,65 @@ function asBarPosition(value: FormDataEntryValue | null | undefined): BarPositio
   }
 }
 
+function normalizeRewardTiers(input: unknown): RewardTier[] {
+  const defaults = DEFAULT_BAR_CONFIG.rewardTiers;
+  if (!Array.isArray(input) || input.length === 0) return defaults.map((t) => ({ ...t }));
+  return defaults.map((fallback, index) => {
+    const row = (input[index] || {}) as Partial<RewardTier>;
+    return {
+      enabled: Boolean(row.enabled ?? fallback.enabled),
+      minAmount: Number.isFinite(Number(row.minAmount))
+        ? Number(row.minAmount)
+        : fallback.minAmount,
+      description: String(row.description || fallback.description),
+      titleBefore: String(row.titleBefore || fallback.titleBefore),
+    };
+  });
+}
+
 export function parseBarConfig(raw: string | null | undefined): BarConfig {
-  if (!raw) return { ...DEFAULT_BAR_CONFIG };
+  if (!raw) return { ...DEFAULT_BAR_CONFIG, rewardTiers: DEFAULT_BAR_CONFIG.rewardTiers.map((t) => ({ ...t })) };
   try {
-    const parsed = JSON.parse(raw) as Partial<BarConfig>;
-    return { ...DEFAULT_BAR_CONFIG, ...parsed };
+    const parsed = JSON.parse(raw) as Partial<BarConfig> & {
+      freeShippingEnabled?: boolean;
+      freeShippingThreshold?: number;
+      freeShippingText?: string;
+      freeShippingReachedText?: string;
+    };
+    const merged: BarConfig = {
+      ...DEFAULT_BAR_CONFIG,
+      ...parsed,
+      rewardTiers: normalizeRewardTiers(parsed.rewardTiers),
+    };
+    // Migrate older single free-shipping setting into tiered rewards
+    if (
+      parsed.rewardEnabled === undefined &&
+      parsed.freeShippingEnabled &&
+      (!parsed.rewardTiers || !Array.isArray(parsed.rewardTiers))
+    ) {
+      merged.rewardEnabled = true;
+      merged.rewardCompleteText =
+        parsed.freeShippingReachedText || merged.rewardCompleteText;
+      merged.rewardTiers = [
+        {
+          enabled: true,
+          minAmount: Number(parsed.freeShippingThreshold) || 100,
+          description: "Free Shipping",
+          titleBefore:
+            parsed.freeShippingText?.replace(
+              /\{\{\s*amount_remaining\s*\}\}/gi,
+              "[AMOUNT]",
+            ) || "You're [AMOUNT] away from free shipping!",
+        },
+        ...DEFAULT_BAR_CONFIG.rewardTiers.slice(1).map((t) => ({ ...t })),
+      ];
+    }
+    return merged;
   } catch {
-    return { ...DEFAULT_BAR_CONFIG };
+    return {
+      ...DEFAULT_BAR_CONFIG,
+      rewardTiers: DEFAULT_BAR_CONFIG.rewardTiers.map((t) => ({ ...t })),
+    };
   }
 }
 
@@ -286,6 +469,179 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
     drawerCheckoutText: asString(
       formData.get("drawerCheckoutText"),
       DEFAULT_BAR_CONFIG.drawerCheckoutText,
+    ),
+    drawerHeaderHeight:
+      String(formData.get("drawerHeaderHeight") || "") === "tall" ? "tall" : "slim",
+    drawerHeaderBorder:
+      String(formData.get("drawerHeaderBorder") || "") === "thin" ? "thin" : "none",
+    drawerHeaderBg: asString(
+      formData.get("drawerHeaderBg"),
+      DEFAULT_BAR_CONFIG.drawerHeaderBg,
+    ),
+    drawerTitleAlign:
+      String(formData.get("drawerTitleAlign") || "") === "center" ? "center" : "left",
+    drawerTitleWeight: (() => {
+      const w = String(formData.get("drawerTitleWeight") || "bold");
+      if (w === "normal" || w === "semibold" || w === "bold") return w;
+      return "bold";
+    })(),
+    drawerTitleSize: asNumber(
+      formData.get("drawerTitleSize"),
+      DEFAULT_BAR_CONFIG.drawerTitleSize,
+    ),
+    drawerCloseSide:
+      String(formData.get("drawerCloseSide") || "") === "left" ? "left" : "right",
+    drawerCloseBg: asString(
+      formData.get("drawerCloseBg"),
+      DEFAULT_BAR_CONFIG.drawerCloseBg,
+    ),
+    drawerCloseHoverBg: asString(
+      formData.get("drawerCloseHoverBg"),
+      DEFAULT_BAR_CONFIG.drawerCloseHoverBg,
+    ),
+    drawerCloseColor: asString(
+      formData.get("drawerCloseColor"),
+      DEFAULT_BAR_CONFIG.drawerCloseColor,
+    ),
+    drawerCloseIconSize: (() => {
+      const s = String(formData.get("drawerCloseIconSize") || "medium");
+      if (s === "small" || s === "medium" || s === "large") return s;
+      return "medium";
+    })(),
+    drawerCloseBorder: (() => {
+      const b = String(formData.get("drawerCloseBorder") || "none");
+      if (b === "none" || b === "thin" || b === "normal" || b === "thick") return b;
+      return "none";
+    })(),
+    announcementEnabled: asBool(formData.get("announcementEnabled"), false),
+    announcementText: asString(
+      formData.get("announcementText"),
+      DEFAULT_BAR_CONFIG.announcementText,
+    ),
+    announcementBg: asString(
+      formData.get("announcementBg"),
+      DEFAULT_BAR_CONFIG.announcementBg,
+    ),
+    announcementTextColor: asString(
+      formData.get("announcementTextColor"),
+      DEFAULT_BAR_CONFIG.announcementTextColor,
+    ),
+    announcementBorderColor: asString(
+      formData.get("announcementBorderColor"),
+      DEFAULT_BAR_CONFIG.announcementBorderColor,
+    ),
+    announcementHeight: (() => {
+      const h = String(formData.get("announcementHeight") || "normal");
+      if (h === "slim" || h === "normal" || h === "thick") return h;
+      return "normal";
+    })(),
+    announcementPosition:
+      String(formData.get("announcementPosition") || "") === "after"
+        ? "after"
+        : "before",
+    announcementTimer: (() => {
+      const raw = String(formData.get("announcementTimer") || "15:00").trim();
+      return /^\d{1,2}:\d{2}$/.test(raw) ? raw : DEFAULT_BAR_CONFIG.announcementTimer;
+    })(),
+    announcementFontSize: asNumber(
+      formData.get("announcementFontSize"),
+      DEFAULT_BAR_CONFIG.announcementFontSize,
+    ),
+    freeShippingEnabled: asBool(formData.get("freeShippingEnabled"), false),
+    freeShippingThreshold: asNumber(
+      formData.get("freeShippingThreshold"),
+      DEFAULT_BAR_CONFIG.freeShippingThreshold,
+    ),
+    freeShippingText: asString(
+      formData.get("freeShippingText"),
+      DEFAULT_BAR_CONFIG.freeShippingText,
+    ),
+    freeShippingReachedText: asString(
+      formData.get("freeShippingReachedText"),
+      DEFAULT_BAR_CONFIG.freeShippingReachedText,
+    ),
+    rewardEnabled: asBool(formData.get("rewardEnabled"), false),
+    rewardShowOnEmpty: asBool(formData.get("rewardShowOnEmpty"), false),
+    rewardBg: asString(formData.get("rewardBg"), DEFAULT_BAR_CONFIG.rewardBg),
+    rewardFg: asString(formData.get("rewardFg"), DEFAULT_BAR_CONFIG.rewardFg),
+    rewardIconColor: asString(
+      formData.get("rewardIconColor"),
+      DEFAULT_BAR_CONFIG.rewardIconColor,
+    ),
+    rewardCompleteText: asString(
+      formData.get("rewardCompleteText"),
+      DEFAULT_BAR_CONFIG.rewardCompleteText,
+    ),
+    rewardCalcMode:
+      String(formData.get("rewardCalcMode") || "") === "quantity"
+        ? "quantity"
+        : "total",
+    rewardTiers: (() => {
+      try {
+        return normalizeRewardTiers(
+          JSON.parse(String(formData.get("rewardTiers") || "[]")),
+        );
+      } catch {
+        return DEFAULT_BAR_CONFIG.rewardTiers.map((t) => ({ ...t }));
+      }
+    })(),
+    recommendationsEnabled: asBool(
+      formData.get("recommendationsEnabled"),
+      false,
+    ),
+    recommendationsEmptyText: asString(
+      formData.get("recommendationsEmptyText"),
+      DEFAULT_BAR_CONFIG.recommendationsEmptyText,
+    ),
+    recommendationsHeader: asString(
+      formData.get("recommendationsHeader"),
+      DEFAULT_BAR_CONFIG.recommendationsHeader,
+    ),
+    recommendationsMax: Math.min(
+      8,
+      Math.max(
+        1,
+        asNumber(
+          formData.get("recommendationsMax"),
+          DEFAULT_BAR_CONFIG.recommendationsMax,
+        ),
+      ),
+    ),
+    recommendationsAddText: asString(
+      formData.get("recommendationsAddText"),
+      DEFAULT_BAR_CONFIG.recommendationsAddText,
+    ),
+    recommendationsShopNowEnabled: asBool(
+      formData.get("recommendationsShopNowEnabled"),
+      false,
+    ),
+    recommendationsShopNowText: asString(
+      formData.get("recommendationsShopNowText"),
+      DEFAULT_BAR_CONFIG.recommendationsShopNowText,
+    ),
+    recommendationsShopNowUrl: asString(
+      formData.get("recommendationsShopNowUrl"),
+      DEFAULT_BAR_CONFIG.recommendationsShopNowUrl,
+    ),
+    recommendationsCollection: asString(
+      formData.get("recommendationsCollection"),
+      DEFAULT_BAR_CONFIG.recommendationsCollection,
+    )
+      .replace(/^\/+|\/+$/g, "")
+      .replace(/^collections\//i, "") || "all",
+    discountEnabled: asBool(formData.get("discountEnabled"), false),
+    discountPlaceholder: asString(
+      formData.get("discountPlaceholder"),
+      DEFAULT_BAR_CONFIG.discountPlaceholder,
+    ),
+    discountButtonText: asString(
+      formData.get("discountButtonText"),
+      DEFAULT_BAR_CONFIG.discountButtonText,
+    ),
+    trustBadgesEnabled: asBool(formData.get("trustBadgesEnabled"), false),
+    trustBadgesText: asString(
+      formData.get("trustBadgesText"),
+      DEFAULT_BAR_CONFIG.trustBadgesText,
     ),
   };
 }
