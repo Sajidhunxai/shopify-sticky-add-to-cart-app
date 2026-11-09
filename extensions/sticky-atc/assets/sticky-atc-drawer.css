@@ -614,6 +614,52 @@
   background: rgba(0, 0, 0, 0.06);
 }
 
+.satc-slider__rec--skeleton {
+  pointer-events: none;
+}
+
+.satc-skel-line,
+.satc-skel-btn {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.06) 0%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: satc-skel-shine 1.1s ease-in-out infinite;
+}
+
+.satc-skel-line {
+  height: 12px;
+  width: 88%;
+  margin-bottom: 8px;
+}
+
+.satc-skel-line--sm {
+  width: 48%;
+  height: 10px;
+  margin-bottom: 0;
+}
+
+.satc-skel-btn {
+  width: 64px;
+  height: 36px;
+  border-radius: 8px;
+  align-self: center;
+}
+
+@keyframes satc-skel-shine {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
 .satc-slider__rec-info {
   min-width: 0;
 }

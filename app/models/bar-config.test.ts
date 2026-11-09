@@ -65,6 +65,10 @@ describe("serialize ↔ barConfigFromFormData round-trip", () => {
       parsed.featureTemplates.recommendations.enabled,
       original.featureTemplates.recommendations.enabled,
     );
+    assert.equal(
+      parsed.featureTemplates.recommendationSkeleton.enabled,
+      original.featureTemplates.recommendationSkeleton.enabled,
+    );
   });
 });
 

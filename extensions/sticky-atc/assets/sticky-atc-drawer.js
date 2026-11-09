@@ -314,6 +314,34 @@
     return built;
   };
 
+  const renderRecSkeletonCard = (index) => {
+    const skelTpl = getFeatureTpl("recommendationSkeleton");
+    if (skelTpl?.template) {
+      return `<div data-satc-feature="recommendationSkeleton" style="--satc-rec-i:${index}">${sanitizeHtml(
+        renderMustache(skelTpl.template, { index: String(index + 1) }),
+      )}${sanitizeHtml(skelTpl.html || "")}</div>`;
+    }
+    return `<div class="satc-slider__rec satc-slider__rec--skeleton" aria-hidden="true" style="--satc-rec-i:${index}">
+      <span class="satc-slider__rec-placeholder"></span>
+      <div class="satc-slider__rec-info">
+        <span class="satc-skel-line"></span>
+        <span class="satc-skel-line satc-skel-line--sm"></span>
+      </div>
+      <span class="satc-skel-btn"></span>
+    </div>`;
+  };
+
+  const renderRecSkeleton = (count = Math.min(recMax, 3)) => {
+    const cards = Array.from({ length: Math.max(1, count) }, (_, i) =>
+      renderRecSkeletonCard(i),
+    ).join("");
+    return `
+      <div class="satc-slider__recs satc-slider__recs--skeleton" data-satc-recs data-satc-feature="recommendationSkeleton">
+        <h3 class="satc-slider__recs-title">${escapeHtml(recHeader)}</h3>
+        <div class="satc-slider__recs-list">${cards}</div>
+      </div>`;
+  };
+
   const renderRecCards = (products) => {
     if (!products.length) return "";
     const cardsHtml = products.map((p, index) => renderRecCard(p, index)).join("");
@@ -784,16 +812,29 @@
       if (titleEl) titleEl.textContent = formatTitle(itemCount);
 
       if (!cart.items?.length) {
+        if (recEnabled) {
+          sliderItems.innerHTML = `
+            <div class="satc-slider__empty-state">
+              <p class="satc-slider__empty">${escapeHtml(i18n.cartEmpty)}</p>
+              <p class="satc-slider__empty-sub">${escapeHtml(recEmptyText)}</p>
+            </div>
+            ${renderRecSkeleton()}`;
+        }
         sliderItems.innerHTML = await renderEmptyCart();
         bindRecAdds(sliderItems);
       } else {
-        const recHtml =
-          recEnabled && recWithItems
-            ? renderRecCards(await loadRecProducts(cart.items))
-            : "";
-        sliderItems.innerHTML = `${renderCartLines(cart.items)}${recHtml}`;
-        bindLineControls();
-        bindRecAdds(sliderItems);
+        const linesHtml = renderCartLines(cart.items);
+        if (recEnabled && recWithItems) {
+          sliderItems.innerHTML = `${linesHtml}${renderRecSkeleton()}`;
+          bindLineControls();
+          const recHtml = renderRecCards(await loadRecProducts(cart.items));
+          sliderItems.innerHTML = `${linesHtml}${recHtml}`;
+          bindLineControls();
+          bindRecAdds(sliderItems);
+        } else {
+          sliderItems.innerHTML = linesHtml;
+          bindLineControls();
+        }
       }
       if (sliderTotal) {
         sliderTotal.textContent = money(cart.total_price);

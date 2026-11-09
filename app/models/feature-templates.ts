@@ -7,6 +7,7 @@ export const FEATURE_TEMPLATE_KEYS = [
   "cartItem",
   "recommendations",
   "recommendationCard",
+  "recommendationSkeleton",
   "emptyCart",
   "discount",
   "trust",
@@ -82,16 +83,35 @@ export const FEATURE_TEMPLATE_META: Record<
 </section>`,
   },
   recommendationCard: {
-    label: "Recommendation card",
+    label: "Recommendation tile",
     placeholders:
       "{{title}}, {{price}}, {{url}}, {{image}}, {{variant_id}}, {{add_text}}, {{available}}",
-    example: `<div class="my-rec">
-  <a href="{{url}}"><img src="{{image}}" alt=""></a>
-  <div>
-    <a href="{{url}}">{{title}}</a>
-    <p>{{price}}</p>
+    example: `<div class="satc-slider__rec" data-satc-rec>
+  <a class="satc-slider__rec-media" href="{{url}}">
+    <img src="{{image}}" alt="" width="72" height="72" loading="lazy">
+  </a>
+  <div class="satc-slider__rec-info">
+    <a class="satc-slider__rec-name" href="{{url}}">{{title}}</a>
+    <p class="satc-slider__rec-price">{{price}}</p>
   </div>
-  <button type="button" data-satc-rec-add data-variant-id="{{variant_id}}">{{add_text}}</button>
+  <button
+    type="button"
+    class="satc-slider__rec-add"
+    data-satc-rec-add
+    data-variant-id="{{variant_id}}"
+  >{{add_text}}</button>
+</div>`,
+  },
+  recommendationSkeleton: {
+    label: "Skeleton",
+    placeholders: "{{index}} (optional)",
+    example: `<div class="satc-slider__rec satc-slider__rec--skeleton" aria-hidden="true">
+  <span class="satc-slider__rec-placeholder"></span>
+  <div class="satc-slider__rec-info">
+    <span class="satc-skel-line"></span>
+    <span class="satc-skel-line satc-skel-line--sm"></span>
+  </div>
+  <span class="satc-skel-btn"></span>
 </div>`,
   },
   emptyCart: {

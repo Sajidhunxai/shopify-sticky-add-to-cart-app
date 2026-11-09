@@ -71,7 +71,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
     const settings = await saveBarConfig(session.shop, config);
     try {
-      await syncStorefrontSettings(admin, settings.hideBranding, config);
+    await syncStorefrontSettings(admin, settings.hideBranding, config);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to sync storefront metafields";
@@ -232,7 +232,7 @@ export default function Index() {
           onShowDrawerChange={setPreviewDrawerManual}
           onShowEmptyChange={setPreviewEmpty}
         />
-      </div>
+        </div>
     </s-page>
   );
 }
