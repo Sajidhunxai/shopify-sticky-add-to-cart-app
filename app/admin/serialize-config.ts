@@ -10,7 +10,11 @@ export function serializeBarConfigToFormData(config: BarConfig): FormData {
   fd.set("intent", "save");
   (Object.keys(config) as (keyof BarConfig)[]).forEach((key) => {
     const value = config[key];
-    if (key === "rewardTiers") {
+    if (
+      key === "rewardTiers" ||
+      key === "recommendationsProducts" ||
+      key === "featureTemplates"
+    ) {
       fd.set(key, JSON.stringify(value));
       return;
     }

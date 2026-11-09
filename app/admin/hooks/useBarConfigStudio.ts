@@ -27,6 +27,7 @@ const DRAWER_FOCUS_NAVS: NavId[] = [
   "discounts",
   "cart-summary",
   "trust",
+  "templates",
 ];
 
 export function useBarConfigStudio(initialConfig: BarConfig) {

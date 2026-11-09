@@ -1,3 +1,4 @@
+import type { DrawerAnimation } from "../../../models/bar-config";
 import type { PanelProps } from "../../types";
 
 export function BehaviorPanel({ config, updateConfig }: PanelProps) {
@@ -13,6 +14,22 @@ export function BehaviorPanel({ config, updateConfig }: PanelProps) {
           )
         }
       />
+      <s-select
+        label="Cart drawer animation"
+        value={config.drawerAnimation}
+        details="Motion when the cart drawer opens and closes"
+        onChange={(e: Event) =>
+          updateConfig(
+            "drawerAnimation",
+            (e.currentTarget as HTMLSelectElement).value as DrawerAnimation,
+          )
+        }
+      >
+        <s-option value="slide">Slide</s-option>
+        <s-option value="fade">Fade</s-option>
+        <s-option value="scale">Scale</s-option>
+        <s-option value="none">None</s-option>
+      </s-select>
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-number-field
           label="Show after scroll — mobile (px)"

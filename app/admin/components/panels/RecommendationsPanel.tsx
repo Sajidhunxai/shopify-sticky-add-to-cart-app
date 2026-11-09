@@ -1,6 +1,87 @@
+import { useAppBridge } from "@shopify/app-bridge-react";
+import type {
+  RecommendationProduct,
+  RecsAnimation,
+  RecommendationSource,
+} from "../../../models/bar-config";
 import type { PanelProps } from "../../types";
 
+type PickedProduct = {
+  id?: string;
+  title?: string;
+  handle?: string;
+  images?: Array<{ originalSrc?: string; src?: string }>;
+  variants?: Array<{ id?: string | number; available?: boolean }>;
+};
+
 export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
+  const shopify = useAppBridge();
+
+  const pickCollection = async () => {
+    try {
+      const selected = await shopify.resourcePicker({
+        type: "collection",
+        multiple: false,
+        action: "select",
+      });
+      if (!selected || !Array.isArray(selected) || !selected.length) return;
+      const collection = selected[0] as { handle?: string; title?: string };
+      const handle = String(collection.handle || "")
+        .trim()
+        .replace(/^\/+|\/+$/g, "")
+        .replace(/^collections\//i, "");
+      if (!handle) return;
+      updateConfig("recommendationsCollection", handle);
+      updateConfig("recommendationsSource", "collection");
+    } catch {
+      /* picker cancelled */
+    }
+  };
+
+  const pickProducts = async () => {
+    try {
+      const selected = await shopify.resourcePicker({
+        type: "product",
+        multiple: true,
+        action: "select",
+      });
+      if (!selected || !Array.isArray(selected)) return;
+      const products: RecommendationProduct[] = (selected as PickedProduct[])
+        .map((product) => {
+          const handle = String(product.handle || "").trim();
+          if (!handle) return null;
+          const variant =
+            (product.variants || []).find((v) => v.available !== false) ||
+            product.variants?.[0];
+          const variantId = String(variant?.id || "").replace(/\D/g, "");
+          const image =
+            product.images?.[0]?.originalSrc ||
+            product.images?.[0]?.src ||
+            "";
+          return {
+            handle,
+            title: String(product.title || handle),
+            url: `/products/${handle}`,
+            image: String(image || ""),
+            variantId,
+          };
+        })
+        .filter((p): p is RecommendationProduct => Boolean(p))
+        .slice(0, 12);
+      updateConfig("recommendationsProducts", products);
+      updateConfig("recommendationsSource", "products");
+    } catch {
+      /* picker cancelled */
+    }
+  };
+
+  const removeProduct = (handle: string) => {
+    updateConfig(
+      "recommendationsProducts",
+      config.recommendationsProducts.filter((p) => p.handle !== handle),
+    );
+  };
+
   return (
     <s-stack gap="base">
       <s-stack direction="inline" gap="base">
@@ -24,9 +105,85 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
       </s-stack>
 
       <s-paragraph>
-        When the cart is empty, the drawer shows an empty message and product
-        recommendations customers can add in one click.
+        Show product recommendations customers can add in one click — on empty
+        carts and optionally when items are already in the cart.
       </s-paragraph>
+
+      <s-switch
+        label="Show recommendations when cart has items"
+        checked={config.recommendationsShowWithItems}
+        onChange={(e: Event) =>
+          updateConfig(
+            "recommendationsShowWithItems",
+            (e.currentTarget as HTMLInputElement).checked,
+          )
+        }
+      />
+      <s-switch
+        label="Hide products already in the cart"
+        checked={config.recommendationsHideInCart}
+        onChange={(e: Event) =>
+          updateConfig(
+            "recommendationsHideInCart",
+            (e.currentTarget as HTMLInputElement).checked,
+          )
+        }
+      />
+
+      <s-select
+        label="Product source"
+        value={config.recommendationsSource}
+        onChange={(e: Event) =>
+          updateConfig(
+            "recommendationsSource",
+            (e.currentTarget as HTMLSelectElement)
+              .value as RecommendationSource,
+          )
+        }
+      >
+        <s-option value="collection">Collection</s-option>
+        <s-option value="products">Specific products</s-option>
+      </s-select>
+
+      {config.recommendationsSource === "collection" ? (
+        <s-stack gap="small-200">
+          <s-text-field
+            label="Collection handle"
+            value={config.recommendationsCollection}
+            details="e.g. all, bestsellers — or pick a collection below"
+            onChange={(e: Event) =>
+              updateConfig(
+                "recommendationsCollection",
+                (e.currentTarget as HTMLInputElement).value,
+              )
+            }
+          />
+          <s-button onClick={pickCollection}>Pick collection</s-button>
+        </s-stack>
+      ) : (
+        <s-stack gap="small-200">
+          <s-paragraph>
+            {config.recommendationsProducts.length
+              ? `${config.recommendationsProducts.length} product(s) selected`
+              : "No products selected yet."}
+          </s-paragraph>
+          {config.recommendationsProducts.map((p) => (
+            <s-stack key={p.handle} direction="inline" gap="base">
+              <s-paragraph>
+                <strong>{p.title}</strong> · {p.handle}
+              </s-paragraph>
+              <s-button variant="tertiary" onClick={() => removeProduct(p.handle)}>
+                Remove
+              </s-button>
+            </s-stack>
+          ))}
+          <s-button onClick={pickProducts}>
+            {config.recommendationsProducts.length
+              ? "Edit products"
+              : "Pick products"}
+          </s-button>
+        </s-stack>
+      )}
 
       <s-text-field
         label="Empty cart helper text"
@@ -70,17 +227,22 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
           )
         }
       />
-      <s-text-field
-        label="Collection handle"
-        value={config.recommendationsCollection}
-        details="Products shown when the cart is empty (e.g. all, bestsellers)."
+
+      <s-select
+        label="Recommendation animation"
+        value={config.recommendationsAnimation}
         onChange={(e: Event) =>
           updateConfig(
-            "recommendationsCollection",
-            (e.currentTarget as HTMLInputElement).value,
+            "recommendationsAnimation",
+            (e.currentTarget as HTMLSelectElement).value as RecsAnimation,
           )
         }
-      />
+      >
+        <s-option value="stagger">Stagger fade-up</s-option>
+        <s-option value="fade">Fade in</s-option>
+        <s-option value="slide">Slide in</s-option>
+        <s-option value="none">None</s-option>
+      </s-select>
 
       <s-heading>Shop now button</s-heading>
       <s-switch

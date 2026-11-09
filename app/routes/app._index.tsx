@@ -36,6 +36,7 @@ import { PlanPanel } from "../admin/components/panels/PlanPanel";
 import { RecommendationsPanel } from "../admin/components/panels/RecommendationsPanel";
 import { RewardsPanel } from "../admin/components/panels/RewardsPanel";
 import { SetupPanel } from "../admin/components/panels/SetupPanel";
+import { TemplatesPanel } from "../admin/components/panels/TemplatesPanel";
 import { TrustPanel } from "../admin/components/panels/TrustPanel";
 import { useBarConfigStudio } from "../admin/hooks/useBarConfigStudio";
 import { getNavLabel } from "../admin/nav";
@@ -212,6 +213,9 @@ export default function Index() {
           )}
           {nav === "behavior" && (
             <BehaviorPanel config={config} updateConfig={updateConfig} />
+          )}
+          {nav === "templates" && (
+            <TemplatesPanel config={config} updateConfig={updateConfig} />
           )}
           {nav === "plan" && (
             <PlanPanel isPro={isPro} hideBranding={hideBranding} busy={busy} />

@@ -47,7 +47,24 @@ describe("serialize ↔ barConfigFromFormData round-trip", () => {
     assert.equal(parsed.drawerShowOnProduct, original.drawerShowOnProduct);
     assert.equal(parsed.cartLineQtyEnabled, original.cartLineQtyEnabled);
     assert.equal(parsed.recommendationsEnabled, original.recommendationsEnabled);
+    assert.equal(
+      parsed.recommendationsShowWithItems,
+      original.recommendationsShowWithItems,
+    );
+    assert.equal(parsed.recommendationsSource, original.recommendationsSource);
+    assert.equal(parsed.drawerAnimation, original.drawerAnimation);
+    assert.equal(parsed.recommendationsAnimation, original.recommendationsAnimation);
+    assert.equal(parsed.rewardAnimation, original.rewardAnimation);
     assert.deepEqual(parsed.rewardTiers, original.rewardTiers);
+    assert.deepEqual(
+      parsed.recommendationsProducts,
+      original.recommendationsProducts,
+    );
+    assert.equal(parsed.customCss, original.customCss);
+    assert.equal(
+      parsed.featureTemplates.recommendations.enabled,
+      original.featureTemplates.recommendations.enabled,
+    );
   });
 });
 

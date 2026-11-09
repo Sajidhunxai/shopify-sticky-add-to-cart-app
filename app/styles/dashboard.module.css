@@ -538,6 +538,35 @@
   line-height: 1.45;
 }
 
+.codeFieldLabel {
+  display: block;
+  margin: 4px 0 6px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #111827;
+}
+
+.codeField {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #0b1020;
+  color: #e5e7eb;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  resize: vertical;
+  min-height: 88px;
+}
+
+.codeField:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 1px;
+}
+
 .studioPreview {
   position: sticky;
   top: 12px;

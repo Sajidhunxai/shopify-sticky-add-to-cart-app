@@ -9,6 +9,7 @@ export type NavId =
   | "discounts"
   | "cart-summary"
   | "trust"
+  | "templates"
   | "pages"
   | "behavior"
   | "plan"
@@ -54,6 +55,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "Settings",
     items: [
+      { id: "templates", label: "HTML / CSS / templates" },
       { id: "pages", label: "Pages & devices" },
       { id: "behavior", label: "Behavior" },
       { id: "plan", label: "Plan & billing" },

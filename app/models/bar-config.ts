@@ -1,3 +1,18 @@
+import {
+  createDefaultFeatureTemplates,
+  normalizeFeatureTemplates,
+  type FeatureTemplates,
+} from "./feature-templates";
+
+export type { FeatureTemplate, FeatureTemplateKey, FeatureTemplates } from "./feature-templates";
+export {
+  FEATURE_TEMPLATE_KEYS,
+  FEATURE_TEMPLATE_META,
+  createDefaultFeatureTemplates,
+  normalizeFeatureTemplates,
+  sanitizeFeatureHtml,
+} from "./feature-templates";
+
 export type Plan = "free" | "pro";
 
 export type AfterAddBehavior = "stay" | "cart" | "drawer";
@@ -20,6 +35,20 @@ export type BarPosition =
   | "right";
 
 export type RewardType = "shipping" | "discount" | "product" | "custom";
+
+export type RecommendationSource = "collection" | "products";
+export type DrawerAnimation = "slide" | "fade" | "scale" | "none";
+export type RecsAnimation = "stagger" | "fade" | "slide" | "none";
+export type RewardAnimation = "smooth" | "pulse" | "glow" | "bounce" | "none";
+
+export type RecommendationProduct = {
+  handle: string;
+  title: string;
+  url: string;
+  image: string;
+  /** First available variant id as string (storefront add-to-cart) */
+  variantId: string;
+};
 
 export type RewardTier = {
   enabled: boolean;
@@ -171,13 +200,33 @@ export type BarConfig = {
   recommendationsShopNowEnabled: boolean;
   recommendationsShopNowText: string;
   recommendationsShopNowUrl: string;
-  /** Collection handle for empty-cart products (e.g. all, bestsellers) */
+  /** Collection handle when source is collection (e.g. all, bestsellers) */
   recommendationsCollection: string;
+  /** Show “You may also like” when the cart already has items */
+  recommendationsShowWithItems: boolean;
+  /** Hide recommended products that are already in the cart */
+  recommendationsHideInCart: boolean;
+  recommendationsSource: RecommendationSource;
+  /** Hand-picked products when source is products */
+  recommendationsProducts: RecommendationProduct[];
+  /** Cart drawer open/close motion */
+  drawerAnimation: DrawerAnimation;
+  /** Recommendation cards entrance motion */
+  recommendationsAnimation: RecsAnimation;
+  /** Tiered rewards progress / unlock motion */
+  rewardAnimation: RewardAnimation;
   discountEnabled: boolean;
   discountPlaceholder: string;
   discountButtonText: string;
   trustBadgesEnabled: boolean;
   trustBadgesText: string;
+  /**
+   * Global CSS injected into the cart drawer (not feature-scoped).
+   * Prefer per-feature css under featureTemplates when possible.
+   */
+  customCss: string;
+  /** Per-feature HTML / CSS / Mustache template overrides */
+  featureTemplates: FeatureTemplates;
 };
 
 export const DEFAULT_BAR_CONFIG: BarConfig = {
@@ -326,11 +375,20 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   recommendationsShopNowText: "Shop now",
   recommendationsShopNowUrl: "/collections/all",
   recommendationsCollection: "all",
+  recommendationsShowWithItems: true,
+  recommendationsHideInCart: true,
+  recommendationsSource: "collection",
+  recommendationsProducts: [],
+  drawerAnimation: "slide",
+  recommendationsAnimation: "stagger",
+  rewardAnimation: "smooth",
   discountEnabled: false,
   discountPlaceholder: "Discount code",
   discountButtonText: "Apply",
   trustBadgesEnabled: false,
   trustBadgesText: "Secure checkout · Free returns · 24/7 support",
+  customCss: "",
+  featureTemplates: createDefaultFeatureTemplates(),
 };
 
 function asBool(value: FormDataEntryValue | null | undefined, fallback: boolean) {
@@ -433,6 +491,72 @@ function normalizeRewardTiers(input: unknown): RewardTier[] {
   });
 }
 
+function asRecommendationSource(
+  value: FormDataEntryValue | null | undefined | string,
+): RecommendationSource {
+  return String(value || "") === "products" ? "products" : "collection";
+}
+
+function asDrawerAnimation(
+  value: FormDataEntryValue | null | undefined | string,
+): DrawerAnimation {
+  const raw = String(value || "slide");
+  if (raw === "fade" || raw === "scale" || raw === "none" || raw === "slide") {
+    return raw;
+  }
+  return "slide";
+}
+
+function asRecsAnimation(
+  value: FormDataEntryValue | null | undefined | string,
+): RecsAnimation {
+  const raw = String(value || "stagger");
+  if (raw === "fade" || raw === "slide" || raw === "none" || raw === "stagger") {
+    return raw;
+  }
+  return "stagger";
+}
+
+function asRewardAnimation(
+  value: FormDataEntryValue | null | undefined | string,
+): RewardAnimation {
+  const raw = String(value || "smooth");
+  if (
+    raw === "pulse" ||
+    raw === "glow" ||
+    raw === "bounce" ||
+    raw === "none" ||
+    raw === "smooth"
+  ) {
+    return raw;
+  }
+  return "smooth";
+}
+
+function normalizeRecommendationProducts(
+  input: unknown,
+): RecommendationProduct[] {
+  if (!Array.isArray(input)) return [];
+  return input
+    .map((row) => {
+      const p = (row || {}) as Partial<RecommendationProduct>;
+      const handle = String(p.handle || "")
+        .trim()
+        .replace(/^\/+|\/+$/g, "")
+        .replace(/^products\//i, "");
+      if (!handle) return null;
+      return {
+        handle,
+        title: String(p.title || handle),
+        url: String(p.url || `/products/${handle}`),
+        image: String(p.image || ""),
+        variantId: String(p.variantId || ""),
+      };
+    })
+    .filter((p): p is RecommendationProduct => Boolean(p))
+    .slice(0, 12);
+}
+
 /** Default palette for “Reset reward colors”. */
 export const DEFAULT_REWARD_COLORS = {
   rewardUseThemeColors: false,
@@ -443,7 +567,14 @@ export const DEFAULT_REWARD_COLORS = {
 } as const;
 
 export function parseBarConfig(raw: string | null | undefined): BarConfig {
-  if (!raw) return { ...DEFAULT_BAR_CONFIG, rewardTiers: DEFAULT_BAR_CONFIG.rewardTiers.map((t) => ({ ...t })) };
+  if (!raw) {
+    return {
+      ...DEFAULT_BAR_CONFIG,
+      rewardTiers: DEFAULT_BAR_CONFIG.rewardTiers.map((t) => ({ ...t })),
+      featureTemplates: createDefaultFeatureTemplates(),
+      recommendationsProducts: [],
+    };
+  }
   try {
     const parsed = JSON.parse(raw) as Partial<BarConfig> & {
       freeShippingEnabled?: boolean;
@@ -455,6 +586,19 @@ export function parseBarConfig(raw: string | null | undefined): BarConfig {
       ...DEFAULT_BAR_CONFIG,
       ...parsed,
       rewardTiers: normalizeRewardTiers(parsed.rewardTiers),
+      recommendationsProducts: normalizeRecommendationProducts(
+        parsed.recommendationsProducts,
+      ),
+      recommendationsSource: asRecommendationSource(
+        parsed.recommendationsSource,
+      ),
+      drawerAnimation: asDrawerAnimation(parsed.drawerAnimation),
+      recommendationsAnimation: asRecsAnimation(
+        parsed.recommendationsAnimation,
+      ),
+      rewardAnimation: asRewardAnimation(parsed.rewardAnimation),
+      customCss: String(parsed.customCss || "").slice(0, 24_000),
+      featureTemplates: normalizeFeatureTemplates(parsed.featureTemplates),
     };
     // Migrate older single free-shipping setting into tiered rewards
     if (
@@ -486,6 +630,8 @@ export function parseBarConfig(raw: string | null | undefined): BarConfig {
     return {
       ...DEFAULT_BAR_CONFIG,
       rewardTiers: DEFAULT_BAR_CONFIG.rewardTiers.map((t) => ({ ...t })),
+      featureTemplates: createDefaultFeatureTemplates(),
+      recommendationsProducts: [],
     };
   }
 }
@@ -833,6 +979,31 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
     )
       .replace(/^\/+|\/+$/g, "")
       .replace(/^collections\//i, "") || "all",
+    recommendationsShowWithItems: asBool(
+      formData.get("recommendationsShowWithItems"),
+      DEFAULT_BAR_CONFIG.recommendationsShowWithItems,
+    ),
+    recommendationsHideInCart: asBool(
+      formData.get("recommendationsHideInCart"),
+      DEFAULT_BAR_CONFIG.recommendationsHideInCart,
+    ),
+    recommendationsSource: asRecommendationSource(
+      formData.get("recommendationsSource"),
+    ),
+    recommendationsProducts: (() => {
+      try {
+        return normalizeRecommendationProducts(
+          JSON.parse(String(formData.get("recommendationsProducts") || "[]")),
+        );
+      } catch {
+        return [];
+      }
+    })(),
+    drawerAnimation: asDrawerAnimation(formData.get("drawerAnimation")),
+    recommendationsAnimation: asRecsAnimation(
+      formData.get("recommendationsAnimation"),
+    ),
+    rewardAnimation: asRewardAnimation(formData.get("rewardAnimation")),
     discountEnabled: asBool(
       formData.get("discountEnabled"),
       DEFAULT_BAR_CONFIG.discountEnabled,
@@ -853,6 +1024,16 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       formData.get("trustBadgesText"),
       DEFAULT_BAR_CONFIG.trustBadgesText,
     ),
+    customCss: String(formData.get("customCss") || "").slice(0, 24_000),
+    featureTemplates: (() => {
+      try {
+        return normalizeFeatureTemplates(
+          JSON.parse(String(formData.get("featureTemplates") || "{}")),
+        );
+      } catch {
+        return createDefaultFeatureTemplates();
+      }
+    })(),
   };
 }
 

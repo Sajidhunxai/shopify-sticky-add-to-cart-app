@@ -412,9 +412,15 @@ export function StudioPreview({
                             marginBottom: 6,
                           }}
                         >
-                          {tiers.map((tier) => {
+                          {tiers.map((tier, index) => {
                             const reached =
                               previewValue >= (Number(tier.minAmount) || 0);
+                            const nextIndex = tiers.findIndex(
+                              (t) =>
+                                previewValue < (Number(t.minAmount) || 0),
+                            );
+                            const isCurrent =
+                              !reached && index === nextIndex;
                             return (
                               <div
                                 key={tier.description + tier.minAmount}
@@ -426,21 +432,33 @@ export function StudioPreview({
                               >
                                 <span
                                   style={{
-                                    display: "inline-block",
-                                    width: 12,
-                                    height: 12,
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: 14,
+                                    height: 14,
                                     borderRadius: "50%",
                                     background: reached ? rIcon : "#fff",
                                     border: reached
                                       ? `2px solid ${rIcon}`
-                                      : "2px solid rgba(0,0,0,0.15)",
+                                      : isCurrent
+                                        ? `2px solid ${rFg}`
+                                        : "2px solid rgba(0,0,0,0.15)",
                                     boxSizing: "border-box",
+                                    boxShadow: reached
+                                      ? `0 0 0 2px ${rIcon}33`
+                                      : undefined,
+                                    color: "#fff",
+                                    fontSize: 8,
+                                    fontWeight: 800,
                                   }}
-                                />
+                                >
+                                  {reached ? "✓" : ""}
+                                </span>
                                 <div
                                   style={{
                                     fontSize: 8,
-                                    fontWeight: 650,
+                                    fontWeight: 700,
                                     lineHeight: 1.2,
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
@@ -602,49 +620,124 @@ export function StudioPreview({
                     )}
                   </div>
                 ) : (
-                  <div className={styles.previewSliderItem}>
-                    <div className={styles.previewSliderThumb} />
                     <div>
-                      <p style={{ color: config.textColor }}>
-                        Classic Canvas Sneaker
-                      </p>
-                      {config.cartLineQtyEnabled ? (
-                        <div
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            marginTop: 4,
-                            border: "1px solid rgba(0,0,0,0.15)",
-                            borderRadius: 6,
-                            fontSize: 10,
-                          }}
-                        >
-                          <span style={{ padding: "2px 6px" }}>−</span>
-                          <span style={{ padding: "2px 6px" }}>1</span>
-                          <span style={{ padding: "2px 6px" }}>+</span>
+                      <div className={styles.previewSliderItem}>
+                        <div className={styles.previewSliderThumb} />
+                        <div>
+                          <p style={{ color: config.textColor }}>
+                            Classic Canvas Sneaker
+                          </p>
+                          {config.cartLineQtyEnabled ? (
+                            <div
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                marginTop: 4,
+                                border: "1px solid rgba(0,0,0,0.15)",
+                                borderRadius: 6,
+                                fontSize: 10,
+                              }}
+                            >
+                              <span style={{ padding: "2px 6px" }}>−</span>
+                              <span style={{ padding: "2px 6px" }}>1</span>
+                              <span style={{ padding: "2px 6px" }}>+</span>
+                            </div>
+                          ) : (
+                            <span style={{ color: config.textColor }}>Qty 1</span>
+                          )}
                         </div>
-                      ) : (
-                        <span style={{ color: config.textColor }}>Qty 1</span>
-                      )}
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      {config.cartLineRemoveEnabled && (
-                        <div
-                          style={{
-                            color: config.textColor,
-                            fontSize: 14,
-                            lineHeight: 1,
-                            opacity: 0.7,
-                          }}
-                        >
-                          ×
+                        <div style={{ textAlign: "right" }}>
+                          {config.cartLineRemoveEnabled && (
+                            <div
+                              style={{
+                                color: config.textColor,
+                                fontSize: 14,
+                                lineHeight: 1,
+                                opacity: 0.7,
+                              }}
+                            >
+                              ×
+                            </div>
+                          )}
+                          <strong style={{ color: config.textColor }}>
+                            $68.00
+                          </strong>
                         </div>
-                      )}
-                      <strong style={{ color: config.textColor }}>
-                        $68.00
-                      </strong>
+                      </div>
+                      {config.recommendationsEnabled &&
+                        config.recommendationsShowWithItems && (
+                          <div style={{ padding: "8px 10px 4px" }}>
+                            <strong
+                              style={{
+                                display: "block",
+                                fontSize: 11,
+                                marginBottom: 6,
+                                color: config.textColor,
+                              }}
+                            >
+                              {config.recommendationsHeader}
+                            </strong>
+                            {Array.from({
+                              length: Math.min(2, config.recommendationsMax),
+                            }).map((_, i) => (
+                              <div
+                                key={`rec-filled-${i}`}
+                                style={{
+                                  display: "grid",
+                                  gridTemplateColumns: "36px 1fr auto",
+                                  gap: 6,
+                                  alignItems: "center",
+                                  marginBottom: 6,
+                                  padding: 5,
+                                  border: "1px solid rgba(0,0,0,0.08)",
+                                  borderRadius: 8,
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: 6,
+                                    background: "rgba(0,0,0,0.08)",
+                                  }}
+                                />
+                                <div style={{ minWidth: 0 }}>
+                                  <p
+                                    style={{
+                                      margin: 0,
+                                      fontSize: 9,
+                                      fontWeight: 650,
+                                      color: config.textColor,
+                                    }}
+                                  >
+                                    Recommended {i + 1}
+                                  </p>
+                                  <span
+                                    style={{
+                                      fontSize: 9,
+                                      color: config.textColor,
+                                    }}
+                                  >
+                                    $24.95
+                                  </span>
+                                </div>
+                                <span
+                                  style={{
+                                    fontSize: 9,
+                                    fontWeight: 700,
+                                    padding: "4px 6px",
+                                    borderRadius: `${config.buttonRadius}px`,
+                                    background: config.accentColor,
+                                    color: config.buttonTextColor,
+                                  }}
+                                >
+                                  {config.recommendationsAddText}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                     </div>
-                  </div>
                 )}
                 {config.announcementEnabled &&
                   config.announcementPosition === "after" && (

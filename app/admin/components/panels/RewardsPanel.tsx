@@ -3,6 +3,7 @@ import { useAppBridge } from "@shopify/app-bridge-react";
 import styles from "../../../styles/dashboard.module.css";
 import {
   DEFAULT_REWARD_COLORS,
+  type RewardAnimation,
   type RewardType,
 } from "../../../models/bar-config";
 import { colorFromEvent } from "../../fields/color";
@@ -246,6 +247,24 @@ export function RewardsPanel({
       >
         <s-option value="total">Cart total ($)</s-option>
         <s-option value="quantity">Cart quantity (#)</s-option>
+      </s-select>
+
+      <s-select
+        label="Rewards animation"
+        value={config.rewardAnimation}
+        details="Progress bar and unlock motion on the storefront"
+        onChange={(e: Event) =>
+          updateConfig(
+            "rewardAnimation",
+            (e.currentTarget as HTMLSelectElement).value as RewardAnimation,
+          )
+        }
+      >
+        <s-option value="smooth">Smooth fill</s-option>
+        <s-option value="pulse">Pulse on unlock</s-option>
+        <s-option value="glow">Glow progress</s-option>
+        <s-option value="bounce">Bounce milestones</s-option>
+        <s-option value="none">None</s-option>
       </s-select>
 
       <s-heading>Tiers</s-heading>

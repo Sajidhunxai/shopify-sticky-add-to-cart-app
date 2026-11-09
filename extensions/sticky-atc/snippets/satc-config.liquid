@@ -121,6 +121,15 @@
   {% assign satc_rec_shop_text = cfg.recommendationsShopNowText %}
   {% assign satc_rec_shop_url = cfg.recommendationsShopNowUrl %}
   {% assign satc_rec_collection = cfg.recommendationsCollection %}
+  {% assign satc_rec_with_items = cfg.recommendationsShowWithItems %}
+  {% assign satc_rec_hide_cart = cfg.recommendationsHideInCart %}
+  {% assign satc_rec_source = cfg.recommendationsSource %}
+  {% assign satc_rec_products_cfg = cfg.recommendationsProducts %}
+  {% assign satc_drawer_anim = cfg.drawerAnimation %}
+  {% assign satc_rec_anim = cfg.recommendationsAnimation %}
+  {% assign satc_reward_anim = cfg.rewardAnimation %}
+  {% assign satc_custom_css = cfg.customCss %}
+  {% assign satc_feature_templates = cfg.featureTemplates %}
   {% assign satc_disc_on = cfg.discountEnabled %}
   {% assign satc_disc_ph = cfg.discountPlaceholder %}
   {% assign satc_disc_btn = cfg.discountButtonText %}
@@ -234,6 +243,15 @@
   {% assign satc_rec_shop_text = 'Shop now' %}
   {% assign satc_rec_shop_url = '/collections/all' %}
   {% assign satc_rec_collection = 'all' %}
+  {% assign satc_rec_with_items = true %}
+  {% assign satc_rec_hide_cart = true %}
+  {% assign satc_rec_source = 'collection' %}
+  {% assign satc_rec_products_cfg = nil %}
+  {% assign satc_drawer_anim = 'slide' %}
+  {% assign satc_rec_anim = 'stagger' %}
+  {% assign satc_reward_anim = 'smooth' %}
+  {% assign satc_custom_css = '' %}
+  {% assign satc_feature_templates = nil %}
   {% assign satc_disc_on = false %}
   {% assign satc_disc_ph = 'Discount code' %}
   {% assign satc_disc_btn = 'Apply' %}
@@ -281,6 +299,12 @@
 {% if satc_rec_shop_text == blank %}{% assign satc_rec_shop_text = 'Shop now' %}{% endif %}
 {% if satc_rec_shop_url == blank %}{% assign satc_rec_shop_url = '/collections/all' %}{% endif %}
 {% if satc_rec_collection == blank %}{% assign satc_rec_collection = 'all' %}{% endif %}
+{% if satc_rec_with_items == nil %}{% assign satc_rec_with_items = true %}{% endif %}
+{% if satc_rec_hide_cart == nil %}{% assign satc_rec_hide_cart = true %}{% endif %}
+{% if satc_rec_source == blank %}{% assign satc_rec_source = 'collection' %}{% endif %}
+{% if satc_drawer_anim == blank %}{% assign satc_drawer_anim = 'slide' %}{% endif %}
+{% if satc_rec_anim == blank %}{% assign satc_rec_anim = 'stagger' %}{% endif %}
+{% if satc_reward_anim == blank %}{% assign satc_reward_anim = 'smooth' %}{% endif %}
 {% if satc_backdrop_opacity == blank %}{% assign satc_backdrop_opacity = 45 %}{% endif %}
 {% if satc_backdrop_blur == nil %}{% assign satc_backdrop_blur = true %}{% endif %}
 {% if satc_theme_font == nil %}{% assign satc_theme_font = true %}{% endif %}
@@ -413,14 +437,23 @@
     satc_line_qty: satc_line_qty,
     satc_line_remove: satc_line_remove,
     satc_rec_add: satc_rec_add,
+    satc_rec_anim: satc_rec_anim,
     satc_rec_collection: satc_rec_collection,
     satc_rec_empty: satc_rec_empty,
     satc_rec_header: satc_rec_header,
+    satc_rec_hide_cart: satc_rec_hide_cart,
     satc_rec_max: satc_rec_max,
     satc_rec_on: satc_rec_on,
+    satc_rec_products_cfg: satc_rec_products_cfg,
     satc_rec_shop_on: satc_rec_shop_on,
     satc_rec_shop_text: satc_rec_shop_text,
     satc_rec_shop_url: satc_rec_shop_url,
+    satc_rec_source: satc_rec_source,
+    satc_rec_with_items: satc_rec_with_items,
+    satc_drawer_anim: satc_drawer_anim,
+    satc_reward_anim: satc_reward_anim,
+    satc_custom_css: satc_custom_css,
+    satc_feature_templates: satc_feature_templates,
     satc_reward_bg: satc_reward_bg,
     satc_reward_done: satc_reward_done,
     satc_reward_empty: satc_reward_empty,
