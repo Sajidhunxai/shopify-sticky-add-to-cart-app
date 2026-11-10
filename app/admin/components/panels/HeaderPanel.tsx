@@ -1,3 +1,4 @@
+import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import { colorFromEvent } from "../../fields/color";
 import type { PanelProps } from "../../types";
 
@@ -212,6 +213,12 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
             (e.currentTarget as HTMLInputElement).value,
           )
         }
+      />
+
+      <FeatureCustomTemplate
+        featureKey="header"
+        config={config}
+        updateConfig={updateConfig}
       />
     </s-stack>
   );

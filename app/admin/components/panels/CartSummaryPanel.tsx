@@ -1,4 +1,5 @@
 import type { BarConfig } from "../../../models/bar-config";
+import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import type { PanelProps } from "../../types";
 
 export function CartSummaryPanel({ config, updateConfig }: PanelProps) {
@@ -34,6 +35,13 @@ export function CartSummaryPanel({ config, updateConfig }: PanelProps) {
         cart drawer” then opens Sticky ATC’s drawer. Also set the theme Cart
         type to <strong>Page</strong> so the header bag does not jump to /cart.
       </s-paragraph>
+
+      <FeatureCustomTemplate
+        featureKey="footer"
+        config={config}
+        updateConfig={updateConfig}
+        title="Custom footer / checkout template"
+      />
     </s-stack>
   );
 }

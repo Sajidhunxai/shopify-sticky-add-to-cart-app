@@ -1,19 +1,11 @@
-import { useState } from "react";
 import { useAppBridge } from "@shopify/app-bridge-react";
-import styles from "../../../styles/dashboard.module.css";
 import type {
   RecommendationProduct,
   RecsAnimation,
   RecommendationSource,
 } from "../../../models/bar-config";
-import {
-  FEATURE_TEMPLATE_META,
-  emptyFeatureTemplate,
-  type FeatureTemplate,
-} from "../../../models/feature-templates";
+import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import type { PanelProps } from "../../types";
-
-type RecTemplateTab = "recommendationCard" | "recommendationSkeleton";
 
 type PickedProduct = {
   id?: string;
@@ -25,30 +17,6 @@ type PickedProduct = {
 
 export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
   const shopify = useAppBridge();
-  const [tplTab, setTplTab] = useState<RecTemplateTab>("recommendationCard");
-  const templates = config.featureTemplates;
-  const currentTpl =
-    templates[tplTab] || emptyFeatureTemplate();
-  const tplMeta = FEATURE_TEMPLATE_META[tplTab];
-
-  const patchTemplate = (patch: Partial<FeatureTemplate>) => {
-    updateConfig("featureTemplates", {
-      ...templates,
-      [tplTab]: { ...(templates[tplTab] || emptyFeatureTemplate()), ...patch },
-    });
-  };
-
-  const loadExampleTemplate = () => {
-    patchTemplate({
-      enabled: true,
-      replaceDefault: true,
-      template: tplMeta.example,
-    });
-  };
-
-  const resetTemplate = () => {
-    patchTemplate(emptyFeatureTemplate());
-  };
 
   const pickCollection = async () => {
     try {
@@ -309,113 +277,12 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
         }
       />
 
-      <s-heading>Custom template</s-heading>
-      <s-stack direction="inline" gap="base">
-        <s-badge tone="caution">Technical skills required</s-badge>
-      </s-stack>
-      <s-paragraph>
-        Override the recommendation tile HTML (and loading skeleton) with your
-        own markup. Use Mustache placeholders like{" "}
-        <code>{"{{title}}"}</code> and <code>{"{{price}}"}</code>. Keep{" "}
-        <code>data-satc-rec-add</code> + <code>data-variant-id</code> on the Add
-        button so one-click add still works.
-      </s-paragraph>
-
-      <div
-        className={styles.tierTabs}
-        role="tablist"
-        aria-label="Recommendation templates"
-      >
-        {(
-          [
-            ["recommendationCard", "Recommendation tile"],
-            ["recommendationSkeleton", "Skeleton"],
-          ] as const
-        ).map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={tplTab === key}
-            className={`${styles.tierTab} ${
-              tplTab === key ? styles.tierTabActive : ""
-            }`}
-            onClick={() => setTplTab(key)}
-          >
-            {label}
-            {templates[key]?.enabled ? " · on" : ""}
-          </button>
-        ))}
-      </div>
-
-      <s-stack direction="inline" gap="base">
-        <s-badge tone={currentTpl.enabled ? "success" : "neutral"}>
-          {currentTpl.enabled ? "Active" : "Inactive"}
-        </s-badge>
-        <s-switch
-          label={
-            currentTpl.enabled
-              ? "Disable custom template"
-              : "Enable custom template"
-          }
-          checked={currentTpl.enabled}
-          onChange={(e: Event) =>
-            patchTemplate({
-              enabled: (e.currentTarget as HTMLInputElement).checked,
-            })
-          }
-        />
-        <s-switch
-          label="Replace built-in markup"
-          checked={currentTpl.replaceDefault}
-          onChange={(e: Event) =>
-            patchTemplate({
-              replaceDefault: (e.currentTarget as HTMLInputElement).checked,
-            })
-          }
-        />
-      </s-stack>
-
-      <s-paragraph>
-        Placeholders: {tplMeta.placeholders}
-      </s-paragraph>
-
-      <label className={styles.codeFieldLabel} htmlFor={`rec-tpl-${tplTab}`}>
-        HTML template
-      </label>
-      <textarea
-        id={`rec-tpl-${tplTab}`}
-        className={styles.codeField}
-        rows={14}
-        spellCheck={false}
-        placeholder={tplMeta.example}
-        value={currentTpl.template}
-        onChange={(e) => patchTemplate({ template: e.target.value })}
+      <FeatureCustomTemplate
+        featureKey="recommendationCard"
+        extraKeys={["recommendationSkeleton", "recommendations", "emptyCart"]}
+        config={config}
+        updateConfig={updateConfig}
       />
-
-      <label className={styles.codeFieldLabel} htmlFor={`rec-css-${tplTab}`}>
-        Feature CSS (optional)
-      </label>
-      <textarea
-        id={`rec-css-${tplTab}`}
-        className={styles.codeField}
-        rows={5}
-        spellCheck={false}
-        placeholder={`[data-satc-feature="${tplTab}"] .my-class { }`}
-        value={currentTpl.css}
-        onChange={(e) => patchTemplate({ css: e.target.value })}
-      />
-
-      <s-stack direction="inline" gap="base">
-        <s-button onClick={loadExampleTemplate}>Load example</s-button>
-        <s-button variant="tertiary" onClick={resetTemplate}>
-          Reset
-        </s-button>
-      </s-stack>
-      <s-paragraph>
-        More features (header, rewards, cart lines, etc.) are under{" "}
-        <strong>Settings → HTML / CSS / templates</strong>.
-      </s-paragraph>
     </s-stack>
   );
 }

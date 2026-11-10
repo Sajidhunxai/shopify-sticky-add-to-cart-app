@@ -1,3 +1,4 @@
+import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import type { PanelProps } from "../../types";
 
 export function TrustPanel({ config, updateConfig }: PanelProps) {
@@ -22,6 +23,12 @@ export function TrustPanel({ config, updateConfig }: PanelProps) {
             (e.currentTarget as HTMLInputElement).value,
           )
         }
+      />
+
+      <FeatureCustomTemplate
+        featureKey="trust"
+        config={config}
+        updateConfig={updateConfig}
       />
     </s-stack>
   );

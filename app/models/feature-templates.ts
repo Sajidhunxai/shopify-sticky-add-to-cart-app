@@ -17,7 +17,7 @@ export const FEATURE_TEMPLATE_KEYS = [
 export type FeatureTemplateKey = (typeof FEATURE_TEMPLATE_KEYS)[number];
 
 export type FeatureTemplate = {
-  /** When true, custom template/html/css for this feature are applied */
+  /** When true, custom template/html/css/js for this feature are applied */
   enabled: boolean;
   /** If true and template is set, replace the built-in markup */
   replaceDefault: boolean;
@@ -27,9 +27,11 @@ export type FeatureTemplate = {
   css: string;
   /**
    * Mustache-style template. Placeholders: {{name}}, {{{html}}}.
-   * Empty = keep built-in markup.
+   * Empty = keep built-in markup. Never pre-filled in admin.
    */
   template: string;
+  /** Optional JS run after this feature renders (storefront). */
+  js: string;
 };
 
 export type FeatureTemplates = Record<FeatureTemplateKey, FeatureTemplate>;
@@ -48,8 +50,8 @@ export const FEATURE_TEMPLATE_META: Record<
   },
   announcement: {
     label: "Announcement",
-    placeholders: "{{text}}, {{timer}}",
-    example: `<div class="my-announcement">{{text}}</div>`,
+    placeholders: "{{text}}, {{timer}} — keep data-satc-announcement-label for countdown",
+    example: `<span data-satc-announcement-label>Your products are reserved for {{timer}}!</span>`,
   },
   rewards: {
     label: "Tiered rewards",
@@ -156,6 +158,7 @@ export function emptyFeatureTemplate(): FeatureTemplate {
     html: "",
     css: "",
     template: "",
+    js: "",
   };
 }
 
@@ -185,6 +188,7 @@ export function normalizeFeatureTemplates(input: unknown): FeatureTemplates {
       html: clip(row.html),
       css: clip(row.css),
       template: clip(row.template),
+      js: clip(row.js),
     };
   }
   return base;

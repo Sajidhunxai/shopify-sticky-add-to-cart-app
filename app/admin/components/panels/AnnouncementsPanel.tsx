@@ -1,3 +1,5 @@
+import styles from "../../../styles/dashboard.module.css";
+import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import { colorFromEvent } from "../../fields/color";
 import type { PanelProps } from "../../types";
 
@@ -69,15 +71,17 @@ export function AnnouncementsPanel({ config, updateConfig }: PanelProps) {
         the announcement text to show the countdown.
       </s-paragraph>
 
-      <s-text-field
-        label="Announcement text"
+      <label className={styles.codeFieldLabel} htmlFor="announcement-text">
+        Announcement text
+      </label>
+      <textarea
+        id="announcement-text"
+        className={styles.codeField}
+        rows={3}
         value={config.announcementText}
-        onChange={(e: Event) =>
-          updateConfig(
-            "announcementText",
-            (e.currentTarget as HTMLInputElement).value,
-          )
-        }
+        placeholder="Your products are reserved for {timer}!"
+        onChange={(e) => updateConfig("announcementText", e.target.value)}
+        style={{ background: "#fff", color: "#111", minHeight: 72 }}
       />
 
       <s-number-field
@@ -119,6 +123,12 @@ export function AnnouncementsPanel({ config, updateConfig }: PanelProps) {
           }}
         />
       </s-grid>
+
+      <FeatureCustomTemplate
+        featureKey="announcement"
+        config={config}
+        updateConfig={updateConfig}
+      />
     </s-stack>
   );
 }

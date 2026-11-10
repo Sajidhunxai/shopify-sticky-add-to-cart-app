@@ -182,6 +182,22 @@
   };
   applyFeatureCss();
 
+  const applyFeatureJs = () => {
+    Object.keys(featureTemplates || {}).forEach((key) => {
+      const row = featureTemplates[key];
+      if (!row?.enabled || !row.js) return;
+      const rootEl =
+        slider?.querySelector(`[data-satc-feature="${key}"]`) || slider;
+      try {
+        // Merchant-authored storefront snippet (same class of control as theme JS).
+        const run = new Function("root", "featureKey", "slider", String(row.js));
+        run(rootEl, key, slider);
+      } catch (err) {
+        console.error("[Sticky ATC] custom js", key, err);
+      }
+    });
+  };
+
   const fetchCollectionProducts = async () => {
     const handle = encodeURIComponent(recCollection || "all");
     const url = `${root}collections/${handle}/products.json?limit=${Math.max(recMax, 8)}`;
@@ -852,6 +868,9 @@
       }
       updateRewards(cart);
       applyStaticFeatureTemplates(cart);
+      applyFeatureCss();
+      applyFeatureJs();
+      startAnnouncementTimer();
     } catch (error) {
       console.error("[Sticky ATC] slider", error);
     }

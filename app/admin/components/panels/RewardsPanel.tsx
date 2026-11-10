@@ -6,6 +6,7 @@ import {
   type RewardAnimation,
   type RewardType,
 } from "../../../models/bar-config";
+import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import { colorFromEvent } from "../../fields/color";
 import type { RewardsPanelProps } from "../../types";
 
@@ -409,6 +410,12 @@ export function RewardsPanel({
           )}
         </div>
       )}
+
+      <FeatureCustomTemplate
+        featureKey="rewards"
+        config={config}
+        updateConfig={updateConfig}
+      />
     </s-stack>
   );
 }

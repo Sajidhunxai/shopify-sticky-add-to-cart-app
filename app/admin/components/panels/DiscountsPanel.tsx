@@ -1,3 +1,4 @@
+import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import type { PanelProps } from "../../types";
 
 export function DiscountsPanel({ config, updateConfig }: PanelProps) {
@@ -37,6 +38,12 @@ export function DiscountsPanel({ config, updateConfig }: PanelProps) {
         Applying a code sends shoppers through Shopify’s discount URL, then they
         can return to checkout.
       </s-paragraph>
+
+      <FeatureCustomTemplate
+        featureKey="discount"
+        config={config}
+        updateConfig={updateConfig}
+      />
     </s-stack>
   );
 }

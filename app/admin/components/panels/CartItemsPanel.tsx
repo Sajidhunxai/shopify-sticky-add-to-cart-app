@@ -1,4 +1,5 @@
 import styles from "../../../styles/dashboard.module.css";
+import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import type { PanelProps } from "../../types";
 
 export function CartItemsPanel({ config, updateConfig }: PanelProps) {
@@ -110,6 +111,13 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
       </s-grid>
+
+      <FeatureCustomTemplate
+        featureKey="cartItem"
+        config={config}
+        updateConfig={updateConfig}
+        title="Custom cart line template"
+      />
     </s-stack>
   );
 }

@@ -567,6 +567,72 @@
   outline-offset: 1px;
 }
 
+.codeField::placeholder,
+.codeEditorField::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.codeEditor {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0b1020;
+}
+
+.codeEditorTabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #111827;
+}
+
+.codeEditorTab {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.codeEditorTab:hover {
+  color: #e5e7eb;
+}
+
+.codeEditorTabActive {
+  color: #fff;
+  border-bottom-color: #60a5fa;
+}
+
+.codeEditorField {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 14px 14px 16px;
+  border: none;
+  border-radius: 0;
+  background: #0b1020;
+  color: #f3f4f6;
+  caret-color: #93c5fd;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 260px;
+}
+
+.codeEditorField:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(96, 165, 250, 0.35);
+}
+
 .studioPreview {
   position: sticky;
   top: 12px;
