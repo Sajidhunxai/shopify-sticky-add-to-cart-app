@@ -355,9 +355,14 @@ export function RewardsPanel({
             className={`${styles.layoutOption} ${
               config.rewardBarLayout === value ? styles.layoutOptionActive : ""
             }`}
-            onClick={() =>
-              updateConfig("rewardBarLayout", value as RewardBarLayout)
-            }
+            onClick={() => {
+              updateConfig("rewardBarLayout", value as RewardBarLayout);
+              // Keep icon placement in sync with the chosen layout.
+              updateConfig(
+                "rewardIconPosition",
+                value === "middle" ? "inside" : "outside-top",
+              );
+            }}
           >
             <span
               className={`${styles.layoutThumb} ${
@@ -418,12 +423,16 @@ export function RewardsPanel({
         label="Icon position"
         value={config.rewardIconPosition}
         details="Inside = on the progress line. Outside = above or below the bar."
-        onChange={(e: Event) =>
-          updateConfig(
-            "rewardIconPosition",
-            (e.currentTarget as HTMLSelectElement).value as RewardIconPosition,
-          )
-        }
+        onChange={(e: Event) => {
+          const value = (e.currentTarget as HTMLSelectElement)
+            .value as RewardIconPosition;
+          updateConfig("rewardIconPosition", value);
+          if (value === "inside") {
+            updateConfig("rewardBarLayout", "middle");
+          } else if (config.rewardBarLayout === "middle") {
+            updateConfig("rewardBarLayout", "stacked");
+          }
+        }}
       >
         <s-option value="inside">Inside (on the line)</s-option>
         <s-option value="outside-top">Outside — top</s-option>

@@ -396,28 +396,195 @@ export function StudioPreview({
                     const rText = config.rewardUseThemeColors
                       ? "#111111"
                       : config.rewardTextColor || "#111111";
-                    const middle = config.rewardBarLayout === "middle";
+                    const iconPos = config.rewardIconPosition || "outside-top";
+                    const iconStyle = config.rewardIconStyle || "filled";
+                    const showIcons = config.rewardShowIcons !== false;
+                    // Inside icons OR "line in middle" layout → line through dots
+                    const middle =
+                      config.rewardBarLayout === "middle" ||
+                      iconPos === "inside";
+                    const iconsBelow = iconPos === "outside-bottom" && !middle;
                     const barFill =
                       config.rewardBarStyle === "striped"
                         ? `repeating-linear-gradient(-45deg, ${rFg}, ${rFg} 4px, ${rFg}99 4px, ${rFg}99 8px)`
-                        : rFg;
+                        : config.rewardBarStyle === "gradient"
+                          ? `linear-gradient(90deg, ${rFg}cc, ${rFg})`
+                          : rFg;
+                    const dotSize = middle ? 18 : 14;
                     const msgEl = (
                       <p
                         style={{
-                          margin: config.rewardMessagePosition === "above" ? "0 0 6px" : "6px 0 0",
+                          margin:
+                            config.rewardMessagePosition === "above"
+                              ? "0 0 6px"
+                              : "6px 0 0",
                           fontSize: 10,
                           fontWeight: 600,
                           textAlign: "center",
                           color: rText,
                           lineHeight: 1.3,
-                          order: config.rewardMessagePosition === "above" ? -1 : undefined,
                         }}
                       >
                         {message}
                       </p>
                     );
+                    const trackEl = (
+                      <div
+                        style={
+                          middle
+                            ? {
+                                position: "absolute",
+                                left: "8%",
+                                right: "8%",
+                                top: Math.round(dotSize / 2) - 3,
+                                height: 6,
+                                borderRadius: 999,
+                                background: "rgba(0,0,0,0.08)",
+                                overflow: "hidden",
+                                zIndex: 0,
+                              }
+                            : {
+                                height: 6,
+                                borderRadius: 999,
+                                background: "rgba(0,0,0,0.08)",
+                                overflow: "hidden",
+                                marginTop: iconsBelow ? 0 : 6,
+                                marginBottom: iconsBelow ? 6 : 0,
+                              }
+                        }
+                      >
+                        <div
+                          style={{
+                            height: "100%",
+                            width: `${Math.round(pct)}%`,
+                            background: barFill,
+                            borderRadius: 999,
+                          }}
+                        />
+                      </div>
+                    );
+                    const milestonesEl = (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          gap: 4,
+                          position: "relative",
+                          zIndex: 1,
+                        }}
+                      >
+                        {tiers.map((tier, index) => {
+                          const reached =
+                            previewValue >= (Number(tier.minAmount) || 0);
+                          const nextIndex = tiers.findIndex(
+                            (t) =>
+                              previewValue < (Number(t.minAmount) || 0),
+                          );
+                          const isCurrent = !reached && index === nextIndex;
+                          const customImg =
+                            tier.icon === "custom" && tier.iconUrl
+                              ? tier.iconUrl
+                              : "";
+                          let dotBg = reached ? rIcon : "#fff";
+                          let dotBorder = reached
+                            ? `2px solid ${rIcon}`
+                            : isCurrent
+                              ? `2px solid ${rFg}`
+                              : "2px solid rgba(0,0,0,0.15)";
+                          let dotColor = "#fff";
+                          if (iconStyle === "outline") {
+                            dotBg = "#fff";
+                            dotBorder = `2px solid ${rIcon}`;
+                            dotColor = rIcon;
+                          } else if (iconStyle === "soft") {
+                            dotBg = `${rIcon}29`;
+                            dotBorder = "2px solid transparent";
+                            dotColor = rIcon;
+                          } else if (iconStyle === "plain") {
+                            dotBg = "transparent";
+                            dotBorder = "2px solid transparent";
+                            dotColor = rIcon;
+                          }
+                          return (
+                            <div
+                              key={tier.description + tier.minAmount}
+                              style={{
+                                flex: 1,
+                                textAlign: "center",
+                                minWidth: 0,
+                              }}
+                            >
+                              {showIcons ? (
+                                <span
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: dotSize,
+                                    height: dotSize,
+                                    borderRadius: "50%",
+                                    background: dotBg,
+                                    border: dotBorder,
+                                    boxSizing: "border-box",
+                                    boxShadow:
+                                      reached && iconStyle === "filled"
+                                        ? `0 0 0 2px ${rIcon}33`
+                                        : undefined,
+                                    color: dotColor,
+                                    fontSize: 8,
+                                    fontWeight: 800,
+                                    overflow: "hidden",
+                                  }}
+                                >
+                                  {customImg ? (
+                                    <img
+                                      src={customImg}
+                                      alt=""
+                                      width={12}
+                                      height={12}
+                                      style={{ objectFit: "contain" }}
+                                    />
+                                  ) : reached ? (
+                                    "✓"
+                                  ) : tier.icon === "truck" ? (
+                                    "🚚"
+                                  ) : tier.icon === "gift" ? (
+                                    "🎁"
+                                  ) : tier.icon === "percent" ? (
+                                    "%"
+                                  ) : tier.icon === "star" ? (
+                                    "★"
+                                  ) : tier.icon === "heart" ? (
+                                    "♥"
+                                  ) : tier.icon === "lock" ? (
+                                    "🔒"
+                                  ) : (
+                                    ""
+                                  )}
+                                </span>
+                              ) : null}
+                              <div
+                                style={{
+                                  fontSize: 8,
+                                  fontWeight: 700,
+                                  lineHeight: 1.2,
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                  color: rText,
+                                  marginTop: showIcons ? 4 : 0,
+                                }}
+                              >
+                                {tier.description}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
                     return (
                       <div
+                        key={`rewards-${config.rewardBarLayout}-${iconPos}-${config.rewardBarStyle}-${iconStyle}-${showIcons}`}
                         style={{
                           background: rBg,
                           padding: "8px 8px 6px",
@@ -426,124 +593,30 @@ export function StudioPreview({
                           flexDirection: "column",
                         }}
                       >
-                        {config.rewardMessagePosition === "above" ? msgEl : null}
+                        {config.rewardMessagePosition === "above"
+                          ? msgEl
+                          : null}
                         <div style={{ position: "relative" }}>
                           {middle ? (
-                            <div
-                              style={{
-                                position: "absolute",
-                                left: "10%",
-                                right: "10%",
-                                top: 7,
-                                height: 6,
-                                borderRadius: 999,
-                                background: "rgba(0,0,0,0.08)",
-                                overflow: "hidden",
-                                zIndex: 0,
-                              }}
-                            >
-                              <div
-                                style={{
-                                  height: "100%",
-                                  width: `${Math.round(pct)}%`,
-                                  background: barFill,
-                                  borderRadius: 999,
-                                }}
-                              />
-                            </div>
-                          ) : null}
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              gap: 4,
-                              marginBottom: middle ? 0 : 6,
-                              position: "relative",
-                              zIndex: 1,
-                            }}
-                          >
-                            {tiers.map((tier, index) => {
-                              const reached =
-                                previewValue >= (Number(tier.minAmount) || 0);
-                              const nextIndex = tiers.findIndex(
-                                (t) =>
-                                  previewValue < (Number(t.minAmount) || 0),
-                              );
-                              const isCurrent =
-                                !reached && index === nextIndex;
-                              return (
-                                <div
-                                  key={tier.description + tier.minAmount}
-                                  style={{
-                                    flex: 1,
-                                    textAlign: "center",
-                                    minWidth: 0,
-                                  }}
-                                >
-                                  <span
-                                    style={{
-                                      display: "inline-flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      width: middle ? 16 : 14,
-                                      height: middle ? 16 : 14,
-                                      borderRadius: "50%",
-                                      background: reached ? rIcon : "#fff",
-                                      border: reached
-                                        ? `2px solid ${rIcon}`
-                                        : isCurrent
-                                          ? `2px solid ${rFg}`
-                                          : "2px solid rgba(0,0,0,0.15)",
-                                      boxSizing: "border-box",
-                                      boxShadow: reached
-                                        ? `0 0 0 2px ${rIcon}33`
-                                        : undefined,
-                                      color: "#fff",
-                                      fontSize: 8,
-                                      fontWeight: 800,
-                                    }}
-                                  >
-                                    {reached ? "✓" : ""}
-                                  </span>
-                                  <div
-                                    style={{
-                                      fontSize: 8,
-                                      fontWeight: 700,
-                                      lineHeight: 1.2,
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                      whiteSpace: "nowrap",
-                                      color: rText,
-                                      marginTop: middle ? 4 : 0,
-                                    }}
-                                  >
-                                    {tier.description}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                          {!middle ? (
-                            <div
-                              style={{
-                                height: 6,
-                                borderRadius: 999,
-                                background: "rgba(0,0,0,0.08)",
-                                overflow: "hidden",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  height: "100%",
-                                  width: `${Math.round(pct)}%`,
-                                  background: barFill,
-                                  borderRadius: 999,
-                                }}
-                              />
-                            </div>
-                          ) : null}
+                            <>
+                              {trackEl}
+                              {milestonesEl}
+                            </>
+                          ) : iconsBelow ? (
+                            <>
+                              {trackEl}
+                              {milestonesEl}
+                            </>
+                          ) : (
+                            <>
+                              {milestonesEl}
+                              {trackEl}
+                            </>
+                          )}
                         </div>
-                        {config.rewardMessagePosition === "below" ? msgEl : null}
+                        {config.rewardMessagePosition === "below"
+                          ? msgEl
+                          : null}
                       </div>
                     );
                   })()}
