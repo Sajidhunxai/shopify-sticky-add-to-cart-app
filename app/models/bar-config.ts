@@ -40,6 +40,10 @@ export type RecommendationSource = "collection" | "products";
 export type DrawerAnimation = "slide" | "fade" | "scale" | "none";
 export type RecsAnimation = "stagger" | "fade" | "slide" | "none";
 export type RewardAnimation = "smooth" | "pulse" | "glow" | "bounce" | "none";
+/** stacked = milestones above bar; middle = progress line through icons */
+export type RewardBarLayout = "stacked" | "middle";
+export type RewardBarStyle = "solid" | "gradient" | "striped";
+export type RewardMessagePosition = "below" | "above";
 
 export type RecommendationProduct = {
   handle: string;
@@ -215,6 +219,12 @@ export type BarConfig = {
   recommendationsAnimation: RecsAnimation;
   /** Tiered rewards progress / unlock motion */
   rewardAnimation: RewardAnimation;
+  /** Progress bar layout: bar below milestones, or line through icons */
+  rewardBarLayout: RewardBarLayout;
+  /** Progress fill style */
+  rewardBarStyle: RewardBarStyle;
+  /** Where the “You’re $X away…” message sits */
+  rewardMessagePosition: RewardMessagePosition;
   discountEnabled: boolean;
   discountPlaceholder: string;
   discountButtonText: string;
@@ -324,6 +334,9 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   rewardTextColor: "#111111",
   rewardCompleteText: "Free shipping unlocked!",
   rewardCalcMode: "total",
+  rewardBarLayout: "stacked",
+  rewardBarStyle: "gradient",
+  rewardMessagePosition: "below",
   rewardTiers: [
     {
       enabled: true,
@@ -533,6 +546,30 @@ function asRewardAnimation(
   return "smooth";
 }
 
+function asRewardBarLayout(
+  value: FormDataEntryValue | null | undefined | string,
+): RewardBarLayout {
+  const raw = String(value || "stacked");
+  if (raw === "middle" || raw === "stacked") return raw;
+  return "stacked";
+}
+
+function asRewardBarStyle(
+  value: FormDataEntryValue | null | undefined | string,
+): RewardBarStyle {
+  const raw = String(value || "gradient");
+  if (raw === "solid" || raw === "striped" || raw === "gradient") return raw;
+  return "gradient";
+}
+
+function asRewardMessagePosition(
+  value: FormDataEntryValue | null | undefined | string,
+): RewardMessagePosition {
+  const raw = String(value || "below");
+  if (raw === "above" || raw === "below") return raw;
+  return "below";
+}
+
 function normalizeRecommendationProducts(
   input: unknown,
 ): RecommendationProduct[] {
@@ -597,6 +634,11 @@ export function parseBarConfig(raw: string | null | undefined): BarConfig {
         parsed.recommendationsAnimation,
       ),
       rewardAnimation: asRewardAnimation(parsed.rewardAnimation),
+      rewardBarLayout: asRewardBarLayout(parsed.rewardBarLayout),
+      rewardBarStyle: asRewardBarStyle(parsed.rewardBarStyle),
+      rewardMessagePosition: asRewardMessagePosition(
+        parsed.rewardMessagePosition,
+      ),
       customCss: String(parsed.customCss || "").slice(0, 24_000),
       featureTemplates: normalizeFeatureTemplates(parsed.featureTemplates),
     };
@@ -1004,6 +1046,11 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       formData.get("recommendationsAnimation"),
     ),
     rewardAnimation: asRewardAnimation(formData.get("rewardAnimation")),
+    rewardBarLayout: asRewardBarLayout(formData.get("rewardBarLayout")),
+    rewardBarStyle: asRewardBarStyle(formData.get("rewardBarStyle")),
+    rewardMessagePosition: asRewardMessagePosition(
+      formData.get("rewardMessagePosition"),
+    ),
     discountEnabled: asBool(
       formData.get("discountEnabled"),
       DEFAULT_BAR_CONFIG.discountEnabled,

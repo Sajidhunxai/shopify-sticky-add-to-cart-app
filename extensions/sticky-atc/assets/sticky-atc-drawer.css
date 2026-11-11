@@ -229,6 +229,13 @@
   padding: 14px 16px 12px;
   background: var(--satc-reward-bg, #f0f2ff) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.satc-slider__rewards--msg-above .satc-slider__rewards-text {
+  order: -1;
+  margin: 0 0 12px;
 }
 
 .satc-slider__rewards-rail {
@@ -242,6 +249,62 @@
   margin-bottom: 10px;
   position: relative;
   z-index: 1;
+}
+
+/* Line through the middle of milestone icons */
+.satc-slider__rewards--layout-middle .satc-slider__rewards-milestones {
+  margin-bottom: 0;
+  padding: 0 2px;
+}
+
+.satc-slider__rewards--layout-middle .satc-slider__rewards-track {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 15px;
+  height: 8px;
+  margin: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.satc-slider__rewards--layout-middle .satc-slider__reward-milestone {
+  gap: 8px;
+}
+
+.satc-slider__rewards--layout-middle .satc-slider__reward-dot {
+  width: 30px;
+  height: 30px;
+  z-index: 1;
+  background: #fff !important;
+  border-width: 2.5px;
+}
+
+.satc-slider__rewards--layout-middle
+  .satc-slider__reward-milestone.is-reached
+  .satc-slider__reward-dot {
+  background: var(--satc-reward-icon, #79be30) !important;
+  color: #fff;
+}
+
+.satc-slider__rewards--layout-middle .satc-slider__reward-icon {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.satc-slider__rewards--fill-solid .satc-slider__rewards-bar {
+  background: var(--satc-reward-fg, #b3009f) !important;
+}
+
+.satc-slider__rewards--fill-striped .satc-slider__rewards-bar {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--satc-reward-fg, #111),
+    var(--satc-reward-fg, #111) 5px,
+    color-mix(in srgb, var(--satc-reward-fg, #111) 55%, #fff) 5px,
+    color-mix(in srgb, var(--satc-reward-fg, #111) 55%, #fff) 10px
+  ) !important;
 }
 
 .satc-slider__reward-milestone {

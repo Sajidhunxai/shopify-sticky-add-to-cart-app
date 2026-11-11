@@ -108,6 +108,28 @@
   const recSource = slider?.dataset.recSource || "collection";
   const recAnim = slider?.dataset.recAnim || "stagger";
   const rewardAnim = slider?.dataset.rewardAnim || "smooth";
+  const rewardLayout = slider?.dataset.rewardLayout || "stacked";
+  const rewardFill = slider?.dataset.rewardStyle || "gradient";
+  const rewardMsgPos = slider?.dataset.rewardMsgPos || "below";
+  if (rewardRoot) {
+    rewardRoot.classList.add(
+      `satc-slider__rewards--layout-${rewardLayout}`,
+      `satc-slider__rewards--fill-${rewardFill}`,
+      `satc-slider__rewards--msg-${rewardMsgPos}`,
+    );
+  }
+  const rewardTypeIcon = (type) => {
+    if (type === "shipping") {
+      return `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 7h11v8H3V7zm12 2h3.2L21 12.5V15h-6V9zM6.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm10 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>`;
+    }
+    if (type === "discount") {
+      return `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.5 2.1 21.9 11.5 12.5 20.9 3.1 11.5 12.5 2.1zm-1.4 5.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm4.4 4.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.2 15.3l5.6-5.6 1.1 1.1-5.6 5.6-1.1-1.1z"/></svg>`;
+    }
+    if (type === "product") {
+      return `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3c2.2 0 3.5 1.5 3.5 3.2 0 .5-.1 1-.3 1.4H18l1 12H5L6 7.6h2.8c-.2-.4-.3-.9-.3-1.4C8.5 4.5 9.8 3 12 3zm0 1.6c-1.1 0-1.8.7-1.8 1.6S10.9 7.8 12 7.8s1.8-.7 1.8-1.6S13.1 4.6 12 4.6z"/></svg>`;
+    }
+    return `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 2.8 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8l5-.7L12 2.8z"/></svg>`;
+  };
   let recSeed = [];
   try {
     const seedEl = slider?.querySelector("[data-satc-rec-seed]");
@@ -639,10 +661,17 @@
           rewardMode === "quantity"
             ? `${Math.round(goal)}`
             : money(Math.round(goal * 100));
-        return `<div class="satc-slider__reward-milestone${reached ? " is-reached" : ""}${isCurrent ? " is-current" : ""}" data-reward-type="${escapeHtml(tier.rewardType || "custom")}" style="--satc-tier-i:${index}">
-            <span class="satc-slider__reward-dot" aria-hidden="true">
-              ${reached ? '<svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path fill="currentColor" d="M6.2 11.4 2.8 8l1.2-1.2 2.2 2.2 5-5L12.4 5.2z"/></svg>' : ""}
-            </span>
+        const type = tier.rewardType || "custom";
+        const iconInner =
+          rewardLayout === "middle"
+            ? reached
+              ? '<svg class="satc-slider__reward-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.2 11.4 2.8 8l1.2-1.2 2.2 2.2 5-5L12.4 5.2z"/></svg>'
+              : rewardTypeIcon(type)
+            : reached
+              ? '<svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path fill="currentColor" d="M6.2 11.4 2.8 8l1.2-1.2 2.2 2.2 5-5L12.4 5.2z"/></svg>'
+              : "";
+        return `<div class="satc-slider__reward-milestone${reached ? " is-reached" : ""}${isCurrent ? " is-current" : ""}" data-reward-type="${escapeHtml(type)}" style="--satc-tier-i:${index}">
+            <span class="satc-slider__reward-dot" aria-hidden="true">${iconInner}</span>
             <span class="satc-slider__reward-label">${labelHtml}</span>
             <span class="satc-slider__reward-goal">${escapeHtml(goalLabel)}</span>
           </div>`;

@@ -47,6 +47,9 @@
     data-reward-mode="{{ satc_reward_mode }}"
     data-reward-done="{{ satc_reward_done | escape }}"
     data-reward-anim="{{ satc_reward_anim | escape }}"
+    data-reward-layout="{{ satc_reward_layout | escape }}"
+    data-reward-style="{{ satc_reward_style | escape }}"
+    data-reward-msg-pos="{{ satc_reward_msg_pos | escape }}"
     data-rec-enabled="{% if satc_rec_on == true or satc_rec_on == 'true' %}true{% else %}false{% endif %}"
     data-rec-empty="{{ satc_rec_empty | escape }}"
     data-rec-header="{{ satc_rec_header | escape }}"
@@ -169,9 +172,12 @@
       {% endif %}
       {% if satc_reward_on == true or satc_reward_on == 'true' or satc_ship_on == true or satc_ship_on == 'true' %}
         <div
-          class="satc-slider__rewards satc-slider__rewards--anim-{{ satc_reward_anim }}"
+          class="satc-slider__rewards satc-slider__rewards--anim-{{ satc_reward_anim }} satc-slider__rewards--layout-{{ satc_reward_layout }} satc-slider__rewards--fill-{{ satc_reward_style }} satc-slider__rewards--msg-{{ satc_reward_msg_pos }}"
           data-satc-rewards
           data-reward-anim="{{ satc_reward_anim | escape }}"
+          data-reward-layout="{{ satc_reward_layout | escape }}"
+          data-reward-style="{{ satc_reward_style | escape }}"
+          data-reward-msg-pos="{{ satc_reward_msg_pos | escape }}"
           style="{% if satc_reward_theme == true or satc_reward_theme == 'true' %}--satc-reward-bg: color-mix(in srgb, rgb(var(--color-button, var(--color-base-accent-1, 27, 57, 254))) 18%, #fff); --satc-reward-fg: rgb(var(--color-button, var(--color-base-accent-1, 179, 0, 159))); --satc-reward-icon: rgb(var(--color-button, var(--color-base-accent-1, 121, 190, 48))); --satc-reward-text: rgb(var(--color-foreground, 17, 17, 17));{% else %}--satc-reward-bg: {{ satc_reward_bg }}; --satc-reward-fg: {{ satc_reward_fg }}; --satc-reward-icon: {{ satc_reward_icon }}; --satc-reward-text: {{ satc_reward_text }};{% endif %}"
         >
           <div class="satc-slider__rewards-rail">

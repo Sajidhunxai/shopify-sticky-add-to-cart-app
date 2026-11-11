@@ -128,6 +128,9 @@
   {% assign satc_drawer_anim = cfg.drawerAnimation %}
   {% assign satc_rec_anim = cfg.recommendationsAnimation %}
   {% assign satc_reward_anim = cfg.rewardAnimation %}
+  {% assign satc_reward_layout = cfg.rewardBarLayout %}
+  {% assign satc_reward_style = cfg.rewardBarStyle %}
+  {% assign satc_reward_msg_pos = cfg.rewardMessagePosition %}
   {% assign satc_custom_css = cfg.customCss %}
   {% assign satc_feature_templates = cfg.featureTemplates %}
   {% assign satc_disc_on = cfg.discountEnabled %}
@@ -250,6 +253,9 @@
   {% assign satc_drawer_anim = 'slide' %}
   {% assign satc_rec_anim = 'stagger' %}
   {% assign satc_reward_anim = 'smooth' %}
+  {% assign satc_reward_layout = 'stacked' %}
+  {% assign satc_reward_style = 'gradient' %}
+  {% assign satc_reward_msg_pos = 'below' %}
   {% assign satc_custom_css = '' %}
   {% assign satc_feature_templates = nil %}
   {% assign satc_disc_on = false %}
@@ -305,6 +311,9 @@
 {% if satc_drawer_anim == blank %}{% assign satc_drawer_anim = 'slide' %}{% endif %}
 {% if satc_rec_anim == blank %}{% assign satc_rec_anim = 'stagger' %}{% endif %}
 {% if satc_reward_anim == blank %}{% assign satc_reward_anim = 'smooth' %}{% endif %}
+{% if satc_reward_layout == blank %}{% assign satc_reward_layout = 'stacked' %}{% endif %}
+{% if satc_reward_style == blank %}{% assign satc_reward_style = 'gradient' %}{% endif %}
+{% if satc_reward_msg_pos == blank %}{% assign satc_reward_msg_pos = 'below' %}{% endif %}
 {% if satc_backdrop_opacity == blank %}{% assign satc_backdrop_opacity = 45 %}{% endif %}
 {% if satc_backdrop_blur == nil %}{% assign satc_backdrop_blur = true %}{% endif %}
 {% if satc_theme_font == nil %}{% assign satc_theme_font = true %}{% endif %}
@@ -452,6 +461,9 @@
     satc_rec_with_items: satc_rec_with_items,
     satc_drawer_anim: satc_drawer_anim,
     satc_reward_anim: satc_reward_anim,
+    satc_reward_layout: satc_reward_layout,
+    satc_reward_style: satc_reward_style,
+    satc_reward_msg_pos: satc_reward_msg_pos,
     satc_custom_css: satc_custom_css,
     satc_feature_templates: satc_feature_templates,
     satc_reward_bg: satc_reward_bg,

@@ -4,6 +4,9 @@ import styles from "../../../styles/dashboard.module.css";
 import {
   DEFAULT_REWARD_COLORS,
   type RewardAnimation,
+  type RewardBarLayout,
+  type RewardBarStyle,
+  type RewardMessagePosition,
   type RewardType,
 } from "../../../models/bar-config";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
@@ -248,6 +251,75 @@ export function RewardsPanel({
       >
         <s-option value="total">Cart total ($)</s-option>
         <s-option value="quantity">Cart quantity (#)</s-option>
+      </s-select>
+
+      <s-heading>Progress bar design</s-heading>
+      <s-paragraph>
+        Mix layout, fill style, and message position. Preview updates on the
+        right — Save to publish to the storefront.
+      </s-paragraph>
+
+      <div className={styles.layoutPicker} role="radiogroup" aria-label="Bar layout">
+        {(
+          [
+            ["stacked", "Bar below", "Milestones on top, progress bar underneath"],
+            ["middle", "Line in middle", "Progress line runs through the icons"],
+          ] as const
+        ).map(([value, label, hint]) => (
+          <button
+            key={value}
+            type="button"
+            role="radio"
+            aria-checked={config.rewardBarLayout === value}
+            className={`${styles.layoutOption} ${
+              config.rewardBarLayout === value ? styles.layoutOptionActive : ""
+            }`}
+            onClick={() =>
+              updateConfig("rewardBarLayout", value as RewardBarLayout)
+            }
+          >
+            <span
+              className={`${styles.layoutThumb} ${
+                value === "middle"
+                  ? styles.layoutThumbMiddle
+                  : styles.layoutThumbStacked
+              }`}
+              aria-hidden="true"
+            />
+            <strong>{label}</strong>
+            <span>{hint}</span>
+          </button>
+        ))}
+      </div>
+
+      <s-select
+        label="Progress fill style"
+        value={config.rewardBarStyle}
+        onChange={(e: Event) =>
+          updateConfig(
+            "rewardBarStyle",
+            (e.currentTarget as HTMLSelectElement).value as RewardBarStyle,
+          )
+        }
+      >
+        <s-option value="gradient">Gradient</s-option>
+        <s-option value="solid">Solid</s-option>
+        <s-option value="striped">Striped</s-option>
+      </s-select>
+
+      <s-select
+        label="Message position"
+        value={config.rewardMessagePosition}
+        onChange={(e: Event) =>
+          updateConfig(
+            "rewardMessagePosition",
+            (e.currentTarget as HTMLSelectElement)
+              .value as RewardMessagePosition,
+          )
+        }
+      >
+        <s-option value="below">Below progress</s-option>
+        <s-option value="above">Above progress</s-option>
       </s-select>
 
       <s-select
