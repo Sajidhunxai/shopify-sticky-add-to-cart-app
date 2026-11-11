@@ -6,7 +6,10 @@ export default function HelpPage() {
     <s-page heading="Setup help">
       <s-banner tone="info" heading="Most issues are embed-related">
         The sticky bar only renders on product pages after the App embed is
-        enabled and the theme is saved.
+        enabled and the theme is saved. For full guides see{" "}
+        <s-link href="/app/docs">Documentation</s-link> — including{" "}
+        <s-link href="/app/docs/getting-started">Getting started</s-link> and{" "}
+        <s-link href="/app/docs/troubleshooting">Troubleshooting</s-link>.
       </s-banner>
 
       <s-section heading="Sticky bar not showing?">

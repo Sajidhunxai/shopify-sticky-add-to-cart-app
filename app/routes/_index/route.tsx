@@ -211,6 +211,7 @@ export default function Landing() {
           <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer">
             Shopify App Store
           </a>
+          <Link to="/docs">Docs</Link>
           <Link to="/privacy">Privacy</Link>
           <Link to="/terms">Terms</Link>
           <a href="mailto:support@appmarka.com">Support</a>

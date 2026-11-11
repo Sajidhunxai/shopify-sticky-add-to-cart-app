@@ -120,6 +120,17 @@ export function buildRewardPreviewModel(
   return { message, progress_pct: pct, tiers: rows, tiers_html };
 }
 
+/** Move rewards message node before the rail when admin chooses “above”. */
+function placeMessageAbove(html: string): string {
+  const textRe =
+    /(<p\b[^>]*\b(?:class="[^"]*satc-slider__rewards-text[^"]*"|data-satc-reward-text)[^>]*>[\s\S]*?<\/p>)/i;
+  const match = html.match(textRe);
+  if (!match) return html;
+  const textBlock = match[1];
+  const without = html.replace(textRe, "");
+  return `${textBlock}\n${without.trimStart()}`;
+}
+
 /** Render custom rewards shell HTML for admin preview, or null to use React fallback. */
 export function renderRewardsCustomPreview(
   config: BarConfig,
@@ -130,7 +141,7 @@ export function renderRewardsCustomPreview(
   if (!tpl?.enabled || !template) return null;
   const model = buildRewardPreviewModel(config, previewValue);
   if (!model) return null;
-  const html = sanitizeFeatureHtml(
+  let html = sanitizeFeatureHtml(
     renderMustache(template, {
       message: model.message,
       progress_pct: model.progress_pct,
@@ -138,6 +149,9 @@ export function renderRewardsCustomPreview(
       tiers: model.tiers,
     }) + String(tpl.html || ""),
   );
+  if ((config.rewardMessagePosition || "below") === "above") {
+    html = placeMessageAbove(html);
+  }
   const cssParts: string[] = [];
   if (tpl.css) cssParts.push(`[data-satc-feature="rewards"]{\n${tpl.css}\n}`);
   const tierCss = config.featureTemplates.rewardTier?.css;

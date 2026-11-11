@@ -519,15 +519,17 @@ export function StudioPreview({
                       const iconPos =
                         config.rewardIconPosition || "outside-top";
                       const iconStyle = config.rewardIconStyle || "filled";
+                      const msgPos =
+                        config.rewardMessagePosition || "below";
                       return (
                         <div
-                          key={`rewards-custom-${config.featureTemplates.rewards.template.length}-${config.featureTemplates.rewardTier?.template?.length || 0}`}
+                          key={`rewards-custom-${msgPos}-${config.rewardShowIcons}-${layout}-${config.featureTemplates.rewards.template.length}`}
                           data-satc-feature="rewards"
                           className={[
                             "satc-slider__rewards",
                             `satc-slider__rewards--layout-${layout}`,
                             `satc-slider__rewards--fill-${config.rewardBarStyle || "gradient"}`,
-                            `satc-slider__rewards--msg-${config.rewardMessagePosition || "below"}`,
+                            `satc-slider__rewards--msg-${msgPos}`,
                             `satc-slider__rewards--icon-${iconPos}`,
                             `satc-slider__rewards--icon-style-${iconStyle}`,
                             config.rewardShowIcons === false
@@ -543,6 +545,9 @@ export function StudioPreview({
                               borderBottom: "1px solid rgba(0,0,0,0.06)",
                               width: "100%",
                               boxSizing: "border-box",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "stretch",
                               ["--satc-reward-bg" as string]: rBg,
                               ["--satc-reward-fg" as string]: rFg,
                               ["--satc-reward-icon" as string]: rIcon,
@@ -568,14 +573,17 @@ export function StudioPreview({
                             [data-satc-feature="rewards"] .satc-slider__reward-goal{font-size:7px;font-weight:600;opacity:.65;color:var(--satc-reward-text,#111)}
                             [data-satc-feature="rewards"] .satc-slider__rewards-track{height:8px;border-radius:999px;background:rgba(0,0,0,.08);overflow:hidden;margin-top:6px}
                             [data-satc-feature="rewards"] .satc-slider__rewards-bar{display:block;height:100%;border-radius:999px;background:var(--satc-reward-fg,#111)}
-                            [data-satc-feature="rewards"] .satc-slider__rewards-text{margin:8px 0 0;font-size:10px;font-weight:600;text-align:center;color:var(--satc-reward-text,#111);line-height:1.35}
-                            [data-satc-feature="rewards"].satc-slider__rewards--layout-middle .satc-slider__rewards-rail{position:relative}
+                            [data-satc-feature="rewards"] .satc-slider__rewards-text{margin:8px 0 0;font-size:10px;font-weight:600;text-align:center;color:var(--satc-reward-text,#111);line-height:1.35;width:100%}
+                            [data-satc-feature="rewards"].satc-slider__rewards--layout-middle .satc-slider__rewards-rail{position:relative;width:100%}
                             [data-satc-feature="rewards"].satc-slider__rewards--layout-middle .satc-slider__rewards-track{position:absolute!important;left:calc(100%/(2*var(--satc-tier-count,4)));right:calc(100%/(2*var(--satc-tier-count,4)));top:calc((var(--satc-reward-icon-size,28px)/2) - 4px);margin:0!important}
                             [data-satc-feature="rewards"].satc-slider__rewards--layout-middle .satc-slider__rewards-milestones{margin:0;position:relative;z-index:1}
                             [data-satc-feature="rewards"].satc-slider__rewards--msg-above .satc-slider__rewards-text{order:-1;margin:0 0 8px}
+                            [data-satc-feature="rewards"].satc-slider__rewards--icons-off .satc-slider__reward-dot{display:none!important}
                             [data-satc-feature="rewards"].satc-slider__rewards--fill-striped .satc-slider__rewards-bar{background:repeating-linear-gradient(-45deg,var(--satc-reward-fg,#111),var(--satc-reward-fg,#111) 4px,color-mix(in srgb,var(--satc-reward-fg,#111) 55%,#fff) 4px,color-mix(in srgb,var(--satc-reward-fg,#111) 55%,#fff) 8px)}
                           `}</style>
+                          {/* display:contents so rail + message are flex children of msg-above parent */}
                           <div
+                            style={{ display: "contents" }}
                             dangerouslySetInnerHTML={{
                               __html: customRewards.html,
                             }}
@@ -847,7 +855,7 @@ export function StudioPreview({
                     );
                     return (
                       <div
-                        key={`rewards-${config.rewardBarLayout}-${iconPos}-${config.rewardBarStyle}-${iconStyle}-${showIcons}-${tiers.length}-${dotSize}-${rIcon}`}
+                        key={`rewards-${config.rewardBarLayout}-${iconPos}-${config.rewardBarStyle}-${iconStyle}-${showIcons}-${tiers.length}-${dotSize}-${rIcon}-${config.rewardMessagePosition}`}
                         style={{
                           background: rBg,
                           padding: "12px 12px 10px",
