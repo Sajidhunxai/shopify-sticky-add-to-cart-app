@@ -126,11 +126,17 @@
     <script type="application/json" data-satc-rec-products-cfg>
       {% if satc_rec_products_cfg != blank %}{{ satc_rec_products_cfg | json }}{% else %}[]{% endif %}
     </script>
+    {%- assign satc_bd_op = satc_backdrop_opacity | default: 45 | times: 1.0 -%}
+    {%- if satc_bd_op > 1 -%}
+      {%- assign satc_bd_op_css = satc_bd_op | divided_by: 100.0 -%}
+    {%- else -%}
+      {%- assign satc_bd_op_css = satc_bd_op -%}
+    {%- endif -%}
     <div
       class="satc-slider__backdrop{% if satc_backdrop_blur == true or satc_backdrop_blur == 'true' %} satc-slider__backdrop--blur{% endif %}"
       data-satc-slider-close
       data-satc-backdrop
-      style="--satc-backdrop-opacity: {{ satc_backdrop_opacity | divided_by: 100.0 }};"
+      style="--satc-backdrop-opacity: {{ satc_bd_op_css }}; background: rgba(17, 17, 17, {{ satc_bd_op_css }}) !important;{% if satc_backdrop_blur == true or satc_backdrop_blur == 'true' %} backdrop-filter: blur(16px) saturate(140%) !important; -webkit-backdrop-filter: blur(16px) saturate(140%) !important;{% endif %}"
     ></div>
     <aside
       class="satc-slider__panel satc-slider__panel--hdr-{{ satc_hdr_h }} satc-slider__panel--close-{{ satc_close_side }} satc-slider__panel--close-size-{{ satc_close_size }} satc-slider__panel--close-border-{{ satc_close_border }}{% if satc_hdr_border == 'thin' %} satc-slider__panel--hdr-border{% endif %}"

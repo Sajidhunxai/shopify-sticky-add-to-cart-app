@@ -7,6 +7,115 @@ import {
   rewardProgressPct,
 } from "../preview/reward-progress";
 
+function mixHexWithWhite(hex: string, whiteRatio = 0.82): string {
+  const raw = String(hex || "#111111").replace("#", "");
+  const full =
+    raw.length === 3
+      ? raw
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : raw.padEnd(6, "0").slice(0, 6);
+  const n = Number.parseInt(full, 16);
+  if (!Number.isFinite(n)) return "#f3f4f6";
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  const mix = (c: number) => Math.round(c * (1 - whiteRatio) + 255 * whiteRatio);
+  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+}
+
+function PreviewRewardIcon({
+  name,
+  color,
+}: {
+  name: string;
+  color: string;
+}) {
+  const stroke = color;
+  const common = {
+    width: 12,
+    height: 12,
+    viewBox: "0 0 24 24",
+    "aria-hidden": true as const,
+  };
+  if (name === "check") {
+    return (
+      <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          fill={stroke}
+          d="M6.2 11.4 2.8 8l1.2-1.2 2.2 2.2 5-5L12.4 5.2z"
+        />
+      </svg>
+    );
+  }
+  if (name === "truck") {
+    return (
+      <svg {...common}>
+        <path
+          fill={stroke}
+          d="M3 7h11v8H3V7zm12 2h3.2L21 12.5V15h-6V9zM6.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm10 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"
+        />
+      </svg>
+    );
+  }
+  if (name === "gift") {
+    return (
+      <svg {...common}>
+        <path
+          fill={stroke}
+          d="M12 3c2.2 0 3.5 1.5 3.5 3.2 0 .5-.1 1-.3 1.4H18l1 12H5L6 7.6h2.8c-.2-.4-.3-.9-.3-1.4C8.5 4.5 9.8 3 12 3zm0 1.6c-1.1 0-1.8.7-1.8 1.6S10.9 7.8 12 7.8s1.8-.7 1.8-1.6S13.1 4.6 12 4.6z"
+        />
+      </svg>
+    );
+  }
+  if (name === "percent") {
+    return (
+      <svg {...common}>
+        <path
+          fill={stroke}
+          d="M7.5 6.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm9 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM8 17.5 16.5 6.5l1.1 1.1L9.1 18.6 8 17.5z"
+        />
+      </svg>
+    );
+  }
+  if (name === "star") {
+    return (
+      <svg {...common}>
+        <path
+          fill={stroke}
+          d="m12 2.8 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8l5-.7L12 2.8z"
+        />
+      </svg>
+    );
+  }
+  if (name === "heart") {
+    return (
+      <svg {...common}>
+        <path
+          fill={stroke}
+          d="M12 21s-6.7-4.2-9.2-8.1C1.1 10.2 2 7 5 6.2c1.8-.5 3.5.3 4.5 1.6C10.5 6.5 12.2 5.7 14 6.2c3 .8 3.9 4 2.2 6.7C18.7 16.8 12 21 12 21z"
+        />
+      </svg>
+    );
+  }
+  if (name === "lock") {
+    return (
+      <svg {...common}>
+        <path
+          fill={stroke}
+          d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V8a3 3 0 0 0-6 0v2z"
+        />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <circle cx="12" cy="12" r="4" fill={stroke} />
+    </svg>
+  );
+}
+
 function previewPositionStyle(
   position: BarConfig["barPosition"],
   edge: number,
@@ -319,6 +428,8 @@ export function StudioPreview({
                         : "none",
                     flexDirection:
                       config.drawerCloseSide === "left" ? "row-reverse" : "row",
+                    padding: "10px 12px",
+                    flexShrink: 0,
                   }}
                 >
                   <strong
@@ -384,17 +495,22 @@ export function StudioPreview({
                       tiers,
                       previewValue,
                     );
+                    // Match storefront theme-color resolution (button/accent, not fake indigo)
+                    const themeAccent =
+                      config.buttonBackground || config.accentColor || "#111111";
                     const rBg = config.rewardUseThemeColors
-                      ? "#eef2ff"
+                      ? mixHexWithWhite(themeAccent, 0.82)
                       : config.rewardBg;
                     const rFg = config.rewardUseThemeColors
-                      ? "#4f46e5"
+                      ? themeAccent
                       : config.rewardFg;
                     const rIcon = config.rewardUseThemeColors
-                      ? "#4f46e5"
+                      ? themeAccent
                       : config.rewardIconColor;
                     const rText = config.rewardUseThemeColors
-                      ? "#111111"
+                      ? config.inheritThemeTextColor
+                        ? "#111111"
+                        : config.textColor || "#111111"
                       : config.rewardTextColor || "#111111";
                     const iconPos = config.rewardIconPosition || "outside-top";
                     const iconStyle = config.rewardIconStyle || "filled";
@@ -410,10 +526,11 @@ export function StudioPreview({
                         : config.rewardBarStyle === "gradient"
                           ? `linear-gradient(90deg, ${rFg}cc, ${rFg})`
                           : rFg;
-                    const dotSize = middle ? 18 : 14;
+                    // Live middle dots are 30px in a ~380px drawer; preview ~320px → ~26px
+                    const dotSize = middle ? 26 : 18;
                     // Match storefront: track spans first→last equal-column icon centers
                     const trackInsetPct = 100 / (2 * Math.max(1, tiers.length));
-                    const trackH = middle ? 6 : 6;
+                    const trackH = middle ? 8 : 8;
                     const amountMatch = message.match(/\$[\d,.]+|\d+/);
                     const amountLabel = amountMatch ? amountMatch[0] : "";
                     const msgEl = (
@@ -521,24 +638,35 @@ export function StudioPreview({
                               : `$${goal.toFixed(2)}`;
                           let dotBg = reached ? rIcon : "#fff";
                           let dotBorder = reached
-                            ? `2px solid ${rIcon}`
+                            ? `2.5px solid ${rIcon}`
                             : isCurrent
-                              ? `2px solid ${rFg}`
-                              : "2px solid rgba(0,0,0,0.15)";
-                          let dotColor = reached ? "#fff" : "#9ca3af";
+                              ? `2.5px solid ${rFg}`
+                              : "2px solid rgba(0,0,0,0.14)";
+                          // Match live: unreached uses icon color on white; reached = white on filled
+                          let glyphColor = reached ? "#fff" : rIcon;
                           if (iconStyle === "outline") {
                             dotBg = "#fff";
-                            dotBorder = `2px solid ${rIcon}`;
-                            dotColor = rIcon;
+                            dotBorder = `2.5px solid ${rIcon}`;
+                            glyphColor = rIcon;
                           } else if (iconStyle === "soft") {
                             dotBg = `${rIcon}29`;
                             dotBorder = "2px solid transparent";
-                            dotColor = rIcon;
+                            glyphColor = rIcon;
                           } else if (iconStyle === "plain") {
                             dotBg = "transparent";
                             dotBorder = "2px solid transparent";
-                            dotColor = rIcon;
+                            glyphColor = rIcon;
                           }
+                          const iconKey =
+                            tier.icon && tier.icon !== "auto" && tier.icon !== "custom"
+                              ? tier.icon
+                              : tier.rewardType === "shipping"
+                                ? "truck"
+                                : tier.rewardType === "discount"
+                                  ? "percent"
+                                  : tier.rewardType === "product"
+                                    ? "gift"
+                                    : "star";
                           return (
                             <div
                               key={tier.description + tier.minAmount}
@@ -547,7 +675,7 @@ export function StudioPreview({
                                 display: "flex",
                                 flexDirection: "column",
                                 alignItems: "center",
-                                gap: 4,
+                                gap: 5,
                                 textAlign: "center",
                                 minWidth: 0,
                                 boxSizing: "border-box",
@@ -562,18 +690,16 @@ export function StudioPreview({
                                     width: dotSize,
                                     height: dotSize,
                                     borderRadius: "50%",
-                                    background: dotBg,
+                                    background: middle && !reached ? "#fff" : dotBg,
                                     border: dotBorder,
                                     boxSizing: "border-box",
                                     boxShadow:
                                       reached && iconStyle === "filled"
-                                        ? `0 0 0 2px ${rIcon}33`
+                                        ? `0 0 0 3px ${rIcon}33`
                                         : isCurrent
-                                          ? `0 0 0 2px ${rFg}33`
-                                          : undefined,
-                                    color: dotColor,
-                                    fontSize: 8,
-                                    fontWeight: 800,
+                                          ? `0 0 0 3px ${rFg}2e`
+                                          : "0 1px 2px rgba(0,0,0,0.06)",
+                                    color: glyphColor,
                                     overflow: "hidden",
                                     position: "relative",
                                     zIndex: 1,
@@ -583,26 +709,15 @@ export function StudioPreview({
                                     <img
                                       src={customImg}
                                       alt=""
-                                      width={12}
-                                      height={12}
+                                      width={14}
+                                      height={14}
                                       style={{ objectFit: "contain" }}
                                     />
-                                  ) : reached ? (
-                                    "✓"
-                                  ) : tier.icon === "truck" ? (
-                                    "🚚"
-                                  ) : tier.icon === "gift" ? (
-                                    "🎁"
-                                  ) : tier.icon === "percent" ? (
-                                    "%"
-                                  ) : tier.icon === "star" ? (
-                                    "★"
-                                  ) : tier.icon === "heart" ? (
-                                    "♥"
-                                  ) : tier.icon === "lock" ? (
-                                    "🔒"
                                   ) : (
-                                    ""
+                                    <PreviewRewardIcon
+                                      name={iconKey}
+                                      color={glyphColor}
+                                    />
                                   )}
                                 </span>
                               ) : null}
@@ -644,13 +759,14 @@ export function StudioPreview({
                         key={`rewards-${config.rewardBarLayout}-${iconPos}-${config.rewardBarStyle}-${iconStyle}-${showIcons}-${tiers.length}`}
                         style={{
                           background: rBg,
-                          padding: "10px 10px 8px",
+                          padding: "12px 12px 10px",
                           borderBottom: "1px solid rgba(0,0,0,0.06)",
                           display: "flex",
                           flexDirection: "column",
                           alignItems: "stretch",
                           width: "100%",
                           boxSizing: "border-box",
+                          overflow: "hidden",
                         }}
                       >
                         {config.rewardMessagePosition === "above"
@@ -806,7 +922,7 @@ export function StudioPreview({
                     )}
                   </div>
                 ) : (
-                    <div>
+                    <div style={{ padding: "10px 12px", flex: 1 }}>
                       <div className={styles.previewSliderItem}>
                         <div className={styles.previewSliderThumb} />
                         <div>

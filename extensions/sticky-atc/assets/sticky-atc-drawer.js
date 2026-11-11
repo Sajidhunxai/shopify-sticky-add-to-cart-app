@@ -10,6 +10,12 @@
   if (slider.dataset.satcDrawerInit === "true") return;
   slider.dataset.satcDrawerInit = "true";
 
+  // Theme sections often use transform/filter, which traps position:fixed and
+  // kills backdrop-filter. Re-parent to <body> so overlay + blur sample the page.
+  if (slider.parentElement !== document.body) {
+    document.body.appendChild(slider);
+  }
+
   const i18n = {
     adding: slider.dataset.i18nAdding || "Adding…",
     added: slider.dataset.i18nAdded || "Added ✓",
@@ -149,9 +155,9 @@
     if (type === "product") return "gift";
     return "star";
   };
-  const rewardTypeIcon = (tier, reached) => {
+  const rewardTypeIcon = (tier, _reached) => {
     if (!rewardShowIcons) return "";
-    if (reached) return ICONS.check;
+    // Always render the merchant-selected icon (reached state is shown via CSS fill)
     const key = resolveTierIconKey(tier);
     if (key === "custom" && tier.iconUrl) {
       return `<img class="satc-slider__reward-icon-img" src="${escapeHtml(tier.iconUrl)}" alt="" width="16" height="16" loading="lazy">`;
@@ -997,13 +1003,30 @@
   const openSlider = async () => {
     if (!slider) return;
     if (!drawerAllowedOnDevice()) return;
+    if (slider.parentElement !== document.body) {
+      document.body.appendChild(slider);
+    }
     const backdrop = slider.querySelector("[data-satc-backdrop]");
-    if (
-      backdrop &&
-      slider.dataset.backdropBlur !== "false" &&
-      !backdrop.classList.contains("satc-slider__backdrop--blur")
-    ) {
-      backdrop.classList.add("satc-slider__backdrop--blur");
+    if (backdrop instanceof HTMLElement) {
+      if (
+        slider.dataset.backdropBlur !== "false" &&
+        !backdrop.classList.contains("satc-slider__backdrop--blur")
+      ) {
+        backdrop.classList.add("satc-slider__backdrop--blur");
+      }
+      // Re-assert blur in case theme CSS stripped the stylesheet rule
+      if (slider.dataset.backdropBlur !== "false") {
+        backdrop.style.setProperty(
+          "backdrop-filter",
+          "blur(16px) saturate(140%)",
+          "important",
+        );
+        backdrop.style.setProperty(
+          "-webkit-backdrop-filter",
+          "blur(16px) saturate(140%)",
+          "important",
+        );
+      }
     }
     slider.hidden = false;
     requestAnimationFrame(() => slider.classList.add("is-open"));

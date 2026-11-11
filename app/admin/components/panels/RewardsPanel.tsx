@@ -26,6 +26,24 @@ type ResolveFileActionData = {
   tierIndex?: number;
 };
 
+function mixWithWhite(hex: string, whiteRatio = 0.82): string {
+  const raw = String(hex || "#111111").replace("#", "");
+  const full =
+    raw.length === 3
+      ? raw
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : raw.padEnd(6, "0").slice(0, 6);
+  const n = Number.parseInt(full, 16);
+  if (!Number.isFinite(n)) return "#f3f4f6";
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  const mix = (c: number) => Math.round(c * (1 - whiteRatio) + 255 * whiteRatio);
+  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+}
+
 export function RewardsPanel({
   config,
   updateConfig,
@@ -37,11 +55,18 @@ export function RewardsPanel({
   const [fileError, setFileError] = useState("");
   const tier = config.rewardTiers[activeTier] || config.rewardTiers[0];
   const themeOn = config.rewardUseThemeColors;
-  const previewBg = themeOn ? "#eef2ff" : config.rewardBg;
-  const previewFg = themeOn ? "#4f46e5" : config.rewardFg;
-  const previewIcon = themeOn ? "#4f46e5" : config.rewardIconColor;
+  // Match storefront theme mapping (button/accent), not a fake indigo
+  const themeAccent =
+    config.buttonBackground || config.accentColor || "#111111";
+  const previewBg = themeOn
+    ? mixWithWhite(themeAccent, 0.82)
+    : config.rewardBg;
+  const previewFg = themeOn ? themeAccent : config.rewardFg;
+  const previewIcon = themeOn ? themeAccent : config.rewardIconColor;
   const previewText = themeOn
-    ? "#111111"
+    ? config.inheritThemeTextColor
+      ? "#111111"
+      : config.textColor || "#111111"
     : config.rewardTextColor || "#111111";
   const fileBusy = fileFetcher.state !== "idle";
 

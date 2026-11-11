@@ -1,9 +1,19 @@
 /* Sticky ATC — cart drawer (loaded only when display_mode is slider) */
-/* Cart slider */
+/* Cart slider — JS moves this node to document.body so theme transforms
+   cannot trap fixed positioning or break backdrop-filter. */
 .satc-slider {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+  contain: none !important;
 }
 
 .satc-slider[hidden] {
@@ -11,11 +21,12 @@
 }
 
 .satc-slider__backdrop {
-  /* fixed so backdrop-filter samples the real page, not an empty stacking context */
-  position: fixed;
-  inset: 0;
+  position: absolute !important;
+  inset: 0 !important;
   z-index: 0;
-  background: rgba(17, 17, 17, var(--satc-backdrop-opacity, 0.45));
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(17, 17, 17, var(--satc-backdrop-opacity, 0.45)) !important;
   pointer-events: auto;
 }
 
@@ -234,7 +245,9 @@
   flex-direction: column;
   align-items: stretch;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .satc-slider__rewards--msg-above .satc-slider__rewards-text {
@@ -301,6 +314,12 @@
   z-index: 1;
   background: #fff !important;
   border-width: 2.5px;
+  border-color: color-mix(
+    in srgb,
+    var(--satc-reward-icon, #79be30) 55%,
+    #fff
+  );
+  color: var(--satc-reward-icon, #79be30) !important;
 }
 
 .satc-slider__rewards--layout-middle
@@ -310,7 +329,8 @@
   .satc-slider__reward-milestone.is-reached
   .satc-slider__reward-dot {
   background: var(--satc-reward-icon, #79be30) !important;
-  color: #fff;
+  border-color: var(--satc-reward-icon, #79be30) !important;
+  color: #fff !important;
 }
 
 .satc-slider__reward-icon {
@@ -451,7 +471,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  /* Unreached: icon color must be visible on white fill (was #fff → invisible) */
+  color: var(--satc-reward-icon, #79be30) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   transition:
     background 0.25s ease,
@@ -463,11 +484,12 @@
 .satc-slider__reward-milestone.is-reached .satc-slider__reward-dot {
   background: var(--satc-reward-icon, #79be30) !important;
   border-color: var(--satc-reward-icon, #79be30) !important;
+  color: #fff !important;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--satc-reward-icon, #79be30) 22%, transparent);
 }
 
 .satc-slider__reward-milestone.is-current .satc-slider__reward-dot {
-  border-color: var(--satc-reward-fg, #b3009f);
+  border-color: var(--satc-reward-fg, #b3009f) !important;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--satc-reward-fg, #b3009f) 18%, transparent);
 }
 
