@@ -6,6 +6,7 @@ import {
   rewardMessage,
   rewardProgressPct,
 } from "../preview/reward-progress";
+import { renderRewardsCustomPreview } from "../preview/reward-template";
 
 function mixHexWithWhite(hex: string, whiteRatio = 0.82): string {
   const raw = String(hex || "#111111").replace("#", "");
@@ -489,6 +490,99 @@ export function StudioPreview({
                       : config.rewardCalcMode === "quantity"
                         ? 1
                         : 68;
+                    const customRewards = renderRewardsCustomPreview(
+                      config,
+                      previewValue,
+                    );
+                    if (customRewards) {
+                      const themeAccent =
+                        config.buttonBackground ||
+                        config.accentColor ||
+                        "#111111";
+                      const rBg = config.rewardUseThemeColors
+                        ? mixHexWithWhite(themeAccent, 0.82)
+                        : config.rewardBg;
+                      const rFg = config.rewardUseThemeColors
+                        ? themeAccent
+                        : config.rewardFg;
+                      const rIcon = config.rewardIconColor || "#111111";
+                      const rText = config.rewardUseThemeColors
+                        ? config.inheritThemeTextColor
+                          ? "#111111"
+                          : config.textColor || "#111111"
+                        : config.rewardTextColor || "#111111";
+                      const iconSize = Math.min(
+                        48,
+                        Math.max(14, Number(config.rewardIconSize) || 28),
+                      );
+                      const layout = config.rewardBarLayout || "stacked";
+                      const iconPos =
+                        config.rewardIconPosition || "outside-top";
+                      const iconStyle = config.rewardIconStyle || "filled";
+                      return (
+                        <div
+                          key={`rewards-custom-${config.featureTemplates.rewards.template.length}-${config.featureTemplates.rewardTier?.template?.length || 0}`}
+                          data-satc-feature="rewards"
+                          className={[
+                            "satc-slider__rewards",
+                            `satc-slider__rewards--layout-${layout}`,
+                            `satc-slider__rewards--fill-${config.rewardBarStyle || "gradient"}`,
+                            `satc-slider__rewards--msg-${config.rewardMessagePosition || "below"}`,
+                            `satc-slider__rewards--icon-${iconPos}`,
+                            `satc-slider__rewards--icon-style-${iconStyle}`,
+                            config.rewardShowIcons === false
+                              ? "satc-slider__rewards--icons-off"
+                              : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                          style={
+                            {
+                              background: rBg,
+                              padding: "12px 12px 10px",
+                              borderBottom: "1px solid rgba(0,0,0,0.06)",
+                              width: "100%",
+                              boxSizing: "border-box",
+                              ["--satc-reward-bg" as string]: rBg,
+                              ["--satc-reward-fg" as string]: rFg,
+                              ["--satc-reward-icon" as string]: rIcon,
+                              ["--satc-reward-text" as string]: rText,
+                              ["--satc-reward-icon-size" as string]: `${iconSize}px`,
+                              ["--satc-tier-count" as string]: String(
+                                Math.max(1, tiers.length),
+                              ),
+                            } as CSSProperties
+                          }
+                        >
+                          {customRewards.css ? (
+                            <style>{customRewards.css}</style>
+                          ) : null}
+                          <style>{`
+                            [data-satc-feature="rewards"] .satc-slider__rewards-milestones{display:flex;justify-content:flex-start;width:100%;gap:0}
+                            [data-satc-feature="rewards"] .satc-slider__reward-milestone{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;text-align:center}
+                            [data-satc-feature="rewards"] .satc-slider__reward-dot{width:var(--satc-reward-icon-size,28px);height:var(--satc-reward-icon-size,28px);border-radius:50%;border:2px solid rgba(0,0,0,.14);background:#fff;display:inline-flex;align-items:center;justify-content:center;color:var(--satc-reward-icon,#111)!important;box-sizing:border-box}
+                            [data-satc-feature="rewards"] .satc-slider__reward-milestone.is-reached .satc-slider__reward-dot{background:var(--satc-reward-icon,#111)!important;border-color:var(--satc-reward-icon,#111)!important;color:#fff!important}
+                            [data-satc-feature="rewards"] .satc-slider__reward-icon{width:calc(var(--satc-reward-icon-size,28px)*.52);height:calc(var(--satc-reward-icon-size,28px)*.52);display:block}
+                            [data-satc-feature="rewards"] .satc-slider__reward-icon-img{width:calc(var(--satc-reward-icon-size,28px)*.62);height:calc(var(--satc-reward-icon-size,28px)*.62);object-fit:contain;display:block}
+                            [data-satc-feature="rewards"] .satc-slider__reward-label{font-size:8px;font-weight:700;line-height:1.25;color:var(--satc-reward-text,#111)}
+                            [data-satc-feature="rewards"] .satc-slider__reward-goal{font-size:7px;font-weight:600;opacity:.65;color:var(--satc-reward-text,#111)}
+                            [data-satc-feature="rewards"] .satc-slider__rewards-track{height:8px;border-radius:999px;background:rgba(0,0,0,.08);overflow:hidden;margin-top:6px}
+                            [data-satc-feature="rewards"] .satc-slider__rewards-bar{display:block;height:100%;border-radius:999px;background:var(--satc-reward-fg,#111)}
+                            [data-satc-feature="rewards"] .satc-slider__rewards-text{margin:8px 0 0;font-size:10px;font-weight:600;text-align:center;color:var(--satc-reward-text,#111);line-height:1.35}
+                            [data-satc-feature="rewards"].satc-slider__rewards--layout-middle .satc-slider__rewards-rail{position:relative}
+                            [data-satc-feature="rewards"].satc-slider__rewards--layout-middle .satc-slider__rewards-track{position:absolute!important;left:calc(100%/(2*var(--satc-tier-count,4)));right:calc(100%/(2*var(--satc-tier-count,4)));top:calc((var(--satc-reward-icon-size,28px)/2) - 4px);margin:0!important}
+                            [data-satc-feature="rewards"].satc-slider__rewards--layout-middle .satc-slider__rewards-milestones{margin:0;position:relative;z-index:1}
+                            [data-satc-feature="rewards"].satc-slider__rewards--msg-above .satc-slider__rewards-text{order:-1;margin:0 0 8px}
+                            [data-satc-feature="rewards"].satc-slider__rewards--fill-striped .satc-slider__rewards-bar{background:repeating-linear-gradient(-45deg,var(--satc-reward-fg,#111),var(--satc-reward-fg,#111) 4px,color-mix(in srgb,var(--satc-reward-fg,#111) 55%,#fff) 4px,color-mix(in srgb,var(--satc-reward-fg,#111) 55%,#fff) 8px)}
+                          `}</style>
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: customRewards.html,
+                            }}
+                          />
+                        </div>
+                      );
+                    }
                     const pct = rewardProgressPct(previewValue, tiers);
                     const message = rewardMessage(
                       config,
@@ -504,7 +598,7 @@ export function StudioPreview({
                     const rFg = config.rewardUseThemeColors
                       ? themeAccent
                       : config.rewardFg;
-                    const rIcon = config.rewardIconColor || "#79be30";
+                    const rIcon = config.rewardIconColor || "#111111";
                     const rText = config.rewardUseThemeColors
                       ? config.inheritThemeTextColor
                         ? "#111111"

@@ -290,10 +290,10 @@
   border-width: 2.5px;
   border-color: color-mix(
     in srgb,
-    var(--satc-reward-icon, #79be30) 55%,
+    var(--satc-reward-icon, #111111) 55%,
     #fff
   );
-  color: var(--satc-reward-icon, #79be30) !important;
+  color: var(--satc-reward-icon, #111111) !important;
 }
 
 .satc-slider__rewards--layout-middle
@@ -302,8 +302,8 @@
 .satc-slider__rewards--icon-inside
   .satc-slider__reward-milestone.is-reached
   .satc-slider__reward-dot {
-  background: var(--satc-reward-icon, #79be30) !important;
-  border-color: var(--satc-reward-icon, #79be30) !important;
+  background: var(--satc-reward-icon, #111111) !important;
+  border-color: var(--satc-reward-icon, #111111) !important;
   color: #fff !important;
 }
 
@@ -394,25 +394,25 @@
 .satc-slider__rewards--icon-style-outline .satc-slider__reward-dot {
   background: #fff !important;
   border-width: 2.5px;
-  border-color: var(--satc-reward-icon, #79be30) !important;
-  color: var(--satc-reward-icon, #79be30) !important;
+  border-color: var(--satc-reward-icon, #111111) !important;
+  color: var(--satc-reward-icon, #111111) !important;
 }
 
 .satc-slider__rewards--icon-style-outline
   .satc-slider__reward-milestone.is-reached
   .satc-slider__reward-dot {
   background: #fff !important;
-  color: var(--satc-reward-icon, #79be30) !important;
+  color: var(--satc-reward-icon, #111111) !important;
 }
 
 .satc-slider__rewards--icon-style-soft .satc-slider__reward-dot {
   background: color-mix(
     in srgb,
-    var(--satc-reward-icon, #79be30) 16%,
+    var(--satc-reward-icon, #111111) 16%,
     #fff
   ) !important;
   border-color: transparent !important;
-  color: var(--satc-reward-icon, #79be30) !important;
+  color: var(--satc-reward-icon, #111111) !important;
   box-shadow: none;
 }
 
@@ -421,17 +421,17 @@
   .satc-slider__reward-dot {
   background: color-mix(
     in srgb,
-    var(--satc-reward-icon, #79be30) 28%,
+    var(--satc-reward-icon, #111111) 28%,
     #fff
   ) !important;
-  color: var(--satc-reward-icon, #79be30) !important;
+  color: var(--satc-reward-icon, #111111) !important;
 }
 
 .satc-slider__rewards--icon-style-plain .satc-slider__reward-dot {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
-  color: var(--satc-reward-icon, #79be30) !important;
+  color: var(--satc-reward-icon, #111111) !important;
   width: 24px;
   height: 24px;
 }
@@ -440,7 +440,7 @@
   .satc-slider__reward-milestone.is-reached
   .satc-slider__reward-dot {
   background: transparent !important;
-  color: var(--satc-reward-icon, #79be30) !important;
+  color: var(--satc-reward-icon, #111111) !important;
 }
 
 .satc-slider__rewards--fill-solid .satc-slider__rewards-bar {
@@ -480,7 +480,7 @@
   align-items: center;
   justify-content: center;
   /* Unreached: icon color must be visible on white fill (was #fff → invisible) */
-  color: var(--satc-reward-icon, #79be30) !important;
+  color: var(--satc-reward-icon, #111111) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   transition:
     background 0.25s ease,
@@ -490,10 +490,10 @@
 }
 
 .satc-slider__reward-milestone.is-reached .satc-slider__reward-dot {
-  background: var(--satc-reward-icon, #79be30) !important;
-  border-color: var(--satc-reward-icon, #79be30) !important;
+  background: var(--satc-reward-icon, #111111) !important;
+  border-color: var(--satc-reward-icon, #111111) !important;
   color: #fff !important;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--satc-reward-icon, #79be30) 22%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--satc-reward-icon, #111111) 22%, transparent);
 }
 
 .satc-slider__reward-milestone.is-current .satc-slider__reward-dot {
@@ -577,7 +577,7 @@
 .satc-slider__rewards.is-complete {
   background: color-mix(
     in srgb,
-    var(--satc-reward-icon, #79be30) 12%,
+    var(--satc-reward-icon, #111111) 12%,
     var(--satc-reward-bg, #f0f2ff)
   ) !important;
 }

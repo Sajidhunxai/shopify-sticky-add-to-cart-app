@@ -370,7 +370,7 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   rewardUseThemeColors: false,
   rewardBg: "#F0F2FF",
   rewardFg: "#B3009F",
-  rewardIconColor: "#79be30",
+  rewardIconColor: "#111111",
   rewardTextColor: "#111111",
   rewardCompleteText: "Free shipping unlocked!",
   rewardCalcMode: "total",
@@ -707,7 +707,7 @@ export const DEFAULT_REWARD_COLORS = {
   rewardUseThemeColors: false,
   rewardBg: "#F0F2FF",
   rewardFg: "#B3009F",
-  rewardIconColor: "#79be30",
+  rewardIconColor: "#111111",
   rewardTextColor: "#111111",
 } as const;
 

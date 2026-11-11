@@ -4,6 +4,7 @@ export const FEATURE_TEMPLATE_KEYS = [
   "header",
   "announcement",
   "rewards",
+  "rewardTier",
   "cartItem",
   "recommendations",
   "recommendationCard",
@@ -54,18 +55,34 @@ export const FEATURE_TEMPLATE_META: Record<
     example: `<span data-satc-announcement-label>{{text}}</span>`,
   },
   rewards: {
-    label: "Tiered rewards",
+    label: "Rewards shell",
     placeholders:
-      "{{message}}, {{progress_pct}}, {{{tiers_html}}} — keep satc-slider__* classes for layout",
+      "{{message}}, {{progress_pct}}, {{#tiers}}…{{/tiers}} (or {{{tiers_html}}}) — edit milestone markup inside the loop",
     example: `<div class="satc-slider__rewards-rail">
   <div class="satc-slider__rewards-milestones" data-satc-reward-milestones>
-    {{{tiers_html}}}
+{{#tiers}}
+    <div class="satc-slider__reward-milestone{{reached_class}}{{current_class}}" data-reward-type="{{reward_type}}" data-reward-icon="{{icon}}" style="--satc-tier-i:{{index}}">
+      <span class="satc-slider__reward-dot" aria-hidden="true">{{{icon_html}}}</span>
+      <span class="satc-slider__reward-label">{{{label_html}}}</span>
+      <span class="satc-slider__reward-goal">{{goal}}</span>
+    </div>
+{{/tiers}}
   </div>
   <div class="satc-slider__rewards-track">
     <span class="satc-slider__rewards-bar" data-satc-reward-bar style="width:{{progress_pct}}%"></span>
   </div>
 </div>
 <p class="satc-slider__rewards-text" data-satc-reward-text>{{message}}</p>`,
+  },
+  rewardTier: {
+    label: "Reward tier (each milestone)",
+    placeholders:
+      "{{description}}, {{goal}}, {{index}}, {{icon}}, {{reward_type}}, {{{icon_html}}}, {{{label_html}}}, {{reached_class}}, {{current_class}} — used when shell still has {{{tiers_html}}}",
+    example: `<div class="satc-slider__reward-milestone{{reached_class}}{{current_class}}" data-reward-type="{{reward_type}}" data-reward-icon="{{icon}}" style="--satc-tier-i:{{index}}">
+  <span class="satc-slider__reward-dot" aria-hidden="true">{{{icon_html}}}</span>
+  <span class="satc-slider__reward-label">{{{label_html}}}</span>
+  <span class="satc-slider__reward-goal">{{goal}}</span>
+</div>`,
   },
   cartItem: {
     label: "Cart line item",

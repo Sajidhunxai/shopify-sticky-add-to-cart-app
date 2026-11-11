@@ -44,6 +44,54 @@ function mixWithWhite(hex: string, whiteRatio = 0.82): string {
   return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
 }
 
+/** Black monochrome glyphs for the tier icon picker (matches storefront SVGs). */
+function PresetGlyph({ id }: { id: string }) {
+  const color = "#111111";
+  if (id === "auto") {
+    return (
+      <span style={{ color, fontWeight: 800, fontSize: 13 }}>A</span>
+    );
+  }
+  if (id === "custom") {
+    return (
+      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill={color}
+          d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"
+        />
+      </svg>
+    );
+  }
+  if (id === "check") {
+    return (
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          fill={color}
+          d="M6.2 11.4 2.8 8l1.2-1.2 2.2 2.2 5-5L12.4 5.2z"
+        />
+      </svg>
+    );
+  }
+  const paths: Record<string, string> = {
+    truck:
+      "M3 7h11v8H3V7zm12 2h3.2L21 12.5V15h-6V9zM6.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm10 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z",
+    gift: "M20 7h-2.26A3.5 3.5 0 0 0 12 3.05 3.5 3.5 0 0 0 6.26 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9h1a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1ZM9.5 5.5a1.5 1.5 0 1 1 0 3H8.26a1.5 1.5 0 0 1 1.24-3Zm5 0a1.5 1.5 0 0 1 1.24 3H14.5a1.5 1.5 0 1 1 0-3ZM6 19v-7h5v7H6Zm12 0h-5v-7h5v7Z",
+    percent:
+      "M7.5 6.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm9 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM8 17.5 16.5 6.5l1.1 1.1L9.1 18.6 8 17.5z",
+    star: "m12 2.8 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8l5-.7L12 2.8z",
+    heart:
+      "M12 21s-6.7-4.2-9.2-8.1C1.1 10.2 2 7 5 6.2c1.8-.5 3.5.3 4.5 1.6C10.5 6.5 12.2 5.7 14 6.2c3 .8 3.9 4 2.2 6.7C18.7 16.8 12 21 12 21z",
+    lock: "M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V8a3 3 0 0 0-6 0v2z",
+  };
+  const d = paths[id];
+  if (!d) return <span style={{ color }}>•</span>;
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill={color} d={d} />
+    </svg>
+  );
+}
+
 export function RewardsPanel({
   config,
   updateConfig,
@@ -631,23 +679,7 @@ export function RewardsPanel({
                 }}
               >
                 <span className={styles.iconPresetGlyph} aria-hidden="true">
-                  {preset.id === "truck"
-                    ? "🚚"
-                    : preset.id === "gift"
-                      ? "🎁"
-                      : preset.id === "percent"
-                        ? "%"
-                        : preset.id === "star"
-                          ? "★"
-                          : preset.id === "check"
-                            ? "✓"
-                            : preset.id === "heart"
-                              ? "♥"
-                              : preset.id === "lock"
-                                ? "🔒"
-                                : preset.id === "custom"
-                                  ? "📁"
-                                  : "A"}
+                  <PresetGlyph id={preset.id} />
                 </span>
                 <span>{preset.label}</span>
               </button>
@@ -776,6 +808,8 @@ export function RewardsPanel({
 
       <FeatureCustomTemplate
         featureKey="rewards"
+        extraKeys={["rewardTier"]}
+        title="Custom rewards HTML"
         config={config}
         updateConfig={updateConfig}
       />

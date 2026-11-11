@@ -219,14 +219,32 @@
     return row;
   };
 
-  const renderMustache = (tpl, data) =>
-    String(tpl || "")
-      .replace(/\{\{\{(\w+)\}\}\}/g, (_, key) =>
-        data[key] == null ? "" : String(data[key]),
-      )
-      .replace(/\{\{(\w+)\}\}/g, (_, key) =>
-        escapeHtml(data[key] == null ? "" : String(data[key])),
-      );
+  const renderMustache = (tpl, data) => {
+    let out = String(tpl || "");
+    // {{#list}}...{{/list}} — arrays of tier/card objects
+    out = out.replace(
+      /\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g,
+      (_, key, inner) => {
+        const list = data[key];
+        if (!Array.isArray(list)) return "";
+        return list
+          .map((item) =>
+            renderMustache(inner, {
+              ...data,
+              ...(item && typeof item === "object" ? item : { value: item }),
+            }),
+          )
+          .join("");
+      },
+    );
+    out = out.replace(/\{\{\{(\w+)\}\}\}/g, (_, key) =>
+      data[key] == null ? "" : String(data[key]),
+    );
+    out = out.replace(/\{\{(\w+)\}\}/g, (_, key) =>
+      escapeHtml(data[key] == null ? "" : String(data[key])),
+    );
+    return out;
+  };
 
   const wrapFeature = (key, innerHtml, extraHtml = "") => {
     const safeExtra = sanitizeHtml(extraHtml);
@@ -689,35 +707,55 @@
       (t) => progressValue < (Number(t.minAmount) || 0),
     );
 
-    const tiersHtml = activeTiers
-      .map((tier, index) => {
-        const goal = Number(tier.minAmount) || 0;
-        const reached = progressValue >= goal;
-        const isCurrent = !reached && index === nextIndex;
-        const label = escapeHtml(tier.description || "Reward");
-        let labelHtml = label;
-        if (tier.rewardType === "product" && reached) {
-          const href =
-            tier.productUrl ||
-            (tier.productHandle
-              ? `${root}products/${encodeURIComponent(String(tier.productHandle).replace(/^\/+|\/+$/g, ""))}`
-              : "");
-          if (href) {
-            labelHtml = `<a href="${escapeHtml(href)}">${escapeHtml(tier.productTitle || tier.description || "Product")}</a>`;
-          }
-        }
-        const goalLabel =
-          rewardMode === "quantity"
-            ? `${Math.round(goal)}`
-            : money(Math.round(goal * 100));
-        const type = tier.rewardType || "custom";
-        const iconInner = rewardTypeIcon(tier, reached);
-        return `<div class="satc-slider__reward-milestone${reached ? " is-reached" : ""}${isCurrent ? " is-current" : ""}" data-reward-type="${escapeHtml(type)}" data-reward-icon="${escapeHtml(String(tier.icon || "auto"))}" style="--satc-tier-i:${index}">
-            <span class="satc-slider__reward-dot" aria-hidden="true">${iconInner}</span>
-            <span class="satc-slider__reward-label">${labelHtml}</span>
-            <span class="satc-slider__reward-goal">${escapeHtml(goalLabel)}</span>
+    const tierTpl = getFeatureTpl("rewardTier");
+    const tierTplHtml = String(tierTpl?.template || "").trim();
+    const defaultTierMarkup = (row) =>
+      `<div class="satc-slider__reward-milestone${row.reached_class}${row.current_class}" data-reward-type="${escapeHtml(row.reward_type)}" data-reward-icon="${escapeHtml(row.icon)}" style="--satc-tier-i:${row.index}">
+            <span class="satc-slider__reward-dot" aria-hidden="true">${row.icon_html}</span>
+            <span class="satc-slider__reward-label">${row.label_html}</span>
+            <span class="satc-slider__reward-goal">${escapeHtml(row.goal)}</span>
           </div>`;
-      })
+
+    const tierRows = activeTiers.map((tier, index) => {
+      const goal = Number(tier.minAmount) || 0;
+      const reached = progressValue >= goal;
+      const isCurrent = !reached && index === nextIndex;
+      let labelHtml = escapeHtml(tier.description || "Reward");
+      if (tier.rewardType === "product" && reached) {
+        const href =
+          tier.productUrl ||
+          (tier.productHandle
+            ? `${root}products/${encodeURIComponent(String(tier.productHandle).replace(/^\/+|\/+$/g, ""))}`
+            : "");
+        if (href) {
+          labelHtml = `<a href="${escapeHtml(href)}">${escapeHtml(tier.productTitle || tier.description || "Product")}</a>`;
+        }
+      }
+      const goalLabel =
+        rewardMode === "quantity"
+          ? `${Math.round(goal)}`
+          : money(Math.round(goal * 100));
+      return {
+        index,
+        description: tier.description || "Reward",
+        goal: goalLabel,
+        icon: String(tier.icon || "auto"),
+        reward_type: tier.rewardType || "custom",
+        icon_html: rewardTypeIcon(tier, reached),
+        label_html: labelHtml,
+        reached_class: reached ? " is-reached" : "",
+        current_class: isCurrent ? " is-current" : "",
+        reached: reached ? "true" : "",
+        current: isCurrent ? "true" : "",
+      };
+    });
+
+    const tiersHtml = tierRows
+      .map((row) =>
+        tierTplHtml
+          ? renderMustache(tierTplHtml, row)
+          : defaultTierMarkup(row),
+      )
       .join("");
 
     let message = rewardDoneText;
@@ -750,6 +788,7 @@
             message,
             progress_pct: pct,
             tiers_html: tiersHtml,
+            tiers: tierRows,
           }),
         ) + sanitizeHtml(rewardsTpl.html || "");
       // Re-bind progress fill if custom markup kept the data attribute.
