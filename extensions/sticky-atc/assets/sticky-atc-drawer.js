@@ -111,24 +111,48 @@
   const rewardLayout = slider?.dataset.rewardLayout || "stacked";
   const rewardFill = slider?.dataset.rewardStyle || "gradient";
   const rewardMsgPos = slider?.dataset.rewardMsgPos || "below";
+  const rewardShowIcons = slider?.dataset.rewardShowIcons !== "false";
+  const rewardIconStyle = slider?.dataset.rewardIconStyle || "filled";
+  const rewardIconPos = slider?.dataset.rewardIconPos || "outside-top";
   if (rewardRoot) {
     rewardRoot.classList.add(
       `satc-slider__rewards--layout-${rewardLayout}`,
       `satc-slider__rewards--fill-${rewardFill}`,
       `satc-slider__rewards--msg-${rewardMsgPos}`,
+      `satc-slider__rewards--icon-${rewardIconPos}`,
+      `satc-slider__rewards--icon-style-${rewardIconStyle}`,
     );
+    if (!rewardShowIcons) {
+      rewardRoot.classList.add("satc-slider__rewards--icons-off");
+    }
   }
-  const rewardTypeIcon = (type) => {
-    if (type === "shipping") {
-      return `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 7h11v8H3V7zm12 2h3.2L21 12.5V15h-6V9zM6.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm10 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>`;
+  const ICONS = {
+    truck: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 7h11v8H3V7zm12 2h3.2L21 12.5V15h-6V9zM6.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm10 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>`,
+    gift: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3c2.2 0 3.5 1.5 3.5 3.2 0 .5-.1 1-.3 1.4H18l1 12H5L6 7.6h2.8c-.2-.4-.3-.9-.3-1.4C8.5 4.5 9.8 3 12 3zm0 1.6c-1.1 0-1.8.7-1.8 1.6S10.9 7.8 12 7.8s1.8-.7 1.8-1.6S13.1 4.6 12 4.6z"/></svg>`,
+    percent: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.5 2.1 21.9 11.5 12.5 20.9 3.1 11.5 12.5 2.1zm-1.4 5.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm4.4 4.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.2 15.3l5.6-5.6 1.1 1.1-5.6 5.6-1.1-1.1z"/></svg>`,
+    star: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 2.8 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8l5-.7L12 2.8z"/></svg>`,
+    check: `<svg class="satc-slider__reward-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.2 11.4 2.8 8l1.2-1.2 2.2 2.2 5-5L12.4 5.2z"/></svg>`,
+    heart: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21s-6.7-4.2-9.2-8.1C1.1 10.2 2 7 5 6.2c1.8-.5 3.5.3 4.5 1.6C10.5 6.5 12.2 5.7 14 6.2c3 .8 3.9 4 2.2 6.7C18.7 16.8 12 21 12 21z"/></svg>`,
+    lock: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V8a3 3 0 0 0-6 0v2z"/></svg>`,
+  };
+  const resolveTierIconKey = (tier) => {
+    const icon = String(tier.icon || "auto");
+    if (icon === "custom") return "custom";
+    if (icon && icon !== "auto" && ICONS[icon]) return icon;
+    const type = tier.rewardType || "custom";
+    if (type === "shipping") return "truck";
+    if (type === "discount") return "percent";
+    if (type === "product") return "gift";
+    return "star";
+  };
+  const rewardTypeIcon = (tier, reached) => {
+    if (!rewardShowIcons) return "";
+    if (reached) return ICONS.check;
+    const key = resolveTierIconKey(tier);
+    if (key === "custom" && tier.iconUrl) {
+      return `<img class="satc-slider__reward-icon-img" src="${escapeHtml(tier.iconUrl)}" alt="" width="16" height="16" loading="lazy">`;
     }
-    if (type === "discount") {
-      return `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.5 2.1 21.9 11.5 12.5 20.9 3.1 11.5 12.5 2.1zm-1.4 5.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm4.4 4.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.2 15.3l5.6-5.6 1.1 1.1-5.6 5.6-1.1-1.1z"/></svg>`;
-    }
-    if (type === "product") {
-      return `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3c2.2 0 3.5 1.5 3.5 3.2 0 .5-.1 1-.3 1.4H18l1 12H5L6 7.6h2.8c-.2-.4-.3-.9-.3-1.4C8.5 4.5 9.8 3 12 3zm0 1.6c-1.1 0-1.8.7-1.8 1.6S10.9 7.8 12 7.8s1.8-.7 1.8-1.6S13.1 4.6 12 4.6z"/></svg>`;
-    }
-    return `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 2.8 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8l5-.7L12 2.8z"/></svg>`;
+    return ICONS[key] || ICONS.star;
   };
   let recSeed = [];
   try {
@@ -662,15 +686,8 @@
             ? `${Math.round(goal)}`
             : money(Math.round(goal * 100));
         const type = tier.rewardType || "custom";
-        const iconInner =
-          rewardLayout === "middle"
-            ? reached
-              ? '<svg class="satc-slider__reward-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.2 11.4 2.8 8l1.2-1.2 2.2 2.2 5-5L12.4 5.2z"/></svg>'
-              : rewardTypeIcon(type)
-            : reached
-              ? '<svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path fill="currentColor" d="M6.2 11.4 2.8 8l1.2-1.2 2.2 2.2 5-5L12.4 5.2z"/></svg>'
-              : "";
-        return `<div class="satc-slider__reward-milestone${reached ? " is-reached" : ""}${isCurrent ? " is-current" : ""}" data-reward-type="${escapeHtml(type)}" style="--satc-tier-i:${index}">
+        const iconInner = rewardTypeIcon(tier, reached);
+        return `<div class="satc-slider__reward-milestone${reached ? " is-reached" : ""}${isCurrent ? " is-current" : ""}" data-reward-type="${escapeHtml(type)}" data-reward-icon="${escapeHtml(String(tier.icon || "auto"))}" style="--satc-tier-i:${index}">
             <span class="satc-slider__reward-dot" aria-hidden="true">${iconInner}</span>
             <span class="satc-slider__reward-label">${labelHtml}</span>
             <span class="satc-slider__reward-goal">${escapeHtml(goalLabel)}</span>
@@ -695,19 +712,26 @@
     }
 
     const rewardsTpl = getFeatureTpl("rewards");
+    const rewardsCustomHtml = String(rewardsTpl?.template || "").trim();
     if (
-      rewardsTpl?.template &&
-      (rewardsTpl.replaceDefault || rewardsTpl.template)
+      rewardsTpl &&
+      rewardsCustomHtml &&
+      (rewardsTpl.replaceDefault || rewardsCustomHtml)
     ) {
       rewardRoot.setAttribute("data-satc-feature", "rewards");
       rewardRoot.innerHTML =
         sanitizeHtml(
-          renderMustache(rewardsTpl.template, {
+          renderMustache(rewardsCustomHtml, {
             message,
             progress_pct: pct,
             tiers_html: tiersHtml,
           }),
         ) + sanitizeHtml(rewardsTpl.html || "");
+      // Re-bind progress fill if custom markup kept the data attribute.
+      const customBar = rewardRoot.querySelector("[data-satc-reward-bar]");
+      if (customBar instanceof HTMLElement) {
+        customBar.style.width = `${pct}%`;
+      }
       if (!next) rewardRoot.classList.add("is-complete");
       else rewardRoot.classList.remove("is-complete");
       return;

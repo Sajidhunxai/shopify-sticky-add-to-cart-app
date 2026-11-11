@@ -44,6 +44,34 @@ export type RewardAnimation = "smooth" | "pulse" | "glow" | "bounce" | "none";
 export type RewardBarLayout = "stacked" | "middle";
 export type RewardBarStyle = "solid" | "gradient" | "striped";
 export type RewardMessagePosition = "below" | "above";
+/** Where milestone icons sit relative to the progress line */
+export type RewardIconPosition = "inside" | "outside-top" | "outside-bottom";
+export type RewardIconStyle = "filled" | "outline" | "soft" | "plain";
+export type RewardIconPreset =
+  | "auto"
+  | "truck"
+  | "gift"
+  | "percent"
+  | "star"
+  | "check"
+  | "heart"
+  | "lock"
+  | "custom";
+
+export const REWARD_ICON_PRESETS: {
+  id: RewardIconPreset;
+  label: string;
+}[] = [
+  { id: "auto", label: "Auto (from type)" },
+  { id: "truck", label: "Truck" },
+  { id: "gift", label: "Gift" },
+  { id: "percent", label: "Percent" },
+  { id: "star", label: "Star" },
+  { id: "check", label: "Check" },
+  { id: "heart", label: "Heart" },
+  { id: "lock", label: "Lock" },
+  { id: "custom", label: "Shopify file" },
+];
 
 export type RecommendationProduct = {
   handle: string;
@@ -65,6 +93,10 @@ export type RewardTier = {
   productHandle: string;
   productTitle: string;
   productUrl: string;
+  /** Milestone icon for this tier */
+  icon: RewardIconPreset;
+  /** Image URL when icon is custom */
+  iconUrl: string;
 };
 
 export type BarConfig = {
@@ -225,6 +257,12 @@ export type BarConfig = {
   rewardBarStyle: RewardBarStyle;
   /** Where the “You’re $X away…” message sits */
   rewardMessagePosition: RewardMessagePosition;
+  /** Show milestone icons on the progress bar */
+  rewardShowIcons: boolean;
+  /** Icon look: filled circle, outline, soft, plain */
+  rewardIconStyle: RewardIconStyle;
+  /** Icon placement vs the progress line */
+  rewardIconPosition: RewardIconPosition;
   discountEnabled: boolean;
   discountPlaceholder: string;
   discountButtonText: string;
@@ -337,6 +375,9 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   rewardBarLayout: "stacked",
   rewardBarStyle: "gradient",
   rewardMessagePosition: "below",
+  rewardShowIcons: true,
+  rewardIconStyle: "filled",
+  rewardIconPosition: "outside-top",
   rewardTiers: [
     {
       enabled: true,
@@ -347,6 +388,8 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
       productHandle: "",
       productTitle: "",
       productUrl: "",
+      icon: "truck",
+      iconUrl: "",
     },
     {
       enabled: true,
@@ -357,6 +400,8 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
       productHandle: "",
       productTitle: "",
       productUrl: "",
+      icon: "truck",
+      iconUrl: "",
     },
     {
       enabled: false,
@@ -367,6 +412,8 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
       productHandle: "",
       productTitle: "",
       productUrl: "",
+      icon: "gift",
+      iconUrl: "",
     },
     {
       enabled: false,
@@ -377,6 +424,8 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
       productHandle: "",
       productTitle: "",
       productUrl: "",
+      icon: "star",
+      iconUrl: "",
     },
   ],
   recommendationsEnabled: true,
@@ -482,6 +531,60 @@ function asRewardType(value: unknown, fallback: RewardType): RewardType {
   return fallback;
 }
 
+function asRewardIconPreset(
+  value: unknown,
+  fallback: RewardIconPreset,
+): RewardIconPreset {
+  const raw = String(value || "");
+  if (
+    raw === "auto" ||
+    raw === "truck" ||
+    raw === "gift" ||
+    raw === "percent" ||
+    raw === "star" ||
+    raw === "check" ||
+    raw === "heart" ||
+    raw === "lock" ||
+    raw === "custom"
+  ) {
+    return raw;
+  }
+  return fallback;
+}
+
+function asRewardIconStyle(
+  value: FormDataEntryValue | null | undefined | string,
+): RewardIconStyle {
+  const raw = String(value || "filled");
+  if (
+    raw === "outline" ||
+    raw === "soft" ||
+    raw === "plain" ||
+    raw === "filled"
+  ) {
+    return raw;
+  }
+  return "filled";
+}
+
+function asRewardIconPosition(
+  value: FormDataEntryValue | null | undefined | string,
+): RewardIconPosition {
+  const raw = String(value || "outside-top");
+  if (
+    raw === "inside" ||
+    raw === "outside-top" ||
+    raw === "outside-bottom" ||
+    raw === "top" ||
+    raw === "bottom"
+  ) {
+    if (raw === "top") return "outside-top";
+    if (raw === "bottom") return "outside-bottom";
+    return raw as RewardIconPosition;
+  }
+  return "outside-top";
+}
+
 function normalizeRewardTiers(input: unknown): RewardTier[] {
   const defaults = DEFAULT_BAR_CONFIG.rewardTiers;
   if (!Array.isArray(input) || input.length === 0) {
@@ -500,6 +603,8 @@ function normalizeRewardTiers(input: unknown): RewardTier[] {
       productHandle: String(row.productHandle || fallback.productHandle || ""),
       productTitle: String(row.productTitle || fallback.productTitle || ""),
       productUrl: String(row.productUrl || fallback.productUrl || ""),
+      icon: asRewardIconPreset(row.icon, fallback.icon || "auto"),
+      iconUrl: String(row.iconUrl || fallback.iconUrl || "").slice(0, 2000),
     };
   });
 }
@@ -639,6 +744,12 @@ export function parseBarConfig(raw: string | null | undefined): BarConfig {
       rewardMessagePosition: asRewardMessagePosition(
         parsed.rewardMessagePosition,
       ),
+      rewardShowIcons:
+        parsed.rewardShowIcons === undefined
+          ? DEFAULT_BAR_CONFIG.rewardShowIcons
+          : Boolean(parsed.rewardShowIcons),
+      rewardIconStyle: asRewardIconStyle(parsed.rewardIconStyle),
+      rewardIconPosition: asRewardIconPosition(parsed.rewardIconPosition),
       customCss: String(parsed.customCss || "").slice(0, 24_000),
       featureTemplates: normalizeFeatureTemplates(parsed.featureTemplates),
     };
@@ -1050,6 +1161,14 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
     rewardBarStyle: asRewardBarStyle(formData.get("rewardBarStyle")),
     rewardMessagePosition: asRewardMessagePosition(
       formData.get("rewardMessagePosition"),
+    ),
+    rewardShowIcons: asBool(
+      formData.get("rewardShowIcons"),
+      DEFAULT_BAR_CONFIG.rewardShowIcons,
+    ),
+    rewardIconStyle: asRewardIconStyle(formData.get("rewardIconStyle")),
+    rewardIconPosition: asRewardIconPosition(
+      formData.get("rewardIconPosition"),
     ),
     discountEnabled: asBool(
       formData.get("discountEnabled"),

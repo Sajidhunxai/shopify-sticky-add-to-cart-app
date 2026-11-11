@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useFetcher } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import styles from "../../../styles/dashboard.module.css";
 import {
   DEFAULT_REWARD_COLORS,
+  REWARD_ICON_PRESETS,
   type RewardAnimation,
   type RewardBarLayout,
   type RewardBarStyle,
+  type RewardIconPosition,
+  type RewardIconPreset,
+  type RewardIconStyle,
   type RewardMessagePosition,
   type RewardType,
 } from "../../../models/bar-config";
@@ -13,13 +18,23 @@ import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import { colorFromEvent } from "../../fields/color";
 import type { RewardsPanelProps } from "../../types";
 
+type ResolveFileActionData = {
+  ok?: boolean;
+  intent?: string;
+  url?: string;
+  message?: string;
+  tierIndex?: number;
+};
+
 export function RewardsPanel({
   config,
   updateConfig,
   updateRewardTier,
 }: RewardsPanelProps) {
   const shopify = useAppBridge();
+  const fileFetcher = useFetcher<ResolveFileActionData>();
   const [activeTier, setActiveTier] = useState(0);
+  const [fileError, setFileError] = useState("");
   const tier = config.rewardTiers[activeTier] || config.rewardTiers[0];
   const themeOn = config.rewardUseThemeColors;
   const previewBg = themeOn ? "#eef2ff" : config.rewardBg;
@@ -28,6 +43,23 @@ export function RewardsPanel({
   const previewText = themeOn
     ? "#111111"
     : config.rewardTextColor || "#111111";
+  const fileBusy = fileFetcher.state !== "idle";
+
+  useEffect(() => {
+    const data = fileFetcher.data;
+    if (!data || data.intent !== "resolve-file") return;
+    if (data.ok && data.url) {
+      const index =
+        typeof data.tierIndex === "number" ? data.tierIndex : activeTier;
+      updateRewardTier(index, {
+        icon: "custom",
+        iconUrl: data.url,
+      });
+      setFileError("");
+      return;
+    }
+    if (data.message) setFileError(data.message);
+  }, [fileFetcher.data, activeTier, updateRewardTier]);
 
   const resetRewardColors = () => {
     updateConfig(
@@ -73,6 +105,55 @@ export function RewardsPanel({
       productTitle: "",
       productHandle: "",
       productUrl: "",
+    });
+  };
+
+  const pickShopifyFile = async () => {
+    setFileError("");
+    try {
+      const intents = (
+        shopify as {
+          intents?: {
+            invoke: (
+              query: string,
+              options?: { data?: Record<string, unknown> },
+            ) => Promise<{ complete: Promise<{ code?: string; data?: { ids?: string[] } }> }>;
+          };
+        }
+      ).intents;
+      if (!intents?.invoke) {
+        setFileError(
+          "Shopify Files picker is unavailable in this admin session. Update the app embed / App Bridge.",
+        );
+        return;
+      }
+      const activity = await intents.invoke("pick:shopify/File", {
+        data: {
+          mediaTypes: ["MediaImage", "GenericFile"],
+          multiSelect: false,
+        },
+      });
+      const response = await activity.complete;
+      if (response?.code !== "ok" || !response.data?.ids?.length) return;
+      const fileId = response.data.ids[0];
+      const fd = new FormData();
+      fd.set("intent", "resolve-file");
+      fd.set("fileId", fileId);
+      fd.set("tierIndex", String(activeTier));
+      fileFetcher.submit(fd, { method: "post" });
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Could not open Shopify Files. Re-auth the app after scopes update.";
+      setFileError(message);
+    }
+  };
+
+  const clearCustomIcon = () => {
+    updateRewardTier(activeTier, {
+      icon: "auto",
+      iconUrl: "",
     });
   };
 
@@ -322,6 +403,48 @@ export function RewardsPanel({
         <s-option value="above">Above progress</s-option>
       </s-select>
 
+      <s-heading>Icons</s-heading>
+      <s-switch
+        label="Show milestone icons"
+        checked={config.rewardShowIcons}
+        onChange={(e: Event) =>
+          updateConfig(
+            "rewardShowIcons",
+            (e.currentTarget as HTMLInputElement).checked,
+          )
+        }
+      />
+      <s-select
+        label="Icon position"
+        value={config.rewardIconPosition}
+        details="Inside = on the progress line. Outside = above or below the bar."
+        onChange={(e: Event) =>
+          updateConfig(
+            "rewardIconPosition",
+            (e.currentTarget as HTMLSelectElement).value as RewardIconPosition,
+          )
+        }
+      >
+        <s-option value="inside">Inside (on the line)</s-option>
+        <s-option value="outside-top">Outside — top</s-option>
+        <s-option value="outside-bottom">Outside — bottom</s-option>
+      </s-select>
+      <s-select
+        label="Icon style"
+        value={config.rewardIconStyle}
+        onChange={(e: Event) =>
+          updateConfig(
+            "rewardIconStyle",
+            (e.currentTarget as HTMLSelectElement).value as RewardIconStyle,
+          )
+        }
+      >
+        <s-option value="filled">Filled</s-option>
+        <s-option value="outline">Outline</s-option>
+        <s-option value="soft">Soft</s-option>
+        <s-option value="plain">Plain</s-option>
+      </s-select>
+
       <s-select
         label="Rewards animation"
         value={config.rewardAnimation}
@@ -422,6 +545,105 @@ export function RewardsPanel({
               })
             }
           />
+
+          <s-heading>Tier icon</s-heading>
+          <s-paragraph>
+            Choose a built-in icon, or pick/upload an image or SVG from Shopify
+            Files for this tier only.
+          </s-paragraph>
+          <div className={styles.iconPresetGrid} role="listbox" aria-label="Tier icon">
+            {REWARD_ICON_PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                role="option"
+                aria-selected={(tier.icon || "auto") === preset.id}
+                className={`${styles.iconPreset} ${
+                  (tier.icon || "auto") === preset.id
+                    ? styles.iconPresetActive
+                    : ""
+                }`}
+                onClick={() => {
+                  if (preset.id === "custom") {
+                    updateRewardTier(activeTier, { icon: "custom" });
+                    void pickShopifyFile();
+                    return;
+                  }
+                  updateRewardTier(activeTier, {
+                    icon: preset.id as RewardIconPreset,
+                    iconUrl: "",
+                  });
+                }}
+              >
+                <span className={styles.iconPresetGlyph} aria-hidden="true">
+                  {preset.id === "truck"
+                    ? "🚚"
+                    : preset.id === "gift"
+                      ? "🎁"
+                      : preset.id === "percent"
+                        ? "%"
+                        : preset.id === "star"
+                          ? "★"
+                          : preset.id === "check"
+                            ? "✓"
+                            : preset.id === "heart"
+                              ? "♥"
+                              : preset.id === "lock"
+                                ? "🔒"
+                                : preset.id === "custom"
+                                  ? "📁"
+                                  : "A"}
+                </span>
+                <span>{preset.label}</span>
+              </button>
+            ))}
+          </div>
+          {(tier.icon || "auto") === "custom" && (
+            <div className={styles.rewardProductRow}>
+              {tier.iconUrl ? (
+                <>
+                  <img
+                    src={tier.iconUrl}
+                    alt=""
+                    width={36}
+                    height={36}
+                    style={{
+                      objectFit: "contain",
+                      borderRadius: 8,
+                      background: "#f3f4f6",
+                    }}
+                  />
+                  <div className={styles.rewardProductMeta}>
+                    <strong>Shopify Files icon</strong>
+                    <span>{tier.iconUrl}</span>
+                  </div>
+                  <s-button
+                    variant="tertiary"
+                    onClick={pickShopifyFile}
+                    disabled={fileBusy}
+                  >
+                    {fileBusy ? "Loading…" : "Change"}
+                  </s-button>
+                  <s-button
+                    variant="tertiary"
+                    tone="critical"
+                    onClick={clearCustomIcon}
+                  >
+                    Remove
+                  </s-button>
+                </>
+              ) : (
+                <s-button onClick={pickShopifyFile} disabled={fileBusy}>
+                  {fileBusy
+                    ? "Loading…"
+                    : "+ Upload or choose from Shopify Files"}
+                </s-button>
+              )}
+            </div>
+          )}
+          {fileError ? (
+            <s-banner tone="critical">{fileError}</s-banner>
+          ) : null}
 
           {tier.rewardType === "product" && (
             <>

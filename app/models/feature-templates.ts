@@ -43,46 +43,52 @@ export const FEATURE_TEMPLATE_META: Record<
   header: {
     label: "Header",
     placeholders: "{{title}}, {{cart_quantity}}",
-    example: `<div class="my-header" style="display:flex;justify-content:space-between;align-items:center;width:100%">
-  <h2 data-satc-drawer-title>{{title}}</h2>
-  <button type="button" data-satc-slider-close aria-label="Close">×</button>
+    example: `<div class="satc-slider__header" style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:12px">
+  <h2 class="satc-slider__title" data-satc-drawer-title>{{title}}</h2>
+  <button type="button" class="satc-slider__close" data-satc-slider-close aria-label="Close">×</button>
 </div>`,
   },
   announcement: {
     label: "Announcement",
     placeholders: "{{text}}, {{timer}} — keep data-satc-announcement-label for countdown",
-    example: `<span data-satc-announcement-label>Your products are reserved for {{timer}}!</span>`,
+    example: `<span data-satc-announcement-label>{{text}}</span>`,
   },
   rewards: {
     label: "Tiered rewards",
     placeholders:
-      "{{message}}, {{progress_pct}}, {{tiers_html}}, {{{tiers_html}}}",
-    example: `<div class="my-rewards">
-  <div class="bar" style="width:{{progress_pct}}%"></div>
-  <p>{{message}}</p>
-  {{{tiers_html}}}
-</div>`,
+      "{{message}}, {{progress_pct}}, {{{tiers_html}}} — keep satc-slider__* classes for layout",
+    example: `<div class="satc-slider__rewards-rail">
+  <div class="satc-slider__rewards-milestones" data-satc-reward-milestones>
+    {{{tiers_html}}}
+  </div>
+  <div class="satc-slider__rewards-track">
+    <span class="satc-slider__rewards-bar" data-satc-reward-bar style="width:{{progress_pct}}%"></span>
+  </div>
+</div>
+<p class="satc-slider__rewards-text" data-satc-reward-text>{{message}}</p>`,
   },
   cartItem: {
     label: "Cart line item",
     placeholders:
       "{{title}}, {{quantity}}, {{price}}, {{image}}, {{line_key}}, {{{qty_controls}}}, {{{remove_button}}}",
-    example: `<div class="my-line" data-line-key="{{line_key}}">
-  <img src="{{image}}" alt="" width="56" height="56">
-  <div>
-    <p>{{title}}</p>
+    example: `<div class="satc-slider__line" data-line-key="{{line_key}}">
+  <img class="satc-slider__line-image" src="{{image}}" alt="" width="56" height="56">
+  <div class="satc-slider__line-info">
+    <p class="satc-slider__line-title">{{title}}</p>
     {{{qty_controls}}}
   </div>
-  <div>{{price}} {{{remove_button}}}</div>
+  <div class="satc-slider__line-meta">{{price}} {{{remove_button}}}</div>
 </div>`,
   },
   recommendations: {
     label: "Recommendations block",
     placeholders: "{{header}}, {{{cards_html}}}",
-    example: `<section class="my-recs">
-  <h3>{{header}}</h3>
-  {{{cards_html}}}
-</section>`,
+    example: `<div class="satc-slider__recs" data-satc-recs>
+  <h3 class="satc-slider__recs-title">{{header}}</h3>
+  <div class="satc-slider__recs-list">
+    {{{cards_html}}}
+  </div>
+</div>`,
   },
   recommendationCard: {
     label: "Recommendation tile",
@@ -119,35 +125,38 @@ export const FEATURE_TEMPLATE_META: Record<
   emptyCart: {
     label: "Empty cart",
     placeholders: "{{empty_title}}, {{empty_text}}, {{{shop_button}}}, {{{recs_html}}}",
-    example: `<div class="my-empty">
-  <p>{{empty_title}}</p>
-  <p>{{empty_text}}</p>
+    example: `<div class="satc-slider__empty-state">
+  <p class="satc-slider__empty">{{empty_title}}</p>
+  <p class="satc-slider__empty-sub">{{empty_text}}</p>
   {{{shop_button}}}
-  {{{recs_html}}}
-</div>`,
+</div>
+{{{recs_html}}}`,
   },
   discount: {
     label: "Discount code",
     placeholders: "{{placeholder}}, {{button_text}}",
-    example: `<form class="my-discount" data-satc-discount>
-  <input name="discount" placeholder="{{placeholder}}">
-  <button type="submit">{{button_text}}</button>
+    example: `<form class="satc-slider__discount" data-satc-discount>
+  <input class="satc-slider__discount-input" name="discount" placeholder="{{placeholder}}">
+  <button type="submit" class="satc-slider__discount-btn">{{button_text}}</button>
 </form>`,
   },
   trust: {
     label: "Trust badges",
     placeholders: "{{text}}",
-    example: `<p class="my-trust">{{text}}</p>`,
+    example: `<p class="satc-slider__trust">{{text}}</p>`,
   },
   footer: {
     label: "Footer / checkout",
     placeholders: "{{subtotal_label}}, {{subtotal}}, {{checkout_text}}, {{{discount_html}}}, {{{trust_html}}}",
-    example: `<footer class="my-footer">
+    example: `<div class="satc-slider__footer">
   {{{discount_html}}}
-  <div><span>{{subtotal_label}}</span><strong>{{subtotal}}</strong></div>
-  <a href="/checkout" data-satc-slider-checkout>{{checkout_text}}</a>
+  <div class="satc-slider__subtotal">
+    <span>{{subtotal_label}}</span>
+    <strong data-satc-slider-total>{{subtotal}}</strong>
+  </div>
+  <a class="satc-slider__checkout" href="/checkout" data-satc-slider-checkout>{{checkout_text}}</a>
   {{{trust_html}}}
-</footer>`,
+</div>`,
   },
 };
 

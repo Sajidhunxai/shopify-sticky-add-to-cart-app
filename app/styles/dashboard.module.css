@@ -723,6 +723,50 @@
     radial-gradient(circle at 82% 50%, #fff 7px, #d1d5db 8px, #d1d5db 10px, transparent 11px);
 }
 
+.iconPresetGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.iconPreset {
+  appearance: none;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 8px;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  cursor: pointer;
+  font-size: 11px;
+  color: #374151;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.iconPreset:hover {
+  border-color: #111827;
+}
+
+.iconPresetActive {
+  border-color: #111827;
+  box-shadow: 0 0 0 1px #111827;
+  font-weight: 650;
+}
+
+.iconPresetGlyph {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .studioPreview {
   position: sticky;
   top: 12px;

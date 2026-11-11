@@ -25,9 +25,9 @@ const CODE_TABS: { id: CodeTab; label: string }[] = [
 ];
 
 const SHORT_HINTS: Record<CodeTab, string> = {
-  html: "Type or paste HTML here… Use {{placeholders}} for dynamic values.",
-  css: "Type or paste CSS here… Scoped to this feature automatically.",
-  js: "Type or paste JS here… Runs after this feature renders (root, featureKey, slider).",
+  html: "Edit the default HTML… Keep satc-slider__* classes so layout stays intact.",
+  css: "Optional CSS… Scoped to this feature automatically.",
+  js: "Optional JS… Runs after this feature renders (root, featureKey, slider).",
 };
 
 export function FeatureCustomTemplate({
@@ -55,6 +55,33 @@ export function FeatureCustomTemplate({
     });
   };
 
+  const loadDefaultHtml = (alsoEnable = true) => {
+    patch({
+      ...(alsoEnable
+        ? { enabled: true, replaceDefault: true }
+        : {}),
+      template: meta.example,
+    });
+  };
+
+  const enableWithDefaults = (enabled: boolean) => {
+    if (!enabled) {
+      patch({ enabled: false });
+      return;
+    }
+    // Enabling with empty HTML broke layout before — seed real default markup.
+    if (!current.template.trim()) {
+      patch({
+        enabled: true,
+        replaceDefault: true,
+        template: meta.example,
+      });
+      setCodeTab("html");
+      return;
+    }
+    patch({ enabled: true, replaceDefault: true });
+  };
+
   const editorValue =
     codeTab === "html"
       ? current.template
@@ -77,8 +104,10 @@ export function FeatureCustomTemplate({
         <s-badge tone="caution">Technical skills required</s-badge>
       </s-stack>
       <s-paragraph>
-        Write your own HTML / CSS / JS for this section. The editor starts empty —
-        nothing is pre-filled. Placeholders: {meta.placeholders}
+        When you enable this, the built-in HTML is copied into the editor so
+        layout stays intact. Edit classes/text or add your own — keep{" "}
+        <code>satc-slider__*</code> wrappers and data attributes. Placeholders:{" "}
+        {meta.placeholders}
       </s-paragraph>
 
       {featureTabs.length > 1 && (
@@ -120,17 +149,27 @@ export function FeatureCustomTemplate({
           }
           checked={current.enabled}
           onChange={(e: Event) =>
-            patch({ enabled: (e.currentTarget as HTMLInputElement).checked })
+            enableWithDefaults(
+              (e.currentTarget as HTMLInputElement).checked,
+            )
           }
         />
         <s-switch
           label="Replace built-in markup"
           checked={current.replaceDefault}
-          onChange={(e: Event) =>
-            patch({
-              replaceDefault: (e.currentTarget as HTMLInputElement).checked,
-            })
-          }
+          onChange={(e: Event) => {
+            const on = (e.currentTarget as HTMLInputElement).checked;
+            if (on && !current.template.trim()) {
+              patch({
+                replaceDefault: true,
+                enabled: true,
+                template: meta.example,
+              });
+              setCodeTab("html");
+              return;
+            }
+            patch({ replaceDefault: on });
+          }}
         />
       </s-stack>
 
@@ -174,18 +213,12 @@ export function FeatureCustomTemplate({
 
       <s-stack direction="inline" gap="base">
         <s-button
-          variant="tertiary"
           onClick={() => {
-            if (codeTab === "html") {
+            if (codeTab === "html") loadDefaultHtml(true);
+            else if (codeTab === "css") {
               patch({
                 enabled: true,
-                replaceDefault: true,
-                template: meta.example,
-              });
-            } else if (codeTab === "css") {
-              patch({
-                enabled: true,
-                css: `/* ${activeFeature} */\n`,
+                css: `/* ${activeFeature} — scoped under [data-satc-feature="${activeFeature}"] */\n`,
               });
             } else {
               patch({
@@ -195,7 +228,7 @@ export function FeatureCustomTemplate({
             }
           }}
         >
-          Insert starter for {codeTab.toUpperCase()}
+          Restore default {codeTab.toUpperCase()}
         </s-button>
         <s-button
           variant="tertiary"

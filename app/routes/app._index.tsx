@@ -100,6 +100,77 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return { ok: true, message: "Storefront settings synced." };
   }
 
+  if (intent === "resolve-file") {
+    const fileId = String(formData.get("fileId") || "").trim();
+    const tierIndex = Number(formData.get("tierIndex") || 0);
+    if (!fileId.startsWith("gid://")) {
+      return { ok: false, message: "Invalid file id", intent: "resolve-file" };
+    }
+    try {
+      const response = await admin.graphql(
+        `#graphql
+          query StickyAtcFileUrl($id: ID!) {
+            node(id: $id) {
+              __typename
+              ... on MediaImage {
+                image {
+                  url
+                  altText
+                }
+              }
+              ... on GenericFile {
+                url
+                mimeType
+              }
+              ... on Video {
+                preview {
+                  image {
+                    url
+                  }
+                }
+              }
+            }
+          }`,
+        { variables: { id: fileId } },
+      );
+      const json = await response.json();
+      const node = json?.data?.node;
+      let url = "";
+      if (node?.__typename === "MediaImage") {
+        url = String(node.image?.url || "");
+      } else if (node?.__typename === "GenericFile") {
+        url = String(node.url || "");
+      } else if (node?.__typename === "Video") {
+        url = String(node.preview?.image?.url || "");
+      }
+      if (!url) {
+        return {
+          ok: false,
+          message: "Could not resolve file URL. Try an image or SVG.",
+          intent: "resolve-file",
+          tierIndex,
+        };
+      }
+      return {
+        ok: true,
+        message: "File selected",
+        intent: "resolve-file",
+        url,
+        fileId,
+        tierIndex,
+      };
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to load Shopify file";
+      return {
+        ok: false,
+        message,
+        intent: "resolve-file",
+        tierIndex,
+      };
+    }
+  }
+
   return { ok: false, message: "Unknown action" };
 };
 
