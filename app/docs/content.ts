@@ -1,5 +1,12 @@
 /** Documentation content for Sticky Add to Cart (admin + public). */
 
+export type DocImage = {
+  /** Path under /public, e.g. /docs/studio-overview.jpg */
+  src: string;
+  alt: string;
+  caption?: string;
+};
+
 export type DocSection = {
   id: string;
   title: string;
@@ -8,6 +15,8 @@ export type DocSection = {
   steps?: string[];
   note?: string;
   links?: { label: string; href: string }[];
+  /** Optional screenshot(s) for this section */
+  images?: DocImage[];
 };
 
 export type DocPage = {
@@ -17,6 +26,8 @@ export type DocPage = {
   group: string;
   /** Studio left-nav id when applicable */
   studioNav?: string;
+  /** Hero image under the page lead */
+  hero?: DocImage;
   sections: DocSection[];
   related?: { slug: string; label: string }[];
 };
@@ -50,7 +61,7 @@ export const DOC_GROUPS: { title: string; slugs: string[] }[] = [
   },
   {
     title: "Help",
-    slugs: ["troubleshooting"],
+    slugs: ["faq", "troubleshooting"],
   },
 ];
 
@@ -61,6 +72,12 @@ export const DOC_PAGES: DocPage[] = [
     description:
       "Sticky Add to Cart keeps Add to cart visible and can open a full cart drawer with rewards, recommendations, and more.",
     group: "Start here",
+    hero: {
+      src: "/docs/studio-overview.jpg",
+      alt: "Sticky ATC admin studio with settings and live cart drawer preview",
+      caption:
+        "Dashboard studio: left menu, center settings, right live preview.",
+    },
     sections: [
       {
         id: "what-it-is",
@@ -73,6 +90,14 @@ export const DOC_PAGES: DocPage[] = [
           "Optional cart drawer with announcements, tiered rewards, recommendations, discounts, and trust badges",
           "Live preview in the admin studio — save to sync settings to the storefront",
           "Optional custom HTML / CSS / JS templates per drawer feature",
+        ],
+        images: [
+          {
+            src: "/docs/cart-drawer.jpg",
+            alt: "Example Sticky ATC cart drawer on a product page",
+            caption:
+              "Cart drawer with announcement, rewards, line items, and checkout.",
+          },
         ],
       },
       {
@@ -100,6 +125,13 @@ export const DOC_PAGES: DocPage[] = [
           "Sticky Cart + Drawer — bar plus slide-out cart drawer (recommended for rewards & recs)",
           "Quick Buy Cart — compact floating quick-buy style",
         ],
+        images: [
+          {
+            src: "/docs/display-modes.jpg",
+            alt: "Three display mode cards: Bar, Cart drawer, Quick Buy",
+            caption: "Pick a display mode at the top of the studio left menu.",
+          },
+        ],
         links: [{ label: "Display style guide", href: "/app/docs/display" }],
       },
     ],
@@ -115,6 +147,11 @@ export const DOC_PAGES: DocPage[] = [
     description: "Install, enable the embed, and publish your first sticky bar or cart drawer.",
     group: "Start here",
     studioNav: "setup",
+    hero: {
+      src: "/docs/theme-embed.jpg",
+      alt: "Shopify theme editor with Sticky ATC App embed enabled",
+      caption: "Turn on the App embed, then Save the theme.",
+    },
     sections: [
       {
         id: "install",
@@ -123,6 +160,13 @@ export const DOC_PAGES: DocPage[] = [
           "Install Sticky Add to Cart from the Shopify App Store (or your install link)",
           "Open the app from Apps → Sticky Add to Cart",
           "You land on the Dashboard studio",
+        ],
+        images: [
+          {
+            src: "/docs/studio-overview.jpg",
+            alt: "Sticky ATC dashboard studio after install",
+            caption: "The Dashboard opens the configuration studio.",
+          },
         ],
       },
       {
@@ -135,6 +179,13 @@ export const DOC_PAGES: DocPage[] = [
           "Save the theme",
         ],
         note: "The bar and drawer only render after the embed is on and the theme is saved.",
+        images: [
+          {
+            src: "/docs/theme-embed.jpg",
+            alt: "App embeds panel with Sticky ATC toggle on",
+            caption: "App embeds → enable Sticky ATC → Save.",
+          },
+        ],
       },
       {
         id: "first-config",
@@ -157,6 +208,13 @@ export const DOC_PAGES: DocPage[] = [
         paragraphs: [
           "If you use Cart drawer mode, set your theme cart type to Page so the theme drawer does not compete with Sticky ATC.",
         ],
+        images: [
+          {
+            src: "/docs/cart-drawer.jpg",
+            alt: "Sticky ATC cart drawer open on storefront",
+            caption: "After setup, the header cart icon opens Sticky ATC’s drawer.",
+          },
+        ],
         links: [
           { label: "Full drawer setup steps", href: "/app/docs/troubleshooting#sticky-drawer" },
           { label: "Setup help (short)", href: "/app/additional" },
@@ -176,12 +234,24 @@ export const DOC_PAGES: DocPage[] = [
       "Colors, fonts, bar background, buttons, images, and visual style for the sticky bar.",
     group: "General",
     studioNav: "design",
+    hero: {
+      src: "/docs/studio-overview.jpg",
+      alt: "Design settings in the Sticky ATC studio",
+      caption: "Design controls sit in the center column; preview updates on the right.",
+    },
     sections: [
       {
         id: "overview",
         title: "Where to find it",
         paragraphs: [
           "Dashboard → left menu → Design. Changes appear in the preview immediately; Save settings to publish.",
+        ],
+        images: [
+          {
+            src: "/docs/studio-overview.jpg",
+            alt: "Studio showing Design section and preview",
+            caption: "Left: Design. Center: colors & layout. Right: preview.",
+          },
         ],
       },
       {
@@ -225,6 +295,11 @@ export const DOC_PAGES: DocPage[] = [
     description: "Cart drawer header title, close button, backdrop blur, and header chrome.",
     group: "General",
     studioNav: "header",
+    hero: {
+      src: "/docs/cart-drawer.jpg",
+      alt: "Cart drawer header and backdrop on the storefront",
+      caption: "Header title, close control, and dimmed/blurred storefront behind the drawer.",
+    },
     sections: [
       {
         id: "overview",
@@ -251,6 +326,13 @@ export const DOC_PAGES: DocPage[] = [
           "Backdrop darkness (0–100)",
         ],
         note: "If blur does not appear, hard-refresh after saving. Theme CSS rarely blocks it after the drawer is attached to the page body.",
+        images: [
+          {
+            src: "/docs/cart-drawer.jpg",
+            alt: "Drawer open with backdrop over the storefront",
+            caption: "Backdrop sits behind the panel when the drawer is open.",
+          },
+        ],
       },
     ],
     related: [
@@ -265,6 +347,11 @@ export const DOC_PAGES: DocPage[] = [
     description: "Choose sticky bar, cart drawer, or quick buy — and how the cart opens.",
     group: "General",
     studioNav: "display",
+    hero: {
+      src: "/docs/display-modes.jpg",
+      alt: "Display mode options for Sticky Add to Cart",
+      caption: "Bar, Cart drawer, or Quick Buy — pick one mode for the storefront.",
+    },
     sections: [
       {
         id: "modes",
@@ -274,12 +361,26 @@ export const DOC_PAGES: DocPage[] = [
           "Sticky Cart + Drawer — sticky bar + slide-out cart (rewards, recs, etc.)",
           "Quick Buy Cart — compact floating control",
         ],
+        images: [
+          {
+            src: "/docs/display-modes.jpg",
+            alt: "Three display mode cards in the studio",
+            caption: "Select Sticky Cart + Drawer to unlock rewards and recommendations.",
+          },
+        ],
       },
       {
         id: "drawer",
         title: "When to use Cart drawer",
         paragraphs: [
           "Use Cart drawer if you want tiered free-shipping rewards, recommendations, discount codes, announcements, or trust badges in the cart experience.",
+        ],
+        images: [
+          {
+            src: "/docs/cart-drawer.jpg",
+            alt: "Cart drawer preview with rewards and recommendations",
+            caption: "Cart drawer mode on the storefront.",
+          },
         ],
         links: [
           { label: "Tiered rewards", href: "/app/docs/rewards" },
@@ -357,12 +458,24 @@ export const DOC_PAGES: DocPage[] = [
       "Free shipping / gift milestones, progress bar design, icons, colors, and custom HTML.",
     group: "Drawer body",
     studioNav: "rewards",
+    hero: {
+      src: "/docs/rewards-bar.jpg",
+      alt: "Tiered rewards progress bar with four milestones",
+      caption: "Progress message, milestone icons, labels, and goal amounts.",
+    },
     sections: [
       {
         id: "overview",
         title: "Overview",
         paragraphs: [
           "Tiered rewards show a progress bar toward cart goals (amount or quantity). Each tier has a threshold, label, message, reward type, and optional icon.",
+        ],
+        images: [
+          {
+            src: "/docs/rewards-bar.jpg",
+            alt: "Rewards strip in the cart drawer",
+            caption: "Line-in-middle layout with icons on the progress track.",
+          },
         ],
         links: [{ label: "Open rewards in studio", href: "/app#rewards" }],
       },
@@ -410,6 +523,13 @@ export const DOC_PAGES: DocPage[] = [
           "Keep satc-slider__* classes and data-satc-reward-* attributes for layout and JS",
           "Click Restore default HTML to load the editable loop template",
           "Preview updates when the custom template is enabled; Save to publish",
+        ],
+        images: [
+          {
+            src: "/docs/custom-html.jpg",
+            alt: "Custom HTML editor for rewards with HTML CSS JS tabs",
+            caption: "Enable the template, edit HTML/CSS/JS, then Save settings.",
+          },
         ],
         links: [{ label: "Templates guide", href: "/app/docs/templates" }],
       },
@@ -534,6 +654,11 @@ export const DOC_PAGES: DocPage[] = [
       "Per-feature custom HTML, CSS, and JS with Mustache placeholders for the cart drawer.",
     group: "Settings",
     studioNav: "templates",
+    hero: {
+      src: "/docs/custom-html.jpg",
+      alt: "Custom HTML CSS JS template editor",
+      caption: "Per-feature custom templates with live-friendly defaults.",
+    },
     sections: [
       {
         id: "overview",
@@ -547,6 +672,13 @@ export const DOC_PAGES: DocPage[] = [
           "Edit HTML / CSS / JS tabs",
           "Keep satc-slider__* classes and data-satc-* attributes the app relies on",
           "Preview updates for supported features (e.g. rewards); Save settings to publish",
+        ],
+        images: [
+          {
+            src: "/docs/custom-html.jpg",
+            alt: "Rewards custom HTML editor tabs",
+            caption: "HTML / CSS / JS tabs with Restore default HTML.",
+          },
         ],
       },
       {
@@ -672,6 +804,11 @@ export const DOC_PAGES: DocPage[] = [
     title: "Troubleshooting",
     description: "Bar not showing, theme drawer conflicts, blur, icons, and sync tips.",
     group: "Help",
+    hero: {
+      src: "/docs/theme-embed.jpg",
+      alt: "Check App embed is enabled in the theme editor",
+      caption: "Most “bar not showing” issues start with a disabled App embed.",
+    },
     sections: [
       {
         id: "bar-missing",
@@ -682,6 +819,13 @@ export const DOC_PAGES: DocPage[] = [
           "Scroll past the threshold in Behavior / Design",
           "If Hide when main ATC is visible is on, scroll past the product form",
           "Save settings in the app, then hard-refresh the storefront",
+        ],
+        images: [
+          {
+            src: "/docs/theme-embed.jpg",
+            alt: "Theme App embeds with Sticky ATC enabled",
+            caption: "Enable the embed, Save theme, then hard-refresh.",
+          },
         ],
         links: [{ label: "Getting started", href: "/app/docs/getting-started" }],
       },
@@ -695,6 +839,13 @@ export const DOC_PAGES: DocPage[] = [
           "Click the header cart icon — Sticky ATC drawer should open",
         ],
         note: "Some themes hide Cart type or use another drawer app — disable competing drawers.",
+        images: [
+          {
+            src: "/docs/cart-drawer.jpg",
+            alt: "Working Sticky ATC cart drawer",
+            caption: "Expected result after switching theme cart type to Page.",
+          },
+        ],
         links: [{ label: "Setup help page", href: "/app/additional" }],
       },
       {
@@ -706,6 +857,13 @@ export const DOC_PAGES: DocPage[] = [
           "Always Save settings before judging the live storefront",
           "Hard-refresh (Ctrl+Shift+R) to bypass CDN/browser cache for theme assets",
         ],
+        images: [
+          {
+            src: "/docs/studio-overview.jpg",
+            alt: "Admin studio preview panel",
+            caption: "Use the right-hand preview, then Save before checking live.",
+          },
+        ],
       },
       {
         id: "rewards-icons",
@@ -714,6 +872,13 @@ export const DOC_PAGES: DocPage[] = [
           "Pick Shopify Files or paste an image URL, then Save settings",
           "Built-in icons use Icon color; PNGs keep their own colors",
           "Message position and icons-off apply in preview and live after save",
+        ],
+        images: [
+          {
+            src: "/docs/rewards-bar.jpg",
+            alt: "Rewards milestones with icons",
+            caption: "Built-in or custom icons on the progress track.",
+          },
         ],
         links: [{ label: "Tiered rewards docs", href: "/app/docs/rewards" }],
       },
@@ -736,6 +901,74 @@ export const DOC_PAGES: DocPage[] = [
       { slug: "getting-started", label: "Getting started" },
       { slug: "rewards", label: "Tiered rewards" },
       { slug: "display", label: "Display style" },
+      { slug: "faq", label: "FAQ" },
+    ],
+  },
+  {
+    slug: "faq",
+    title: "FAQ",
+    description:
+      "Frequently asked questions about Sticky Add to Cart for Shopify: install, themes, Free vs Pro, rewards, and docs.",
+    group: "Help",
+    sections: [
+      {
+        id: "install",
+        title: "How do I install Sticky Add to Cart?",
+        paragraphs: [
+          "Install from the Shopify App Store, open the app, enable the Sticky ATC App embed in Online Store → Themes → Customize → App embeds, save the theme, then configure and Save settings in the Dashboard.",
+        ],
+        links: [{ label: "Getting started", href: "/app/docs/getting-started" }],
+      },
+      {
+        id: "themes",
+        title: "Does it work with my theme?",
+        paragraphs: [
+          "Yes for most Online Store 2.0 themes that support app embeds (including Dawn). Use Cart drawer mode and set your theme cart type to Page if you want Sticky ATC’s drawer instead of the theme drawer.",
+        ],
+        links: [{ label: "Display style", href: "/app/docs/display" }],
+      },
+      {
+        id: "plans",
+        title: "What is included in Free vs Pro?",
+        paragraphs: [
+          "Free includes the sticky bar with colors and copy on desktop and mobile, with a small branding label. Pro removes branding and includes a 39-day trial.",
+        ],
+        links: [{ label: "Plan & branding", href: "/app/docs/plan" }],
+      },
+      {
+        id: "rewards",
+        title: "Can I show free shipping progress in the cart?",
+        paragraphs: [
+          "Yes. Switch Display style to Sticky Cart + Drawer, then open Tiered rewards to set milestones, icons, and progress bar design.",
+        ],
+        links: [{ label: "Tiered rewards", href: "/app/docs/rewards" }],
+      },
+      {
+        id: "bar-missing",
+        title: "The sticky bar is not showing — what should I check?",
+        paragraphs: [
+          "Confirm the App embed is on and the theme is saved, view a product page, scroll past the visibility threshold, click Save settings in the app, then hard-refresh the storefront.",
+        ],
+        links: [
+          { label: "Troubleshooting", href: "/app/docs/troubleshooting" },
+        ],
+      },
+      {
+        id: "more-help",
+        title: "Where else can I get help?",
+        paragraphs: [
+          "Browse the full documentation site, or email support@appmarka.com with your shop domain and theme name.",
+        ],
+        links: [
+          { label: "Docs home", href: "/app/docs" },
+          { label: "Troubleshooting", href: "/app/docs/troubleshooting" },
+        ],
+      },
+    ],
+    related: [
+      { slug: "getting-started", label: "Getting started" },
+      { slug: "troubleshooting", label: "Troubleshooting" },
+      { slug: "overview", label: "Overview" },
     ],
   },
 ];

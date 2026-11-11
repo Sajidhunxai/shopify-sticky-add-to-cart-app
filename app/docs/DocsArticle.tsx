@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import styles from "../styles/docs.module.css";
-import type { DocPage } from "./content";
+import type { DocImage, DocPage } from "./content";
 
 type Props = {
   page: DocPage;
@@ -16,6 +16,23 @@ function resolveDocHref(href: string, basePath: string): string {
       .replace(/^\/app$/, "/");
   }
   return href;
+}
+
+function DocFigure({ image }: { image: DocImage }) {
+  return (
+    <figure className={styles.figure}>
+      <img
+        className={styles.figureImg}
+        src={image.src}
+        alt={image.alt}
+        loading="lazy"
+        decoding="async"
+      />
+      {image.caption ? (
+        <figcaption className={styles.figureCaption}>{image.caption}</figcaption>
+      ) : null}
+    </figure>
+  );
 }
 
 export function DocsArticle({
@@ -44,6 +61,8 @@ export function DocsArticle({
         </p>
       ) : null}
 
+      {page.hero ? <DocFigure image={page.hero} /> : null}
+
       <nav className={styles.toc} aria-label="On this page">
         <p className={styles.tocTitle}>On this page</p>
         <ol className={styles.tocList}>
@@ -70,6 +89,9 @@ export function DocsArticle({
           <h2>{section.title}</h2>
           {section.paragraphs?.map((p) => (
             <p key={p.slice(0, 48)}>{p}</p>
+          ))}
+          {section.images?.map((image) => (
+            <DocFigure key={image.src + image.alt} image={image} />
           ))}
           {section.steps?.length ? (
             <ol>

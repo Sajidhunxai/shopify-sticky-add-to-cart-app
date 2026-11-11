@@ -13,7 +13,15 @@ export function DocsSidebar({ activeSlug, basePath = "/app/docs" }: Props) {
 
   return (
     <nav className={styles.sidebar} aria-label="Documentation">
-      <p className={styles.sidebarTitle}>Documentation</p>
+      <Link to={basePath} className={styles.sidebarBrand}>
+        <img
+          src="/logo.svg"
+          width={28}
+          height={28}
+          alt="Sticky Add to Cart logo"
+        />
+        <span>Documentation</span>
+      </Link>
       {DOC_GROUPS.map((group) => (
         <div key={group.title} className={styles.group}>
           <p className={styles.groupTitle}>{group.title}</p>
