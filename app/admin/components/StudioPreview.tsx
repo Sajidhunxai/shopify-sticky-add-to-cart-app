@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import styles from "../../styles/dashboard.module.css";
 import type { BarConfig } from "../../models/bar-config";
 import {
@@ -411,21 +411,46 @@ export function StudioPreview({
                           ? `linear-gradient(90deg, ${rFg}cc, ${rFg})`
                           : rFg;
                     const dotSize = middle ? 18 : 14;
+                    // Match storefront: track spans first→last equal-column icon centers
+                    const trackInsetPct = 100 / (2 * Math.max(1, tiers.length));
+                    const trackH = middle ? 6 : 6;
+                    const amountMatch = message.match(/\$[\d,.]+|\d+/);
+                    const amountLabel = amountMatch ? amountMatch[0] : "";
                     const msgEl = (
                       <p
                         style={{
                           margin:
                             config.rewardMessagePosition === "above"
-                              ? "0 0 6px"
-                              : "6px 0 0",
+                              ? "0 0 8px"
+                              : "8px 0 0",
                           fontSize: 10,
                           fontWeight: 600,
                           textAlign: "center",
                           color: rText,
-                          lineHeight: 1.3,
+                          lineHeight: 1.35,
+                          width: "100%",
+                          boxSizing: "border-box",
+                          padding: "0 2px",
                         }}
                       >
-                        {message}
+                        {amountLabel
+                          ? message
+                              .split(amountLabel)
+                              .reduce<ReactNode[]>((parts, chunk, i) => {
+                                if (i > 0) {
+                                  parts.push(
+                                    <strong
+                                      key={`amt-${i}`}
+                                      style={{ fontWeight: 800, color: rFg }}
+                                    >
+                                      {amountLabel}
+                                    </strong>,
+                                  );
+                                }
+                                parts.push(chunk);
+                                return parts;
+                              }, [])
+                          : message}
                       </p>
                     );
                     const trackEl = (
@@ -434,22 +459,23 @@ export function StudioPreview({
                           middle
                             ? {
                                 position: "absolute",
-                                left: "8%",
-                                right: "8%",
-                                top: Math.round(dotSize / 2) - 3,
-                                height: 6,
+                                left: `${trackInsetPct}%`,
+                                right: `${trackInsetPct}%`,
+                                top: Math.round(dotSize / 2) - Math.round(trackH / 2),
+                                height: trackH,
                                 borderRadius: 999,
                                 background: "rgba(0,0,0,0.08)",
                                 overflow: "hidden",
                                 zIndex: 0,
                               }
                             : {
-                                height: 6,
+                                height: trackH,
                                 borderRadius: 999,
                                 background: "rgba(0,0,0,0.08)",
                                 overflow: "hidden",
                                 marginTop: iconsBelow ? 0 : 6,
                                 marginBottom: iconsBelow ? 6 : 0,
+                                width: "100%",
                               }
                         }
                       >
@@ -467,10 +493,13 @@ export function StudioPreview({
                       <div
                         style={{
                           display: "flex",
-                          justifyContent: "space-between",
-                          gap: 4,
+                          justifyContent: "flex-start",
+                          alignItems: "flex-start",
+                          gap: 0,
                           position: "relative",
                           zIndex: 1,
+                          width: "100%",
+                          boxSizing: "border-box",
                         }}
                       >
                         {tiers.map((tier, index) => {
@@ -485,13 +514,18 @@ export function StudioPreview({
                             tier.icon === "custom" && tier.iconUrl
                               ? tier.iconUrl
                               : "";
+                          const goal = Number(tier.minAmount) || 0;
+                          const goalLabel =
+                            config.rewardCalcMode === "quantity"
+                              ? String(Math.round(goal))
+                              : `$${goal.toFixed(2)}`;
                           let dotBg = reached ? rIcon : "#fff";
                           let dotBorder = reached
                             ? `2px solid ${rIcon}`
                             : isCurrent
                               ? `2px solid ${rFg}`
                               : "2px solid rgba(0,0,0,0.15)";
-                          let dotColor = "#fff";
+                          let dotColor = reached ? "#fff" : "#9ca3af";
                           if (iconStyle === "outline") {
                             dotBg = "#fff";
                             dotBorder = `2px solid ${rIcon}`;
@@ -509,9 +543,14 @@ export function StudioPreview({
                             <div
                               key={tier.description + tier.minAmount}
                               style={{
-                                flex: 1,
+                                flex: "1 1 0",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                gap: 4,
                                 textAlign: "center",
                                 minWidth: 0,
+                                boxSizing: "border-box",
                               }}
                             >
                               {showIcons ? (
@@ -529,11 +568,15 @@ export function StudioPreview({
                                     boxShadow:
                                       reached && iconStyle === "filled"
                                         ? `0 0 0 2px ${rIcon}33`
-                                        : undefined,
+                                        : isCurrent
+                                          ? `0 0 0 2px ${rFg}33`
+                                          : undefined,
                                     color: dotColor,
                                     fontSize: 8,
                                     fontWeight: 800,
                                     overflow: "hidden",
+                                    position: "relative",
+                                    zIndex: 1,
                                   }}
                                 >
                                   {customImg ? (
@@ -567,15 +610,29 @@ export function StudioPreview({
                                 style={{
                                   fontSize: 8,
                                   fontWeight: 700,
-                                  lineHeight: 1.2,
+                                  lineHeight: 1.25,
                                   overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  whiteSpace: "nowrap",
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: "vertical",
+                                  whiteSpace: "normal",
+                                  wordBreak: "break-word",
                                   color: rText,
-                                  marginTop: showIcons ? 4 : 0,
+                                  maxWidth: "100%",
                                 }}
                               >
                                 {tier.description}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: 7,
+                                  fontWeight: 600,
+                                  lineHeight: 1.2,
+                                  opacity: 0.65,
+                                  color: rText,
+                                }}
+                              >
+                                {goalLabel}
                               </div>
                             </div>
                           );
@@ -584,19 +641,32 @@ export function StudioPreview({
                     );
                     return (
                       <div
-                        key={`rewards-${config.rewardBarLayout}-${iconPos}-${config.rewardBarStyle}-${iconStyle}-${showIcons}`}
+                        key={`rewards-${config.rewardBarLayout}-${iconPos}-${config.rewardBarStyle}-${iconStyle}-${showIcons}-${tiers.length}`}
                         style={{
                           background: rBg,
-                          padding: "8px 8px 6px",
+                          padding: "10px 10px 8px",
                           borderBottom: "1px solid rgba(0,0,0,0.06)",
                           display: "flex",
                           flexDirection: "column",
+                          alignItems: "stretch",
+                          width: "100%",
+                          boxSizing: "border-box",
                         }}
                       >
                         {config.rewardMessagePosition === "above"
                           ? msgEl
                           : null}
-                        <div style={{ position: "relative" }}>
+                        <div
+                          style={{
+                            position: "relative",
+                            width: "100%",
+                            maxWidth: "100%",
+                            margin: "0 auto",
+                            boxSizing: "border-box",
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
+                        >
                           {middle ? (
                             <>
                               {trackEl}

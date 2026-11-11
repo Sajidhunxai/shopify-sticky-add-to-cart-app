@@ -125,6 +125,10 @@
     if (!rewardShowIcons) {
       rewardRoot.classList.add("satc-slider__rewards--icons-off");
     }
+    rewardRoot.style.setProperty(
+      "--satc-tier-count",
+      String(Math.max(1, activeTiers.length || 4)),
+    );
   }
   const ICONS = {
     truck: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 7h11v8H3V7zm12 2h3.2L21 12.5V15h-6V9zM6.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm10 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>`,
@@ -649,6 +653,12 @@
     }
 
     const pct = Math.round(rewardProgressPct(progressValue, activeTiers));
+    if (rewardRoot) {
+      rewardRoot.style.setProperty(
+        "--satc-tier-count",
+        String(Math.max(1, activeTiers.length)),
+      );
+    }
     if (rewardBarEl) {
       const prev = Number(rewardBarEl.dataset.pct || 0);
       rewardBarEl.style.width = `${pct}%`;
