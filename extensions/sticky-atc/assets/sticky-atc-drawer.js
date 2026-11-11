@@ -138,7 +138,7 @@
   }
   const ICONS = {
     truck: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 7h11v8H3V7zm12 2h3.2L21 12.5V15h-6V9zM6.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm10 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>`,
-    gift: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3c2.2 0 3.5 1.5 3.5 3.2 0 .5-.1 1-.3 1.4H18l1 12H5L6 7.6h2.8c-.2-.4-.3-.9-.3-1.4C8.5 4.5 9.8 3 12 3zm0 1.6c-1.1 0-1.8.7-1.8 1.6S10.9 7.8 12 7.8s1.8-.7 1.8-1.6S13.1 4.6 12 4.6z"/></svg>`,
+    gift: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 7h-2.26A3.5 3.5 0 0 0 12 3.05 3.5 3.5 0 0 0 6.26 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9h1a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1ZM9.5 5.5a1.5 1.5 0 1 1 0 3H8.26a1.5 1.5 0 0 1 1.24-3Zm5 0a1.5 1.5 0 0 1 1.24 3H14.5a1.5 1.5 0 1 1 0-3ZM6 19v-7h5v7H6Zm12 0h-5v-7h5v7Z"/></svg>`,
     percent: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.5 2.1 21.9 11.5 12.5 20.9 3.1 11.5 12.5 2.1zm-1.4 5.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm4.4 4.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.2 15.3l5.6-5.6 1.1 1.1-5.6 5.6-1.1-1.1z"/></svg>`,
     star: `<svg class="satc-slider__reward-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 2.8 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8l5-.7L12 2.8z"/></svg>`,
     check: `<svg class="satc-slider__reward-icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M6.2 11.4 2.8 8l1.2-1.2 2.2 2.2 5-5L12.4 5.2z"/></svg>`,
@@ -157,10 +157,19 @@
   };
   const rewardTypeIcon = (tier, _reached) => {
     if (!rewardShowIcons) return "";
-    // Always render the merchant-selected icon (reached state is shown via CSS fill)
+    // Custom PNG/SVG from Shopify Files — prefer whenever a URL is present
+    const customUrl = String(tier.iconUrl || "").trim();
+    if (customUrl) {
+      return `<img class="satc-slider__reward-icon-img" src="${escapeHtml(customUrl)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">`;
+    }
     const key = resolveTierIconKey(tier);
-    if (key === "custom" && tier.iconUrl) {
-      return `<img class="satc-slider__reward-icon-img" src="${escapeHtml(tier.iconUrl)}" alt="" width="16" height="16" loading="lazy">`;
+    if (key === "custom") {
+      // Selected custom but no URL yet — fall back by reward type
+      const type = tier.rewardType || "custom";
+      if (type === "shipping") return ICONS.truck;
+      if (type === "discount") return ICONS.percent;
+      if (type === "product") return ICONS.gift;
+      return ICONS.star;
     }
     return ICONS[key] || ICONS.star;
   };

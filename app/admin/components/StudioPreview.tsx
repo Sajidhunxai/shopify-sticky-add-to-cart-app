@@ -64,7 +64,7 @@ function PreviewRewardIcon({
       <svg {...common}>
         <path
           fill={stroke}
-          d="M12 3c2.2 0 3.5 1.5 3.5 3.2 0 .5-.1 1-.3 1.4H18l1 12H5L6 7.6h2.8c-.2-.4-.3-.9-.3-1.4C8.5 4.5 9.8 3 12 3zm0 1.6c-1.1 0-1.8.7-1.8 1.6S10.9 7.8 12 7.8s1.8-.7 1.8-1.6S13.1 4.6 12 4.6z"
+          d="M20 7h-2.26A3.5 3.5 0 0 0 12 3.05 3.5 3.5 0 0 0 6.26 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9h1a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1ZM9.5 5.5a1.5 1.5 0 1 1 0 3H8.26a1.5 1.5 0 0 1 1.24-3Zm5 0a1.5 1.5 0 0 1 1.24 3H14.5a1.5 1.5 0 1 1 0-3ZM6 19v-7h5v7H6Zm12 0h-5v-7h5v7Z"
         />
       </svg>
     );
@@ -495,7 +495,7 @@ export function StudioPreview({
                       tiers,
                       previewValue,
                     );
-                    // Match storefront theme-color resolution (button/accent, not fake indigo)
+                    // Match storefront: theme affects bg/progress/text; icon color stays merchant-picked
                     const themeAccent =
                       config.buttonBackground || config.accentColor || "#111111";
                     const rBg = config.rewardUseThemeColors
@@ -504,9 +504,7 @@ export function StudioPreview({
                     const rFg = config.rewardUseThemeColors
                       ? themeAccent
                       : config.rewardFg;
-                    const rIcon = config.rewardUseThemeColors
-                      ? themeAccent
-                      : config.rewardIconColor;
+                    const rIcon = config.rewardIconColor || "#79be30";
                     const rText = config.rewardUseThemeColors
                       ? config.inheritThemeTextColor
                         ? "#111111"
@@ -526,8 +524,10 @@ export function StudioPreview({
                         : config.rewardBarStyle === "gradient"
                           ? `linear-gradient(90deg, ${rFg}cc, ${rFg})`
                           : rFg;
-                    // Live middle dots are 30px in a ~380px drawer; preview ~320px → ~26px
-                    const dotSize = middle ? 26 : 18;
+                    const dotSize = Math.min(
+                      40,
+                      Math.max(12, Number(config.rewardIconSize) || 28),
+                    );
                     // Match storefront: track spans first→last equal-column icon centers
                     const trackInsetPct = 100 / (2 * Math.max(1, tiers.length));
                     const trackH = middle ? 8 : 8;
@@ -627,10 +627,7 @@ export function StudioPreview({
                               previewValue < (Number(t.minAmount) || 0),
                           );
                           const isCurrent = !reached && index === nextIndex;
-                          const customImg =
-                            tier.icon === "custom" && tier.iconUrl
-                              ? tier.iconUrl
-                              : "";
+                          const customImg = String(tier.iconUrl || "").trim();
                           const goal = Number(tier.minAmount) || 0;
                           const goalLabel =
                             config.rewardCalcMode === "quantity"
@@ -709,8 +706,8 @@ export function StudioPreview({
                                     <img
                                       src={customImg}
                                       alt=""
-                                      width={14}
-                                      height={14}
+                                      width={Math.round(dotSize * 0.62)}
+                                      height={Math.round(dotSize * 0.62)}
                                       style={{ objectFit: "contain" }}
                                     />
                                   ) : (
@@ -756,7 +753,7 @@ export function StudioPreview({
                     );
                     return (
                       <div
-                        key={`rewards-${config.rewardBarLayout}-${iconPos}-${config.rewardBarStyle}-${iconStyle}-${showIcons}-${tiers.length}`}
+                        key={`rewards-${config.rewardBarLayout}-${iconPos}-${config.rewardBarStyle}-${iconStyle}-${showIcons}-${tiers.length}-${dotSize}-${rIcon}`}
                         style={{
                           background: rBg,
                           padding: "12px 12px 10px",

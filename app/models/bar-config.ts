@@ -263,6 +263,8 @@ export type BarConfig = {
   rewardIconStyle: RewardIconStyle;
   /** Icon placement vs the progress line */
   rewardIconPosition: RewardIconPosition;
+  /** Milestone icon diameter in px (dot size) */
+  rewardIconSize: number;
   discountEnabled: boolean;
   discountPlaceholder: string;
   discountButtonText: string;
@@ -378,6 +380,7 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   rewardShowIcons: true,
   rewardIconStyle: "filled",
   rewardIconPosition: "outside-top",
+  rewardIconSize: 28,
   rewardTiers: [
     {
       enabled: true,
@@ -750,6 +753,16 @@ export function parseBarConfig(raw: string | null | undefined): BarConfig {
           : Boolean(parsed.rewardShowIcons),
       rewardIconStyle: asRewardIconStyle(parsed.rewardIconStyle),
       rewardIconPosition: asRewardIconPosition(parsed.rewardIconPosition),
+      rewardIconSize: Math.min(
+        48,
+        Math.max(
+          14,
+          Math.round(
+            Number(parsed.rewardIconSize ?? DEFAULT_BAR_CONFIG.rewardIconSize) ||
+              DEFAULT_BAR_CONFIG.rewardIconSize,
+          ),
+        ),
+      ),
       customCss: String(parsed.customCss || "").slice(0, 24_000),
       featureTemplates: normalizeFeatureTemplates(parsed.featureTemplates),
     };
@@ -1169,6 +1182,16 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
     rewardIconStyle: asRewardIconStyle(formData.get("rewardIconStyle")),
     rewardIconPosition: asRewardIconPosition(
       formData.get("rewardIconPosition"),
+    ),
+    rewardIconSize: Math.min(
+      48,
+      Math.max(
+        14,
+        Math.round(
+          Number(formData.get("rewardIconSize")) ||
+            DEFAULT_BAR_CONFIG.rewardIconSize,
+        ),
+      ),
     ),
     discountEnabled: asBool(
       formData.get("discountEnabled"),

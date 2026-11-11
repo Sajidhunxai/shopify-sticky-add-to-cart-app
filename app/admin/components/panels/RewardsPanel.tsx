@@ -62,7 +62,7 @@ export function RewardsPanel({
     ? mixWithWhite(themeAccent, 0.82)
     : config.rewardBg;
   const previewFg = themeOn ? themeAccent : config.rewardFg;
-  const previewIcon = themeOn ? themeAccent : config.rewardIconColor;
+  const previewIcon = config.rewardIconColor;
   const previewText = themeOn
     ? config.inheritThemeTextColor
       ? "#111111"
@@ -313,14 +313,6 @@ export function RewardsPanel({
               }}
             />
             <s-color-field
-              label="Reward tier icon"
-              value={config.rewardIconColor}
-              onChange={(e: Event) => {
-                const value = colorFromEvent(e);
-                if (value) updateConfig("rewardIconColor", value);
-              }}
-            />
-            <s-color-field
               label="Message text"
               value={config.rewardTextColor}
               onChange={(e: Event) => {
@@ -331,6 +323,16 @@ export function RewardsPanel({
           </s-grid>
         </>
       )}
+
+      <s-color-field
+        label="Icon color"
+        value={config.rewardIconColor}
+        details="Applies to built-in SVG icons (PNG uploads keep their own colors)."
+        onChange={(e: Event) => {
+          const value = colorFromEvent(e);
+          if (value) updateConfig("rewardIconColor", value);
+        }}
+      />
 
       <s-text-field
         label="Text after completing full rewards bar"
@@ -463,6 +465,25 @@ export function RewardsPanel({
         <s-option value="outside-top">Outside — top</s-option>
         <s-option value="outside-bottom">Outside — bottom</s-option>
       </s-select>
+      <s-number-field
+        label="Icon size (px)"
+        value={String(config.rewardIconSize ?? 28)}
+        min={14}
+        max={48}
+        details="Diameter of each milestone circle (14–48)."
+        onChange={(e: Event) =>
+          updateConfig(
+            "rewardIconSize",
+            Math.min(
+              48,
+              Math.max(
+                14,
+                Number((e.currentTarget as HTMLInputElement).value) || 28,
+              ),
+            ),
+          )
+        }
+      />
       <s-select
         label="Icon style"
         value={config.rewardIconStyle}
@@ -633,47 +654,61 @@ export function RewardsPanel({
             ))}
           </div>
           {(tier.icon || "auto") === "custom" && (
-            <div className={styles.rewardProductRow}>
-              {tier.iconUrl ? (
-                <>
-                  <img
-                    src={tier.iconUrl}
-                    alt=""
-                    width={36}
-                    height={36}
-                    style={{
-                      objectFit: "contain",
-                      borderRadius: 8,
-                      background: "#f3f4f6",
-                    }}
-                  />
-                  <div className={styles.rewardProductMeta}>
-                    <strong>Shopify Files icon</strong>
-                    <span>{tier.iconUrl}</span>
-                  </div>
-                  <s-button
-                    variant="tertiary"
-                    onClick={pickShopifyFile}
-                    disabled={fileBusy}
-                  >
-                    {fileBusy ? "Loading…" : "Change"}
+            <s-stack gap="base">
+              <div className={styles.rewardProductRow}>
+                {tier.iconUrl ? (
+                  <>
+                    <img
+                      src={tier.iconUrl}
+                      alt=""
+                      width={36}
+                      height={36}
+                      style={{
+                        objectFit: "contain",
+                        borderRadius: 8,
+                        background: "#f3f4f6",
+                      }}
+                    />
+                    <div className={styles.rewardProductMeta}>
+                      <strong>Custom icon</strong>
+                      <span>{tier.iconUrl}</span>
+                    </div>
+                    <s-button
+                      variant="tertiary"
+                      onClick={pickShopifyFile}
+                      disabled={fileBusy}
+                    >
+                      {fileBusy ? "Loading…" : "Change file"}
+                    </s-button>
+                    <s-button
+                      variant="tertiary"
+                      tone="critical"
+                      onClick={clearCustomIcon}
+                    >
+                      Remove
+                    </s-button>
+                  </>
+                ) : (
+                  <s-button onClick={pickShopifyFile} disabled={fileBusy}>
+                    {fileBusy
+                      ? "Loading…"
+                      : "+ Upload or choose from Shopify Files"}
                   </s-button>
-                  <s-button
-                    variant="tertiary"
-                    tone="critical"
-                    onClick={clearCustomIcon}
-                  >
-                    Remove
-                  </s-button>
-                </>
-              ) : (
-                <s-button onClick={pickShopifyFile} disabled={fileBusy}>
-                  {fileBusy
-                    ? "Loading…"
-                    : "+ Upload or choose from Shopify Files"}
-                </s-button>
-              )}
-            </div>
+                )}
+              </div>
+              <s-text-field
+                label="Or paste image URL (PNG / SVG / JPG)"
+                value={tier.iconUrl || ""}
+                details="After picking a file or pasting a URL, click Save to publish to the storefront."
+                onChange={(e: Event) => {
+                  const url = (e.currentTarget as HTMLInputElement).value.trim();
+                  updateRewardTier(activeTier, {
+                    icon: "custom",
+                    iconUrl: url,
+                  });
+                }}
+              />
+            </s-stack>
           )}
           {fileError ? (
             <s-banner tone="critical">{fileError}</s-banner>
