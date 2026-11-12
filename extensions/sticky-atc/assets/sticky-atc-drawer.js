@@ -1048,36 +1048,59 @@
     return isDesktop() ? deskOk : mobOk;
   };
 
+  const backdropOpacityCss = () => {
+    const raw = Number(slider.dataset.backdropOpacity);
+    if (!Number.isFinite(raw)) return 0.45;
+    if (raw > 1) return Math.min(1, Math.max(0, raw / 100));
+    return Math.min(1, Math.max(0, raw));
+  };
+
+  const paintBackdrop = () => {
+    const backdrop = slider.querySelector("[data-satc-backdrop]");
+    if (!(backdrop instanceof HTMLElement)) return;
+    const blurOn = slider.dataset.backdropBlur !== "false";
+    const opacity = backdropOpacityCss();
+    if (blurOn) {
+      backdrop.classList.add("satc-slider__backdrop--blur");
+    } else {
+      backdrop.classList.remove("satc-slider__backdrop--blur");
+    }
+    backdrop.style.setProperty("--satc-backdrop-opacity", String(opacity));
+    backdrop.style.setProperty(
+      "position",
+      "fixed",
+      "important",
+    );
+    backdrop.style.setProperty("inset", "0", "important");
+    backdrop.style.setProperty("width", "100vw", "important");
+    backdrop.style.setProperty("height", "100dvh", "important");
+    backdrop.style.setProperty("z-index", "0", "important");
+    backdrop.style.setProperty("opacity", "1", "important");
+    backdrop.style.setProperty("visibility", "visible", "important");
+    backdrop.style.setProperty("display", "block", "important");
+    backdrop.style.setProperty(
+      "background",
+      `rgba(17, 17, 17, ${opacity})`,
+      "important",
+    );
+    const blurValue = blurOn ? "blur(16px) saturate(140%)" : "none";
+    backdrop.style.setProperty("backdrop-filter", blurValue, "important");
+    backdrop.style.setProperty("-webkit-backdrop-filter", blurValue, "important");
+  };
+
   const openSlider = async () => {
     if (!slider) return;
     if (!drawerAllowedOnDevice()) return;
     if (slider.parentElement !== document.body) {
       document.body.appendChild(slider);
     }
-    const backdrop = slider.querySelector("[data-satc-backdrop]");
-    if (backdrop instanceof HTMLElement) {
-      if (
-        slider.dataset.backdropBlur !== "false" &&
-        !backdrop.classList.contains("satc-slider__backdrop--blur")
-      ) {
-        backdrop.classList.add("satc-slider__backdrop--blur");
-      }
-      // Re-assert blur in case theme CSS stripped the stylesheet rule
-      if (slider.dataset.backdropBlur !== "false") {
-        backdrop.style.setProperty(
-          "backdrop-filter",
-          "blur(16px) saturate(140%)",
-          "important",
-        );
-        backdrop.style.setProperty(
-          "-webkit-backdrop-filter",
-          "blur(16px) saturate(140%)",
-          "important",
-        );
-      }
-    }
+    paintBackdrop();
+    document.documentElement.classList.add("satc-drawer-open");
     slider.hidden = false;
-    requestAnimationFrame(() => slider.classList.add("is-open"));
+    requestAnimationFrame(() => {
+      paintBackdrop();
+      slider.classList.add("is-open");
+    });
     startAnnouncementTimer();
     await refreshSlider();
   };
@@ -1085,6 +1108,7 @@
   const closeSlider = () => {
     if (!slider) return;
     slider.classList.remove("is-open");
+    document.documentElement.classList.remove("satc-drawer-open");
     setTimeout(() => {
       slider.hidden = true;
     }, 280);

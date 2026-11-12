@@ -28,7 +28,8 @@
     data-satc-slider
     data-satc-boot
     data-display-mode="slider"
-    data-backdrop-blur="{% if satc_backdrop_blur == true or satc_backdrop_blur == 'true' %}true{% else %}false{% endif %}"
+    data-backdrop-blur="{% if satc_backdrop_blur == false or satc_backdrop_blur == 'false' %}false{% else %}true{% endif %}"
+    data-backdrop-opacity="{% if satc_backdrop_opacity != blank %}{{ satc_backdrop_opacity }}{% else %}45{% endif %}"
     data-drawer-desktop="{% if satc_drawer_desktop == true or satc_drawer_desktop == 'true' %}true{% else %}false{% endif %}"
     data-drawer-mobile="{% if satc_drawer_mobile == true or satc_drawer_mobile == 'true' %}true{% else %}false{% endif %}"
     data-drawer-anim="{{ satc_drawer_anim | escape }}"
@@ -126,17 +127,22 @@
     <script type="application/json" data-satc-rec-products-cfg>
       {% if satc_rec_products_cfg != blank %}{{ satc_rec_products_cfg | json }}{% else %}[]{% endif %}
     </script>
-    {%- assign satc_bd_op = satc_backdrop_opacity | default: 45 | times: 1.0 -%}
+    {%- assign satc_bd_op = satc_backdrop_opacity | default: 45 | plus: 0 -%}
     {%- if satc_bd_op > 1 -%}
-      {%- assign satc_bd_op_css = satc_bd_op | divided_by: 100.0 -%}
+      {%- comment -%} times 0.01 avoids Liquid integer divided_by truncating to 0 {%- endcomment -%}
+      {%- assign satc_bd_op_css = satc_bd_op | times: 0.01 -%}
     {%- else -%}
       {%- assign satc_bd_op_css = satc_bd_op -%}
     {%- endif -%}
+    {%- assign satc_blur_on = true -%}
+    {%- if satc_backdrop_blur == false or satc_backdrop_blur == 'false' -%}
+      {%- assign satc_blur_on = false -%}
+    {%- endif -%}
     <div
-      class="satc-slider__backdrop{% if satc_backdrop_blur == true or satc_backdrop_blur == 'true' %} satc-slider__backdrop--blur{% endif %}"
+      class="satc-slider__backdrop{% if satc_blur_on %} satc-slider__backdrop--blur{% endif %}"
       data-satc-slider-close
       data-satc-backdrop
-      style="--satc-backdrop-opacity: {{ satc_bd_op_css }}; background: rgba(17, 17, 17, {{ satc_bd_op_css }}) !important;{% if satc_backdrop_blur == true or satc_backdrop_blur == 'true' %} backdrop-filter: blur(16px) saturate(140%) !important; -webkit-backdrop-filter: blur(16px) saturate(140%) !important;{% endif %}"
+      style="--satc-backdrop-opacity: {{ satc_bd_op_css }}; background: rgba(17, 17, 17, {{ satc_bd_op_css }}) !important;{% if satc_blur_on %} backdrop-filter: blur(16px) saturate(140%) !important; -webkit-backdrop-filter: blur(16px) saturate(140%) !important;{% endif %}"
     ></div>
     <aside
       class="satc-slider__panel satc-slider__panel--hdr-{{ satc_hdr_h }} satc-slider__panel--close-{{ satc_close_side }} satc-slider__panel--close-size-{{ satc_close_size }} satc-slider__panel--close-border-{{ satc_close_border }}{% if satc_hdr_border == 'thin' %} satc-slider__panel--hdr-border{% endif %}"

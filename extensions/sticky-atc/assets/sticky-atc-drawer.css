@@ -21,19 +21,38 @@
 }
 
 .satc-slider__backdrop {
-  position: absolute !important;
+  /* fixed + viewport units: theme transforms on ancestors cannot clip this */
+  position: fixed !important;
   inset: 0 !important;
-  z-index: 0;
-  width: 100% !important;
-  height: 100% !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  transform: none !important;
+  filter: none !important;
+  pointer-events: auto !important;
   background: rgba(17, 17, 17, var(--satc-backdrop-opacity, 0.45)) !important;
-  pointer-events: auto;
 }
 
 .satc-slider__backdrop--blur,
 .satc-slider[data-backdrop-blur="true"] .satc-slider__backdrop {
   backdrop-filter: blur(16px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+}
+
+.satc-slider[data-backdrop-blur="false"] .satc-slider__backdrop {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .satc-slider__panel {
