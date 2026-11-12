@@ -524,5 +524,22 @@
       "trust": "Badge di fiducia",
       "footer": "Footer / checkout"
     }
+  },
+  "contentDefaults": {
+    "addToCart": "Aggiungi al carrello",
+    "soldOut": "Esaurito",
+    "drawerTitle": "IL TUO CARRELLO ({{cart_quantity}})",
+    "checkout": "Checkout",
+    "reservedFor": "I tuoi prodotti sono riservati per {timer}!",
+    "freeShippingUnlocked": "Spedizione gratuita sbloccata!",
+    "youMayAlsoLike": "Potrebbe piacerti anche",
+    "add": "Aggiungi",
+    "addFavorites": "Aggiungi i tuoi articoli preferiti al carrello.",
+    "discountCode": "Codice sconto",
+    "apply": "Applica",
+    "trustDefault": "Checkout sicuro · Resi gratuiti · Assistenza 24/7"
+  },
+  "language": {
+    "hint": "Lingua admin. Lo storefront segue la lingua del negozio; i testi predefiniti si traducono finché non li personalizzi."
   }
 }

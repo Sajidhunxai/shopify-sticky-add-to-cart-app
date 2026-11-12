@@ -7,6 +7,7 @@
     "added": "Added ✓",
     "try_again": "Try again",
     "your_cart": "Your cart",
+    "your_cart_count": "YOUR CART ({{cart_quantity}})",
     "cart_empty": "Your cart is empty",
     "subtotal": "Subtotal",
     "checkout": "Checkout",
@@ -23,6 +24,24 @@
     "update_failed": "Couldn’t update cart",
     "add_failed": "Couldn’t add to cart",
     "add_success": "Added to cart",
-    "unavailable": "This product is unavailable"
+    "unavailable": "This product is unavailable",
+    "you_may_also_like": "You may also like",
+    "add": "Add",
+    "shop_now": "Shop now",
+    "discount_code": "Discount code",
+    "apply": "Apply",
+    "reserved_for": "Your products are reserved for {timer}!",
+    "free_shipping_unlocked": "Free shipping unlocked!",
+    "add_favorites": "Add your favorite items to your cart.",
+    "trust_default": "Secure checkout · Free returns · 24/7 support",
+    "tier_free_shipping": "Free Shipping",
+    "tier_free_express": "Free Express",
+    "tier_free_gift": "Free Gift",
+    "tier_vip_reward": "VIP Reward",
+    "away_free_shipping": "You're [AMOUNT] away from free shipping!",
+    "away_free_express": "You're [AMOUNT] away from free express shipping!",
+    "away_free_gift": "You're [AMOUNT] away from a free gift!",
+    "away_vip_reward": "You're [AMOUNT] away from VIP reward!",
+    "away_generic": "You're [AMOUNT] away!"
   }
 }

@@ -23,6 +23,25 @@
     "unavailable": "Este producto no está disponible",
     "removed": "Eliminado del carrito",
     "updated": "Carrito actualizado",
-    "updating": "Actualizando…"
+    "updating": "Actualizando…",
+    "your_cart_count": "TU CARRITO ({{cart_quantity}})",
+    "you_may_also_like": "También te puede gustar",
+    "add": "Añadir",
+    "shop_now": "Comprar ahora",
+    "discount_code": "Código de descuento",
+    "apply": "Aplicar",
+    "reserved_for": "¡Tus productos están reservados por {timer}!",
+    "free_shipping_unlocked": "¡Envío gratis desbloqueado!",
+    "add_favorites": "Añade tus productos favoritos al carrito.",
+    "trust_default": "Pago seguro · Devoluciones gratis · Soporte 24/7",
+    "tier_free_shipping": "Envío gratis",
+    "tier_free_express": "Express gratis",
+    "tier_free_gift": "Regalo gratis",
+    "tier_vip_reward": "Recompensa VIP",
+    "away_free_shipping": "¡Te faltan [AMOUNT] para el envío gratis!",
+    "away_free_express": "¡Te faltan [AMOUNT] para el envío express gratis!",
+    "away_free_gift": "¡Te faltan [AMOUNT] para un regalo gratis!",
+    "away_vip_reward": "¡Te faltan [AMOUNT] para la recompensa VIP!",
+    "away_generic": "¡Te faltan [AMOUNT]!"
   }
 }

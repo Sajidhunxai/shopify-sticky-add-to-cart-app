@@ -524,5 +524,22 @@
       "trust": "信頼バッジ",
       "footer": "フッター／チェックアウト"
     }
+  },
+  "contentDefaults": {
+    "addToCart": "カートに追加",
+    "soldOut": "売り切れ",
+    "drawerTitle": "カート ({{cart_quantity}})",
+    "checkout": "レジに進む",
+    "reservedFor": "商品はあと {timer} 確保されています！",
+    "freeShippingUnlocked": "送料無料が適用されました！",
+    "youMayAlsoLike": "こちらもおすすめ",
+    "add": "追加",
+    "addFavorites": "お気に入りの商品をカートに追加しましょう。",
+    "discountCode": "割引コード",
+    "apply": "適用",
+    "trustDefault": "安全な決済 · 返品無料 · 年中無休サポート"
+  },
+  "language": {
+    "hint": "管理画面の言語です。ストアフロントはショップ言語に従います。未カスタムの初期テキストは自動翻訳されます。"
   }
 }

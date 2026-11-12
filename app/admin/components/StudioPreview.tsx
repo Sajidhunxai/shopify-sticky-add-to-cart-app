@@ -13,6 +13,7 @@ import {
 } from "../preview/reward-progress";
 import { renderRewardsCustomPreview } from "../preview/reward-template";
 import { renderMustache, sanitizeFeatureHtml } from "../preview/mustache";
+import { previewCopy } from "../preview/localized-copy";
 
 function mixHexWithWhite(hex: string, whiteRatio = 0.82): string {
   const raw = String(hex || "#111111").replace("#", "");
@@ -186,6 +187,7 @@ function hexToRgba(hex: string, opacityPct: number) {
 
 export function StudioPreview() {
   const t = useI18nStore((s) => s.t);
+  const locale = useI18nStore((s) => s.locale);
   const config = useStudioStore((s) => s.config);
   const showDrawerPreview = useStudioStore((s) => s.showDrawerPreview());
   const showEmptyPreview = useStudioStore((s) => s.showEmptyPreview());
@@ -195,6 +197,7 @@ export function StudioPreview() {
   const hideBranding = useSessionStore((s) => s.hideBranding);
   const onShowDrawerChange = setPreviewDrawerManual;
   const onShowEmptyChange = setPreviewEmpty;
+  const copy = previewCopy(t);
   const previewBg =
     config.backgroundStyle === "gradient"
       ? `linear-gradient(135deg, ${hexToRgba(config.backgroundColor, config.backgroundOpacity)}, ${hexToRgba(config.backgroundColor, Math.max(40, config.backgroundOpacity - 25))})`
@@ -229,7 +232,11 @@ export function StudioPreview() {
   };
 
   return (
-    <aside className={styles.studioPreview} aria-label={t("preview.livePreview")}>
+    <aside
+      key={locale}
+      className={styles.studioPreview}
+      aria-label={t("preview.livePreview")}
+    >
       <div className={styles.previewShell}>
         <div className={styles.previewChrome}>
           <span className={styles.previewDot} />
@@ -306,7 +313,7 @@ export function StudioPreview() {
                   : "none",
               }}
             >
-              {config.buttonText}
+              {copy.buttonText(config.buttonText)}
             </div>
           ) : (
             <div
@@ -384,7 +391,7 @@ export function StudioPreview() {
                       : undefined,
                 }}
               >
-                {config.buttonText}
+                {copy.buttonText(config.buttonText)}
               </button>
             </div>
           )}
@@ -449,7 +456,7 @@ export function StudioPreview() {
                     }}
                   >
                     {(
-                      config.drawerTitle || "YOUR CART ({{cart_quantity}})"
+                      copy.drawerTitle(config.drawerTitle)
                     ).replace(
                       /\{\{\s*cart_quantity\s*\}\}/gi,
                       showEmptyPreview ? "0" : "1",
@@ -475,7 +482,7 @@ export function StudioPreview() {
                         textAlign: "center",
                       }}
                     >
-                      {config.announcementText.replace(
+                      {copy.announcementText(config.announcementText).replace(
                         /\{timer\}|\{\{\s*timer\s*\}\}/gi,
                         config.announcementTimer || "15:00",
                       )}
@@ -597,6 +604,12 @@ export function StudioPreview() {
                       config,
                       tiers,
                       previewValue,
+                      {
+                        completeText: copy.rewardCompleteText(
+                          config.rewardCompleteText,
+                        ),
+                        localizeTitleBefore: copy.tierTitleBefore,
+                      },
                     );
                     // Match storefront: theme affects bg/progress/text; icon color stays merchant-picked
                     const themeAccent =
@@ -836,7 +849,7 @@ export function StudioPreview() {
                                   maxWidth: "100%",
                                 }}
                               >
-                                {tier.description}
+                                {copy.tierDescription(tier.description)}
                               </div>
                               <div
                                 style={{
@@ -928,7 +941,7 @@ export function StudioPreview() {
                         color: config.textColor,
                       }}
                     >
-                      {config.recommendationsEmptyText}
+                      {copy.recommendationsEmptyText(config.recommendationsEmptyText)}
                     </p>
                     {config.recommendationsShopNowEnabled && (
                       <div
@@ -958,7 +971,7 @@ export function StudioPreview() {
                             color: config.textColor,
                           }}
                         >
-                          {config.recommendationsHeader}
+                          {copy.recommendationsHeader(config.recommendationsHeader)}
                         </strong>
                         {Array.from({
                           length: Math.min(3, config.recommendationsMax),
@@ -993,7 +1006,9 @@ export function StudioPreview() {
                                   color: config.textColor,
                                 }}
                               >
-                                Recommended product {i + 1}
+                                {t("preview.recommendedProduct", {
+                                  n: String(i + 1),
+                                })}
                               </p>
                               <span
                                 style={{
@@ -1014,7 +1029,7 @@ export function StudioPreview() {
                                 color: config.buttonTextColor,
                               }}
                             >
-                              {config.recommendationsAddText}
+                              {copy.recommendationsAddText(config.recommendationsAddText)}
                             </span>
                           </div>
                         ))}
@@ -1270,7 +1285,7 @@ export function StudioPreview() {
                                 color: config.textColor,
                               }}
                             >
-                              {config.recommendationsHeader}
+                              {copy.recommendationsHeader(config.recommendationsHeader)}
                             </strong>
                             {Array.from({
                               length: Math.min(2, config.recommendationsMax),
@@ -1305,7 +1320,9 @@ export function StudioPreview() {
                                       color: config.textColor,
                                     }}
                                   >
-                                    Recommended {i + 1}
+                                    {t("preview.recommendedShort", {
+                                      n: String(i + 1),
+                                    })}
                                   </p>
                                   <span
                                     style={{
@@ -1326,7 +1343,7 @@ export function StudioPreview() {
                                     color: config.buttonTextColor,
                                   }}
                                 >
-                                  {config.recommendationsAddText}
+                                  {copy.recommendationsAddText(config.recommendationsAddText)}
                                 </span>
                               </div>
                             ))}
@@ -1347,7 +1364,7 @@ export function StudioPreview() {
                         textAlign: "center",
                       }}
                     >
-                      {config.announcementText.replace(
+                      {copy.announcementText(config.announcementText).replace(
                         /\{timer\}|\{\{\s*timer\s*\}\}/gi,
                         config.announcementTimer || "15:00",
                       )}
@@ -1355,6 +1372,40 @@ export function StudioPreview() {
                   )}
                 {!showEmptyPreview && (
                   <div className={styles.previewSliderFooter}>
+                    {config.discountEnabled && (
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          marginBottom: 8,
+                        }}
+                      >
+                        <span
+                          style={{
+                            flex: 1,
+                            border: "1px solid rgba(0,0,0,0.12)",
+                            borderRadius: 8,
+                            padding: "6px 8px",
+                            fontSize: 10,
+                            color: "#9ca3af",
+                          }}
+                        >
+                          {copy.discountPlaceholder(config.discountPlaceholder)}
+                        </span>
+                        <span
+                          style={{
+                            borderRadius: 8,
+                            padding: "6px 10px",
+                            fontSize: 10,
+                            fontWeight: 650,
+                            background: config.buttonBackground,
+                            color: config.buttonTextColor,
+                          }}
+                        >
+                          {copy.discountButtonText(config.discountButtonText)}
+                        </span>
+                      </div>
+                    )}
                     <div style={{ color: config.textColor }}>
                       <span>{t("preview.subtotal")}</span>
                       <strong>$68.00</strong>
@@ -1367,8 +1418,21 @@ export function StudioPreview() {
                         borderRadius: `${config.buttonRadius}px`,
                       }}
                     >
-                      {config.drawerCheckoutText || t("preview.checkout")}
+                      {copy.drawerCheckoutText(config.drawerCheckoutText)}
                     </div>
+                    {config.trustBadgesEnabled && (
+                      <p
+                        style={{
+                          margin: "8px 0 0",
+                          fontSize: 9,
+                          textAlign: "center",
+                          opacity: 0.7,
+                          color: config.textColor,
+                        }}
+                      >
+                        {copy.trustBadgesText(config.trustBadgesText)}
+                      </p>
+                    )}
                   </div>
                 )}
                 {(config.toastShowSuccess ||

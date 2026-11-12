@@ -32,29 +32,34 @@ export function useI18n() {
 export function LanguageSelect({ className }: { className?: string }) {
   const { locale, setLocale, locales, localeLabels, t } = useI18n();
   return (
-    <label
+    <div
       className={className}
-      style={{ display: "inline-flex", gap: 8, alignItems: "center" }}
+      style={{ display: "inline-flex", flexDirection: "column", gap: 4 }}
     >
-      <span style={{ fontSize: 12, fontWeight: 650 }}>{t("app.language")}</span>
-      <select
-        value={locale}
-        onChange={(e) => setLocale(normalizeLocale(e.target.value))}
-        style={{
-          font: "inherit",
-          fontSize: 13,
-          padding: "6px 8px",
-          borderRadius: 8,
-          border: "1px solid rgba(0,0,0,0.14)",
-          background: "#fff",
-        }}
-      >
-        {locales.map((code) => (
-          <option key={code} value={code}>
-            {localeLabels[code]}
-          </option>
-        ))}
-      </select>
-    </label>
+      <label style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+        <span style={{ fontSize: 12, fontWeight: 650 }}>{t("app.language")}</span>
+        <select
+          value={locale}
+          onChange={(e) => setLocale(normalizeLocale(e.target.value))}
+          style={{
+            font: "inherit",
+            fontSize: 13,
+            padding: "6px 8px",
+            borderRadius: 8,
+            border: "1px solid rgba(0,0,0,0.14)",
+            background: "#fff",
+          }}
+        >
+          {locales.map((code) => (
+            <option key={code} value={code}>
+              {localeLabels[code]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <span style={{ fontSize: 11, color: "#6b7280", maxWidth: 420 }}>
+        {t("language.hint")}
+      </span>
+    </div>
   );
 }

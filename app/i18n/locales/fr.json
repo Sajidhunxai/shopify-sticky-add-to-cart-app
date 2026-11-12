@@ -524,5 +524,22 @@
       "trust": "Badges de confiance",
       "footer": "Pied de page / paiement"
     }
+  },
+  "contentDefaults": {
+    "addToCart": "Ajouter au panier",
+    "soldOut": "Épuisé",
+    "drawerTitle": "VOTRE PANIER ({{cart_quantity}})",
+    "checkout": "Payer",
+    "reservedFor": "Vos articles sont réservés pendant {timer} !",
+    "freeShippingUnlocked": "Livraison gratuite débloquée !",
+    "youMayAlsoLike": "Vous aimerez aussi",
+    "add": "Ajouter",
+    "addFavorites": "Ajoutez vos articles préférés au panier.",
+    "discountCode": "Code promo",
+    "apply": "Appliquer",
+    "trustDefault": "Paiement sécurisé · Retours gratuits · Support 24/7"
+  },
+  "language": {
+    "hint": "Langue de l’admin. Le storefront suit la langue de la boutique ; les textes par défaut sont traduits tant que vous ne les personnalisez pas."
   }
 }

@@ -185,6 +185,29 @@
   const rewardMode = slider?.dataset.rewardMode === "quantity" ? "quantity" : "total";
   const rewardDoneText =
     slider?.dataset.rewardDone || "Free shipping unlocked!";
+  const tierI18n = {
+    "Free Shipping": slider?.dataset.i18nTierFreeShipping,
+    "Free Express": slider?.dataset.i18nTierFreeExpress,
+    "Free Gift": slider?.dataset.i18nTierFreeGift,
+    "VIP Reward": slider?.dataset.i18nTierVipReward,
+    "You're [AMOUNT] away from free shipping!":
+      slider?.dataset.i18nAwayFreeShipping,
+    "You're {{amount_remaining}} away from free shipping!":
+      slider?.dataset.i18nAwayFreeShipping,
+    "You're [AMOUNT] away from free express shipping!":
+      slider?.dataset.i18nAwayFreeExpress,
+    "You're [AMOUNT] away from a free gift!":
+      slider?.dataset.i18nAwayFreeGift,
+    "You're [AMOUNT] away from VIP reward!":
+      slider?.dataset.i18nAwayVipReward,
+    "You're [AMOUNT] away!": slider?.dataset.i18nAwayGeneric,
+  };
+  const localizeTierText = (value, fallback) => {
+    const raw = String(value ?? "").trim();
+    const mapped = tierI18n[raw];
+    if (mapped) return mapped;
+    return raw || fallback || "";
+  };
   let rewardTiers = [];
   try {
     const tiersEl = slider?.querySelector("[data-satc-reward-tiers]");
@@ -209,6 +232,17 @@
       ];
     }
   }
+  rewardTiers = (Array.isArray(rewardTiers) ? rewardTiers : []).map((tier) => {
+    if (!tier || typeof tier !== "object") return tier;
+    return {
+      ...tier,
+      description: localizeTierText(tier.description, tier.description),
+      titleBefore: localizeTierText(
+        tier.titleBefore,
+        tier.titleBefore || "You're [AMOUNT] away!",
+      ),
+    };
+  });
   const activeTiers = rewardTiers
     .filter((t) => t && t.enabled !== false)
     .slice()
@@ -1041,7 +1075,10 @@
         rewardMode === "quantity"
           ? `${Math.ceil(remainingRaw)}`
           : money(Math.round(remainingRaw * 100));
-      message = String(next.titleBefore || "You're [AMOUNT] away!")
+      message = String(
+        next.titleBefore ||
+          localizeTierText("You're [AMOUNT] away!", "You're [AMOUNT] away!"),
+      )
         .replace(/\[AMOUNT\]/gi, remainingLabel)
         .replace(/\{\{\s*amount_remaining\s*\}\}/gi, remainingLabel);
     }

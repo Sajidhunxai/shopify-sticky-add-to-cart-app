@@ -55,7 +55,9 @@
     "productPageMock": "Product page mock",
     "nativeAddToCart": "Native Add to cart",
     "checkout": "Checkout",
-    "toastSample": "Added to cart"
+    "toastSample": "Added to cart",
+    "recommendedProduct": "Recommended product {n}",
+    "recommendedShort": "Recommended {n}"
   },
   "common": {
     "enable": "Enable",
@@ -488,6 +490,33 @@
     "check6": "After the first Save, admin settings fully override Theme Editor color/text defaults for this embed",
     "check7": "Hard-refresh the storefront, then open the cart drawer",
     "check8": "To replace the theme cart drawer: theme Cart type → Page. Full steps under Setup help."
+  },
+  "contentDefaults": {
+    "addToCart": "Add to cart",
+    "soldOut": "Sold out",
+    "drawerTitle": "YOUR CART ({{cart_quantity}})",
+    "checkout": "Checkout",
+    "reservedFor": "Your products are reserved for {timer}!",
+    "freeShippingUnlocked": "Free shipping unlocked!",
+    "youMayAlsoLike": "You may also like",
+    "add": "Add",
+    "addFavorites": "Add your favorite items to your cart.",
+    "discountCode": "Discount code",
+    "apply": "Apply",
+    "trustDefault": "Secure checkout · Free returns · 24/7 support",
+    "tierFreeShipping": "Free Shipping",
+    "tierFreeExpress": "Free Express",
+    "tierFreeGift": "Free Gift",
+    "tierVipReward": "VIP Reward",
+    "awayFreeShipping": "You're [AMOUNT] away from free shipping!",
+    "awayFreeExpress": "You're [AMOUNT] away from free express shipping!",
+    "awayFreeGift": "You're [AMOUNT] away from a free gift!",
+    "awayVipReward": "You're [AMOUNT] away from VIP reward!",
+    "awayGeneric": "You're [AMOUNT] away!",
+    "awayFreeShippingAmount": "You're [AMOUNT] away from free shipping!"
+  },
+  "language": {
+    "hint": "Admin UI language. Storefront follows the shop’s language; default texts auto-translate until you customize them."
   },
   "featureTemplate": {
     "title": "Custom template",

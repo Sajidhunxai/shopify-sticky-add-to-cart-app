@@ -339,11 +339,51 @@
 
 {% if satc_display_mode == blank %}{% assign satc_display_mode = 'bar' %}{% endif %}
 {% if satc_accent == blank %}{% assign satc_accent = satc_btn_bg %}{% endif %}
-{% if satc_drawer_title == blank or satc_drawer_title == 'Your cart' %}
-  {% assign satc_drawer_title = 'general.your_cart' | t %}
+{% comment %}
+  Saved English defaults must not lock the storefront to English.
+  When the value is blank or still the app’s English default, use theme locale.
+{% endcomment %}
+{% if satc_button_label == blank or satc_button_label == 'Add to cart' %}
+  {% assign satc_button_label = 'general.add_to_cart' | t %}
+{% endif %}
+{% if satc_sold_out == blank or satc_sold_out == 'Sold out' %}
+  {% assign satc_sold_out = 'general.sold_out' | t %}
+{% endif %}
+{% if satc_drawer_title == blank or satc_drawer_title == 'Your cart' or satc_drawer_title == 'Your cart {{cart_quantity}}' or satc_drawer_title == 'YOUR CART ({{cart_quantity}})' %}
+  {% assign satc_drawer_title = 'general.your_cart_count' | t %}
 {% endif %}
 {% if satc_drawer_checkout == blank or satc_drawer_checkout == 'Checkout' %}
   {% assign satc_drawer_checkout = 'general.checkout' | t %}
+{% endif %}
+{% if satc_ann_text == blank or satc_ann_text == 'Your products are reserved for {timer}!' %}
+  {% assign satc_ann_text = 'general.reserved_for' | t %}
+{% endif %}
+{% if satc_reward_done == blank or satc_reward_done == 'Free shipping unlocked!' %}
+  {% assign satc_reward_done = 'general.free_shipping_unlocked' | t %}
+{% endif %}
+{% if satc_rec_empty == blank or satc_rec_empty == 'Add your favorite items to your cart.' %}
+  {% assign satc_rec_empty = 'general.add_favorites' | t %}
+{% endif %}
+{% if satc_rec_header == blank or satc_rec_header == 'You may also like' %}
+  {% assign satc_rec_header = 'general.you_may_also_like' | t %}
+{% endif %}
+{% if satc_rec_add == blank or satc_rec_add == 'Add' %}
+  {% assign satc_rec_add = 'general.add' | t %}
+{% endif %}
+{% if satc_rec_shop_text == blank or satc_rec_shop_text == 'Shop now' %}
+  {% assign satc_rec_shop_text = 'general.shop_now' | t %}
+{% endif %}
+{% if satc_disc_ph == blank or satc_disc_ph == 'Discount code' %}
+  {% assign satc_disc_ph = 'general.discount_code' | t %}
+{% endif %}
+{% if satc_disc_btn == blank or satc_disc_btn == 'Apply' %}
+  {% assign satc_disc_btn = 'general.apply' | t %}
+{% endif %}
+{% if satc_trust_text == blank or satc_trust_text == 'Secure checkout · Free returns · 24/7 support' %}
+  {% assign satc_trust_text = 'general.trust_default' | t %}
+{% endif %}
+{% if satc_ship_text == blank or satc_ship_text == "You're {{amount_remaining}} away from free shipping!" or satc_ship_text == "You're [AMOUNT] away from free shipping!" %}
+  {% assign satc_ship_text = 'general.away_free_shipping' | t %}
 {% endif %}
 {% if satc_scroll_desktop == blank %}{% assign satc_scroll_desktop = 0 %}{% endif %}
 {% if satc_bg_style == blank %}{% assign satc_bg_style = 'solid' %}{% endif %}
@@ -367,14 +407,9 @@
 {% if satc_reward_fg == blank %}{% assign satc_reward_fg = '#B3009F' %}{% endif %}
 {% if satc_reward_icon == blank %}{% assign satc_reward_icon = '#111111' %}{% endif %}
 {% if satc_reward_text == blank %}{% assign satc_reward_text = '#111111' %}{% endif %}
-{% if satc_reward_done == blank %}{% assign satc_reward_done = 'Free shipping unlocked!' %}{% endif %}
 {% if satc_reward_mode == blank %}{% assign satc_reward_mode = 'total' %}{% endif %}
 {% if satc_reward_empty == nil %}{% assign satc_reward_empty = true %}{% endif %}
-{% if satc_rec_empty == blank %}{% assign satc_rec_empty = 'Add your favorite items to your cart.' %}{% endif %}
-{% if satc_rec_header == blank %}{% assign satc_rec_header = 'You may also like' %}{% endif %}
 {% if satc_rec_max == blank %}{% assign satc_rec_max = 3 %}{% endif %}
-{% if satc_rec_add == blank %}{% assign satc_rec_add = 'Add' %}{% endif %}
-{% if satc_rec_shop_text == blank %}{% assign satc_rec_shop_text = 'Shop now' %}{% endif %}
 {% if satc_rec_shop_url == blank %}{% assign satc_rec_shop_url = '/collections/all' %}{% endif %}
 {% if satc_rec_collection == blank %}{% assign satc_rec_collection = 'all' %}{% endif %}
 {% if satc_rec_with_items == nil %}{% assign satc_rec_with_items = true %}{% endif %}

@@ -524,5 +524,22 @@
       "trust": "Selos de confiança",
       "footer": "Rodapé / checkout"
     }
+  },
+  "contentDefaults": {
+    "addToCart": "Adicionar ao carrinho",
+    "soldOut": "Esgotado",
+    "drawerTitle": "SEU CARRINHO ({{cart_quantity}})",
+    "checkout": "Finalizar compra",
+    "reservedFor": "Seus produtos estão reservados por {timer}!",
+    "freeShippingUnlocked": "Frete grátis desbloqueado!",
+    "youMayAlsoLike": "Você também pode gostar",
+    "add": "Adicionar",
+    "addFavorites": "Adicione seus itens favoritos ao carrinho.",
+    "discountCode": "Cupom de desconto",
+    "apply": "Aplicar",
+    "trustDefault": "Checkout seguro · Devolução grátis · Suporte 24/7"
+  },
+  "language": {
+    "hint": "Idioma do admin. A vitrine segue o idioma da loja; textos padrão são traduzidos até você personalizá-los."
   }
 }

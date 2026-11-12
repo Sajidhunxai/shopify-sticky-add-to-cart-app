@@ -1,8 +1,8 @@
 import type { BarConfig, RewardTier } from "../../models/bar-config";
 
-export type ActiveRewardTier = RewardTier[];
+export type ActiveRewardTiers = RewardTier[];
 
-export function activeRewardTiers(config: BarConfig): ActiveRewardTier {
+export function activeRewardTiers(config: BarConfig): ActiveRewardTiers {
   return config.rewardTiers
     .filter((t) => t.enabled)
     .slice()
@@ -14,7 +14,7 @@ export function activeRewardTiers(config: BarConfig): ActiveRewardTier {
 /** Equal segments per tier — mirrors storefront sticky-atc-drawer.js */
 export function rewardProgressPct(
   value: number,
-  tiers: ActiveRewardTier,
+  tiers: ActiveRewardTiers,
 ): number {
   if (!tiers.length) return 0;
   const goals = tiers.map((t) => Number(t.minAmount) || 0);
@@ -36,17 +36,27 @@ export function rewardProgressPct(
 
 export function rewardMessage(
   config: BarConfig,
-  tiers: ActiveRewardTier,
+  tiers: ActiveRewardTiers,
   progressValue: number,
+  opts?: {
+    completeText?: string;
+    localizeTitleBefore?: (value: string) => string;
+  },
 ): string {
   const next = tiers.find((t) => progressValue < (Number(t.minAmount) || 0));
-  if (!next) return config.rewardCompleteText;
+  if (!next) {
+    return opts?.completeText ?? config.rewardCompleteText;
+  }
   const remaining = (Number(next.minAmount) || 0) - progressValue;
   const label =
     config.rewardCalcMode === "quantity"
       ? String(Math.ceil(remaining))
       : `$${remaining.toFixed(2)}`;
-  return (next.titleBefore || "You're [AMOUNT] away!")
+  const rawBefore = String(next.titleBefore || "You're [AMOUNT] away!");
+  const before = opts?.localizeTitleBefore
+    ? opts.localizeTitleBefore(rawBefore)
+    : rawBefore;
+  return before
     .replace(/\[AMOUNT\]/gi, label)
     .replace(/\{\{\s*amount_remaining\s*\}\}/gi, label);
 }

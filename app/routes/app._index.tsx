@@ -184,6 +184,7 @@ export default function Index() {
   const submit = useSubmit();
   const shopify = useAppBridge();
   const t = useI18nStore((s) => s.t);
+  const locale = useI18nStore((s) => s.locale);
   const hydrateSession = useSessionStore((s) => s.hydrate);
   const setBusy = useSessionStore((s) => s.setBusy);
   const config = useStudioStore((s) => s.config);
@@ -247,21 +248,24 @@ export default function Index() {
             <p className={styles.panelSub}>{t("app.panelHint")}</p>
           </header>
 
-          {nav === "design" && <DesignPanel />}
-          {nav === "header" && <HeaderPanel />}
-          {nav === "display" && <DisplayPanel />}
-          {nav === "cart-items" && <CartItemsPanel />}
-          {nav === "announcements" && <AnnouncementsPanel />}
-          {nav === "rewards" && <RewardsPanel />}
-          {nav === "recommendations" && <RecommendationsPanel />}
-          {nav === "discounts" && <DiscountsPanel />}
-          {nav === "trust" && <TrustPanel />}
-          {nav === "cart-summary" && <CartSummaryPanel />}
-          {nav === "pages" && <PagesPanel />}
-          {nav === "behavior" && <BehaviorPanel />}
-          {nav === "templates" && <TemplatesPanel />}
-          {nav === "plan" && <PlanPanel />}
-          {nav === "setup" && <SetupPanel />}
+          {/* Remount Polaris web components so labels refresh on locale change */}
+          <div key={locale}>
+            {nav === "design" && <DesignPanel />}
+            {nav === "header" && <HeaderPanel />}
+            {nav === "display" && <DisplayPanel />}
+            {nav === "cart-items" && <CartItemsPanel />}
+            {nav === "announcements" && <AnnouncementsPanel />}
+            {nav === "rewards" && <RewardsPanel />}
+            {nav === "recommendations" && <RecommendationsPanel />}
+            {nav === "discounts" && <DiscountsPanel />}
+            {nav === "trust" && <TrustPanel />}
+            {nav === "cart-summary" && <CartSummaryPanel />}
+            {nav === "pages" && <PagesPanel />}
+            {nav === "behavior" && <BehaviorPanel />}
+            {nav === "templates" && <TemplatesPanel />}
+            {nav === "plan" && <PlanPanel />}
+            {nav === "setup" && <SetupPanel />}
+          </div>
         </section>
 
         <StudioPreview />
