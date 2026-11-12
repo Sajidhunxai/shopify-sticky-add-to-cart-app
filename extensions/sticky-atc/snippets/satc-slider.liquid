@@ -38,6 +38,9 @@
     data-i18n-adding="{{ 'general.adding' | t | escape }}"
     data-i18n-added="{{ 'general.added' | t | escape }}"
     data-i18n-try-again="{{ 'general.try_again' | t | escape }}"
+    data-i18n-add-failed="{{ 'general.add_failed' | t | escape }}"
+    data-i18n-add-success="{{ 'general.add_success' | t | escape }}"
+    data-i18n-unavailable="{{ 'general.unavailable' | t | escape }}"
     data-drawer-title="{{ satc_drawer_title | escape }}"
     data-ship-enabled="{% if satc_ship_on == true or satc_ship_on == 'true' %}true{% else %}false{% endif %}"
     data-ship-threshold="{{ satc_ship_threshold }}"
@@ -267,6 +270,13 @@
           <p class="satc-slider__trust">{{ satc_trust_text }}</p>
         {% endif %}
       </footer>
+      <div
+        class="satc-slider__toast"
+        data-satc-toast
+        hidden
+        role="status"
+        aria-live="polite"
+      ></div>
     </aside>
   </div>
 

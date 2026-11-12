@@ -13,6 +13,9 @@
     "close": "Cerrar",
     "decrease_quantity": "Reducir cantidad",
     "increase_quantity": "Aumentar cantidad",
-    "quantity": "Cantidad"
+    "quantity": "Cantidad",
+    "add_failed": "No se pudo añadir al carrito",
+    "add_success": "Añadido al carrito",
+    "unavailable": "Este producto no está disponible"
   }
 }

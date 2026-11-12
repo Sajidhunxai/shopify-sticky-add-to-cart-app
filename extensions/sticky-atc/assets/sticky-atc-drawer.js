@@ -21,6 +21,42 @@
     added: slider.dataset.i18nAdded || "Added ✓",
     tryAgain: slider.dataset.i18nTryAgain || "Try again",
     cartEmpty: slider.dataset.i18nCartEmpty || "Your cart is empty",
+    addFailed: slider.dataset.i18nAddFailed || "Couldn’t add to cart",
+    addSuccess: slider.dataset.i18nAddSuccess || "Added to cart",
+    unavailable: slider.dataset.i18nUnavailable || "This product is unavailable",
+  };
+
+  let toastTimer = null;
+  const showToast = (message, type = "info", ms = 4200) => {
+    const el = slider.querySelector("[data-satc-toast]");
+    if (!(el instanceof HTMLElement) || !message) return;
+    el.hidden = false;
+    el.className = `satc-slider__toast satc-slider__toast--${type}`;
+    el.textContent = String(message);
+    requestAnimationFrame(() => el.classList.add("is-visible"));
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      el.classList.remove("is-visible");
+      setTimeout(() => {
+        el.hidden = true;
+        el.textContent = "";
+      }, 220);
+    }, ms);
+  };
+
+  const readCartError = async (res) => {
+    try {
+      const data = await res.json();
+      return (
+        data.description ||
+        data.message ||
+        data.errors ||
+        (Array.isArray(data) ? data.join(", ") : "") ||
+        i18n.addFailed
+      );
+    } catch (_) {
+      return i18n.addFailed;
+    }
   };
   const isDesktop = () => window.matchMedia("(min-width: 750px)").matches;
   const root =
@@ -579,10 +615,17 @@
         },
         body: JSON.stringify({ id: lineKey, quantity: Math.max(0, Number(quantity) || 0) }),
       });
-      if (!res.ok) throw new Error("cart change failed");
+      if (!res.ok) {
+        const msg = await readCartError(res);
+        throw new Error(typeof msg === "string" ? msg : "Couldn’t update cart");
+      }
       await refreshSlider();
     } catch (err) {
       console.error("[Sticky ATC] cart change", err);
+      showToast(
+        err && typeof err.message === "string" ? err.message : "Couldn’t update cart",
+        "error",
+      );
     }
   };
 
@@ -695,7 +738,11 @@
       .join("");
 
   const addRecToCart = async (variantId, btn) => {
-    if (!variantId) return;
+    const id = Number(variantId);
+    if (!id) {
+      showToast(i18n.unavailable, "error");
+      return;
+    }
     const label = btn?.textContent || recAddText;
     if (btn) {
       btn.disabled = true;
@@ -708,14 +755,26 @@
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify({ id: Number(variantId), quantity: 1 }),
+        // Prefer items[] (same as sticky bar) — Shopify accepts both, items is safer
+        body: JSON.stringify({
+          items: [{ id, quantity: 1 }],
+        }),
       });
-      if (!res.ok) throw new Error("add failed");
+      if (!res.ok) {
+        const msg = await readCartError(res);
+        throw new Error(typeof msg === "string" ? msg : i18n.addFailed);
+      }
       if (btn) btn.textContent = i18n.added;
+      showToast(i18n.addSuccess, "success", 2200);
       await refreshSlider();
       openSlider();
     } catch (err) {
       console.error("[Sticky ATC] rec add", err);
+      const message =
+        err && typeof err.message === "string" && err.message
+          ? err.message
+          : i18n.addFailed;
+      showToast(message, "error");
       if (btn) {
         btn.textContent = i18n.tryAgain;
         btn.disabled = false;

@@ -13,6 +13,9 @@
     "close": "閉じる",
     "decrease_quantity": "数量を減らす",
     "increase_quantity": "数量を増やす",
-    "quantity": "数量"
+    "quantity": "数量",
+    "add_failed": "カートに追加できませんでした",
+    "add_success": "カートに追加しました",
+    "unavailable": "この商品は利用できません"
   }
 }
