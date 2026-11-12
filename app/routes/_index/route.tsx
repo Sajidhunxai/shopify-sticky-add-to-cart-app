@@ -17,6 +17,17 @@ const FEATURES = [
   { title: "Recommendations", href: "#feature-recommendations" },
   { title: "Live studio", href: "#feature-studio" },
   { title: "Templates", href: "#feature-templates" },
+  { title: "Languages", href: "#feature-languages" },
+] as const;
+
+const LANGUAGE_SHOWCASE = [
+  { code: "EN", label: "English", sample: "Your cart" },
+  { code: "DE", label: "Deutsch", sample: "Dein Warenkorb" },
+  { code: "ES", label: "Español", sample: "Tu carrito" },
+  { code: "FR", label: "Français", sample: "Votre panier" },
+  { code: "IT", label: "Italiano", sample: "Il tuo carrello" },
+  { code: "JA", label: "日本語", sample: "カート" },
+  { code: "PT", label: "Português", sample: "Seu carrinho" },
 ] as const;
 
 const FEATURE_DETAILS = [
@@ -123,6 +134,24 @@ const FEATURE_DETAILS = [
     docsHref: "/docs/templates",
     docsLabel: "Templates docs",
   },
+  {
+    id: "feature-languages",
+    eyebrow: "07 · Languages",
+    title: "Admin and storefront in your merchants’ languages",
+    body: "Run the studio in English, German, Spanish, French, Italian, Japanese, or Portuguese. Default cart copy follows each shop’s language until a merchant customizes it — so every store keeps its own settings and locale.",
+    bullets: [
+      "7 admin UI languages with a one-click picker",
+      "Storefront defaults follow the shop locale",
+      "Custom merchant copy stays editable per store",
+      "Per-shop settings — never shared across installs",
+    ],
+    image: "/docs/studio-overview.jpg",
+    imageAlt: "Multi-language admin and cart drawer copy",
+    imageFocus: "center top",
+    docsHref: "/docs/overview",
+    docsLabel: "Overview docs",
+    mock: "languages" as const,
+  },
 ] as const;
 
 const FAQS = [
@@ -149,6 +178,10 @@ const FAQS = [
   {
     q: "The sticky bar is not showing — what should I check?",
     a: "Confirm the App embed is on and the theme is saved, view a product page, scroll past the visibility threshold, click Save settings in the app, then hard-refresh the storefront.",
+  },
+  {
+    q: "Does Sticky Add to Cart support multiple languages?",
+    a: "Yes. The admin studio supports English, German, Spanish, French, Italian, Japanese, and Portuguese. Storefront default texts follow each shop’s language; customized copy you save stays as written. Each store has its own settings.",
   },
 ] as const;
 
@@ -313,7 +346,8 @@ export default function Landing() {
           <p className={styles.lead}>
             Sticky Add to Cart adds a customizable sticky ATC bar on product pages,
             plus an optional cart drawer with tiered rewards, recommendations,
-            announcements, and discounts. Theme app embed. No code edits.
+            announcements, and discounts — with admin and storefront language
+            support for multi-store merchants. Theme app embed. No code edits.
           </p>
 
           <div className={styles.ctaRow}>
@@ -408,6 +442,30 @@ export default function Landing() {
                       <em>Add</em>
                     </div>
                   </div>
+                </div>
+              ) : "mock" in feature && feature.mock === "languages" ? (
+                <div className={styles.langMock} aria-hidden="true">
+                  <div className={styles.langMockHeader}>
+                    <p className={styles.langMockEyebrow}>Studio language</p>
+                    <p className={styles.langMockTitle}>7 languages ready</p>
+                  </div>
+                  <ul className={styles.langMockList}>
+                    {LANGUAGE_SHOWCASE.map((lang, i) => (
+                      <li
+                        key={lang.code}
+                        className={
+                          i === 1 ? styles.langMockItemActive : styles.langMockItem
+                        }
+                      >
+                        <span className={styles.langMockCode}>{lang.code}</span>
+                        <span className={styles.langMockLabel}>{lang.label}</span>
+                        <span className={styles.langMockSample}>{lang.sample}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className={styles.langMockFoot}>
+                    Storefront follows each shop’s locale · settings stay per store
+                  </p>
                 </div>
               ) : (
                 <img

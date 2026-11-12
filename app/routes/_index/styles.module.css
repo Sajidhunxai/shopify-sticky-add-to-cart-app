@@ -586,6 +586,91 @@ a.button {
   padding: 0.4rem 0.5rem;
 }
 
+.langMock {
+  height: 100%;
+  min-height: 280px;
+  padding: 1.2rem 1.15rem 1.1rem;
+  display: grid;
+  align-content: start;
+  gap: 0.85rem;
+  background:
+    radial-gradient(80% 70% at 0% 0%, rgba(15, 122, 102, 0.16), transparent 55%),
+    linear-gradient(165deg, #f6faf8, #e8efeb);
+}
+
+.langMockHeader {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.langMockEyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+}
+
+.langMockTitle {
+  margin: 0;
+  font-weight: 750;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.langMockList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.langMockItem,
+.langMockItemActive {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr auto;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(19, 33, 43, 0.08);
+  font-size: 0.82rem;
+}
+
+.langMockItemActive {
+  border-color: rgba(15, 122, 102, 0.35);
+  box-shadow: 0 0 0 2px rgba(15, 122, 102, 0.12);
+  background: #fff;
+}
+
+.langMockCode {
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--accent-deep);
+}
+
+.langMockLabel {
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.langMockSample {
+  color: var(--muted);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.langMockFoot {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
 .inlineLinks {
   margin: 1rem 0 0;
   color: var(--muted);
