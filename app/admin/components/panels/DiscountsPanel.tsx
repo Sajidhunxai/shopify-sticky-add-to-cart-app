@@ -1,11 +1,11 @@
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import type { PanelProps } from "../../types";
 
-export function DiscountsPanel({ config, updateConfig }: PanelProps) {
+export function DiscountsPanel({ config, updateConfig, t }: PanelProps) {
   return (
     <s-stack gap="base">
       <s-switch
-        label="Show discount code field"
+        label={t("discounts.enable")}
         checked={config.discountEnabled}
         onChange={(e: Event) =>
           updateConfig(
@@ -15,7 +15,7 @@ export function DiscountsPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-text-field
-        label="Input placeholder"
+        label={t("discounts.placeholder")}
         value={config.discountPlaceholder}
         onChange={(e: Event) =>
           updateConfig(
@@ -25,7 +25,7 @@ export function DiscountsPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-text-field
-        label="Apply button text"
+        label={t("discounts.button")}
         value={config.discountButtonText}
         onChange={(e: Event) =>
           updateConfig(
@@ -34,10 +34,7 @@ export function DiscountsPanel({ config, updateConfig }: PanelProps) {
           )
         }
       />
-      <s-paragraph>
-        Applying a code sends shoppers through Shopify’s discount URL, then they
-        can return to checkout.
-      </s-paragraph>
+      <s-paragraph>{t("discounts.help")}</s-paragraph>
 
       <FeatureCustomTemplate
         featureKey="discount"

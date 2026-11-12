@@ -17,6 +17,7 @@
     adding: bar.dataset.i18nAdding || "Adding…",
     added: bar.dataset.i18nAdded || "Added ✓",
     tryAgain: bar.dataset.i18nTryAgain || "Try again",
+    addFailed: bar.dataset.i18nAddFailed || "Couldn’t add to cart",
   };
   const formSelector =
     'form[action*="/cart/add"], form[action$="/cart/add"], product-form form, [data-product-form]';
@@ -178,7 +179,17 @@
         }),
       });
 
-      if (!response.ok) throw new Error("Add to cart failed");
+      if (!response.ok) {
+        let message = i18n.addFailed;
+        try {
+          const data = await response.json();
+          const raw = data.description || data.message || data.errors;
+          if (typeof raw === "string" && raw.trim()) message = raw.trim();
+        } catch (_) {
+          /* keep fallback */
+        }
+        throw new Error(message);
+      }
 
       document.dispatchEvent(
         new CustomEvent("satc:added", {
@@ -205,11 +216,21 @@
       }, 1200);
     } catch (error) {
       console.error("[Sticky ATC]", error);
+      const message =
+        error && typeof error.message === "string" && error.message
+          ? error.message
+          : i18n.addFailed;
+      if (typeof window.SatcDrawer?.toast === "function") {
+        window.SatcDrawer.toast(message, "error");
+      } else {
+        button.title = message;
+      }
       button.textContent = i18n.tryAgain;
       button.disabled = false;
       setTimeout(() => {
         button.textContent = original;
-      }, 1500);
+        button.removeAttribute("title");
+      }, 2500);
     }
   });
 })();

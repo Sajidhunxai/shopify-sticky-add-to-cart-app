@@ -2,7 +2,7 @@
  * Sticky ATC — cart drawer (cart lines, rewards, recommendations,
  * announcement timer, discount, theme cart-icon intercept).
  * Loaded by snippets/satc-slider.liquid only when display_mode is "slider".
- * Public API: window.SatcDrawer.{ open, close, refresh }.
+ * Public API: window.SatcDrawer.{ open, close, refresh, toast }.
  */
 (() => {
   const slider = document.querySelector("[data-satc-slider]");
@@ -24,7 +24,16 @@
     addFailed: slider.dataset.i18nAddFailed || "Couldn’t add to cart",
     addSuccess: slider.dataset.i18nAddSuccess || "Added to cart",
     unavailable: slider.dataset.i18nUnavailable || "This product is unavailable",
+    delete: slider.dataset.i18nDelete || "Delete",
+    remove: slider.dataset.i18nRemove || "Remove",
+    qtyTemplate: slider.dataset.i18nQty || "Qty __COUNT__",
+    updateFailed: slider.dataset.i18nUpdateFailed || "Couldn’t update cart",
+    decreaseQty: slider.dataset.i18nDecreaseQty || "Decrease quantity",
+    increaseQty: slider.dataset.i18nIncreaseQty || "Increase quantity",
   };
+
+  const formatQty = (count) =>
+    String(i18n.qtyTemplate).replace(/__COUNT__|\{\{\s*count\s*\}\}/g, String(count));
 
   let toastTimer = null;
   const showToast = (message, type = "info", ms = 4200) => {
@@ -47,13 +56,19 @@
   const readCartError = async (res) => {
     try {
       const data = await res.json();
-      return (
+      const raw =
         data.description ||
         data.message ||
         data.errors ||
-        (Array.isArray(data) ? data.join(", ") : "") ||
-        i18n.addFailed
-      );
+        (Array.isArray(data) ? data.join(", ") : "");
+      if (typeof raw === "string" && raw.trim()) return raw.trim();
+      if (raw && typeof raw === "object") {
+        const parts = Object.values(raw)
+          .flatMap((v) => (Array.isArray(v) ? v : [v]))
+          .filter((v) => typeof v === "string" && v.trim());
+        if (parts.length) return parts.join(", ");
+      }
+      return i18n.addFailed;
     } catch (_) {
       return i18n.addFailed;
     }
@@ -328,24 +343,26 @@
       if (!res.ok) throw new Error("collection fetch failed");
       const data = await res.json();
       const products = Array.isArray(data.products) ? data.products : [];
-      return products.map((p) => {
-        const variant =
-          (p.variants || []).find((v) => v.available) || p.variants?.[0];
-        const img =
-          p.images?.[0]?.src ||
-          p.image?.src ||
-          (typeof p.images?.[0] === "string" ? p.images[0] : "") ||
-          "";
-        return {
-          id: p.id,
-          title: p.title,
-          url: p.url || `/products/${p.handle}`,
-          image: img,
-          price: Math.round(Number(variant?.price || p.price || 0) * 100),
-          variantId: variant?.id,
-          available: variant ? variant.available !== false : true,
-        };
-      });
+      return products
+        .map((p) => {
+          const variant = (p.variants || []).find((v) => v.available);
+          if (!variant?.id) return null;
+          const img =
+            p.images?.[0]?.src ||
+            p.image?.src ||
+            (typeof p.images?.[0] === "string" ? p.images[0] : "") ||
+            "";
+          return {
+            id: p.id,
+            title: p.title,
+            url: p.url || `/products/${p.handle}`,
+            image: img,
+            price: Math.round(Number(variant.price || p.price || 0) * 100),
+            variantId: variant.id,
+            available: true,
+          };
+        })
+        .filter(Boolean);
     } catch (_) {
       return [];
     }
@@ -353,7 +370,7 @@
 
   const normalizeSeedProducts = (list) =>
     (list || [])
-      .filter((p) => p && p.variantId)
+      .filter((p) => p && p.variantId && p.available !== false)
       .map((p) => ({
         id: p.id,
         title: p.title || "Product",
@@ -361,7 +378,7 @@
         image: p.image || "",
         price: Number(p.price) || 0,
         variantId: p.variantId,
-        available: p.available !== false,
+        available: true,
       }));
 
   const filterOutCartProducts = (products, cartItems) => {
@@ -382,7 +399,7 @@
 
   const productsFromAdminCfg = () =>
     (recProductsCfg || [])
-      .filter((p) => p && (p.variantId || p.handle))
+      .filter((p) => p && p.variantId && p.available !== false)
       .map((p) => ({
         id: p.id || p.handle,
         title: p.title || p.handle || "Product",
@@ -390,9 +407,8 @@
         image: p.image || "",
         price: Number(p.price) || 0,
         variantId: p.variantId,
-        available: p.available !== false,
-      }))
-      .filter((p) => p.variantId);
+        available: true,
+      }));
 
   const loadRecProducts = async (cartItems) => {
     if (!recEnabled) return [];
@@ -403,7 +419,9 @@
     if (products.length < 1 && recSource !== "products") {
       products = await fetchCollectionProducts();
     }
-    products = filterOutCartProducts(products, cartItems || []);
+    products = filterOutCartProducts(products, cartItems || []).filter(
+      (p) => p.available !== false && p.variantId,
+    );
     return products.slice(0, recMax);
   };
 
@@ -582,19 +600,13 @@
   const removeControlHtml = (key) => {
     if (!lineRemoveEnabled) return "";
     const label =
-      lineRemoveStyle === "delete"
-        ? "Delete"
-        : lineRemoveStyle === "remove"
-          ? "Remove"
-          : "Remove";
+      lineRemoveStyle === "delete" ? i18n.delete : i18n.remove;
     const inner =
       lineRemoveStyle === "trash"
         ? trashSvg
         : lineRemoveStyle === "x"
           ? "×"
-          : escapeHtml(
-              lineRemoveStyle === "delete" ? "Delete" : "Remove",
-            );
+          : escapeHtml(label);
     const styleClass =
       lineRemoveStyle === "x"
         ? "satc-slider__line-remove--x"
@@ -617,13 +629,13 @@
       });
       if (!res.ok) {
         const msg = await readCartError(res);
-        throw new Error(typeof msg === "string" ? msg : "Couldn’t update cart");
+        throw new Error(typeof msg === "string" ? msg : i18n.updateFailed);
       }
       await refreshSlider();
     } catch (err) {
       console.error("[Sticky ATC] cart change", err);
       showToast(
-        err && typeof err.message === "string" ? err.message : "Couldn’t update cart",
+        err && typeof err.message === "string" ? err.message : i18n.updateFailed,
         "error",
       );
     }
@@ -666,11 +678,11 @@
         const qtyControls = !lineQtyEnabled
           ? ""
           : lineQtyStyle === "plain"
-            ? `<p class="satc-slider__item-meta">Qty ${qty}</p>`
+            ? `<p class="satc-slider__item-meta">${escapeHtml(formatQty(qty))}</p>`
             : `<div class="satc-slider__line-qty satc-slider__line-qty--${escapeHtml(lineQtySize)}" data-satc-line-qty>
-              <button type="button" class="satc-slider__line-qty-btn" data-satc-line-minus data-line-key="${escapeHtml(key)}" data-qty="${qty}" aria-label="Decrease">−</button>
+              <button type="button" class="satc-slider__line-qty-btn" data-satc-line-minus data-line-key="${escapeHtml(key)}" data-qty="${qty}" aria-label="${escapeHtml(i18n.decreaseQty)}">−</button>
               <span class="satc-slider__line-qty-val">${qty}</span>
-              <button type="button" class="satc-slider__line-qty-btn" data-satc-line-plus data-line-key="${escapeHtml(key)}" data-qty="${qty}" aria-label="Increase">+</button>
+              <button type="button" class="satc-slider__line-qty-btn" data-satc-line-plus data-line-key="${escapeHtml(key)}" data-qty="${qty}" aria-label="${escapeHtml(i18n.increaseQty)}">+</button>
             </div>`;
         const removeBtn = removeControlHtml(key);
         const priceLabel = money(item.final_line_price ?? item.line_price);
@@ -1319,5 +1331,6 @@
     open: openSlider,
     close: closeSlider,
     refresh: refreshSlider,
+    toast: showToast,
   };
 })();

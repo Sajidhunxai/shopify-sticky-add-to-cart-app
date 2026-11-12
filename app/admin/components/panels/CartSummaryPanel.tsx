@@ -2,11 +2,11 @@ import type { BarConfig } from "../../../models/bar-config";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import type { PanelProps } from "../../types";
 
-export function CartSummaryPanel({ config, updateConfig }: PanelProps) {
+export function CartSummaryPanel({ config, updateConfig, t }: PanelProps) {
   return (
     <s-stack gap="base">
       <s-select
-        label="After adding to cart"
+        label={t("behavior.afterAdd")}
         value={config.afterAdd}
         onChange={(e: Event) =>
           updateConfig(
@@ -16,12 +16,12 @@ export function CartSummaryPanel({ config, updateConfig }: PanelProps) {
           )
         }
       >
-        <s-option value="stay">Stay on page</s-option>
-        <s-option value="cart">Go to cart</s-option>
-        <s-option value="drawer">Open cart drawer (if supported)</s-option>
+        <s-option value="stay">{t("behavior.stay")}</s-option>
+        <s-option value="cart">{t("behavior.goCart")}</s-option>
+        <s-option value="drawer">{t("cartSummary.openDrawerIfSupported")}</s-option>
       </s-select>
       <s-text-field
-        label="Checkout button text"
+        label={t("cartSummary.checkoutText")}
         value={config.drawerCheckoutText}
         onChange={(e: Event) =>
           updateConfig(
@@ -30,17 +30,13 @@ export function CartSummaryPanel({ config, updateConfig }: PanelProps) {
           )
         }
       />
-      <s-paragraph>
-        Tip: set <strong>Display style → Cart drawer</strong> (required). “Open
-        cart drawer” then opens Sticky ATC’s drawer. Also set the theme Cart
-        type to <strong>Page</strong> so the header bag does not jump to /cart.
-      </s-paragraph>
+      <s-paragraph>{t("cartSummary.tip")}</s-paragraph>
 
       <FeatureCustomTemplate
         featureKey="footer"
         config={config}
         updateConfig={updateConfig}
-        title="Custom footer / checkout template"
+        title={t("cartSummary.customTemplate")}
       />
     </s-stack>
   );

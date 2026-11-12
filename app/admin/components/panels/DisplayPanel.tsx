@@ -2,30 +2,30 @@ import styles from "../../../styles/dashboard.module.css";
 import type { BarConfig } from "../../../models/bar-config";
 import type { PanelProps } from "../../types";
 
-export function DisplayPanel({ config, updateConfig }: PanelProps) {
+export function DisplayPanel({ config, updateConfig, t }: PanelProps) {
   return (
     <s-stack gap="base">
       <div
         className={styles.modeGrid}
         role="radiogroup"
-        aria-label="Display style"
+        aria-label={t("display.heading")}
       >
         {(
           [
             {
               id: "bar" as const,
-              title: "Sticky bar",
-              blurb: "Classic sticky Add to cart bar",
+              title: t("display.barTitle"),
+              blurb: t("display.barBlurb"),
             },
             {
               id: "slider" as const,
-              title: "Cart drawer",
-              blurb: "Bar + slide-out cart after add",
+              title: t("display.sliderTitle"),
+              blurb: t("display.sliderBlurb"),
             },
             {
               id: "quickbuy" as const,
-              title: "Quick buy",
-              blurb: "Floating button that expands",
+              title: t("display.quickbuyTitle"),
+              blurb: t("display.quickbuyBlurb"),
             },
           ] as const
         ).map((mode) => (
@@ -45,7 +45,7 @@ export function DisplayPanel({ config, updateConfig }: PanelProps) {
       </div>
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-select
-          label="Bar layout"
+          label={t("display.barLayout")}
           value={config.layout}
           onChange={(e: Event) =>
             updateConfig(
@@ -55,12 +55,12 @@ export function DisplayPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="row">Row</s-option>
-          <s-option value="compact">Compact pill</s-option>
-          <s-option value="stacked">Stacked</s-option>
+          <s-option value="row">{t("display.layoutRow")}</s-option>
+          <s-option value="compact">{t("display.layoutCompact")}</s-option>
+          <s-option value="stacked">{t("display.layoutStacked")}</s-option>
         </s-select>
         <s-select
-          label="Bar position"
+          label={t("display.barPosition")}
           value={config.barPosition}
           onChange={(e: Event) =>
             updateConfig(
@@ -70,17 +70,17 @@ export function DisplayPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="bottom">Bottom center</s-option>
-          <s-option value="bottom-left">Bottom left</s-option>
-          <s-option value="bottom-right">Bottom right</s-option>
-          <s-option value="top">Top center</s-option>
-          <s-option value="top-left">Top left</s-option>
-          <s-option value="top-right">Top right</s-option>
-          <s-option value="left">Middle left</s-option>
-          <s-option value="right">Middle right</s-option>
+          <s-option value="bottom">{t("display.posBottom")}</s-option>
+          <s-option value="bottom-left">{t("display.posBottomLeft")}</s-option>
+          <s-option value="bottom-right">{t("display.posBottomRight")}</s-option>
+          <s-option value="top">{t("display.posTop")}</s-option>
+          <s-option value="top-left">{t("display.posTopLeft")}</s-option>
+          <s-option value="top-right">{t("display.posTopRight")}</s-option>
+          <s-option value="left">{t("display.posLeft")}</s-option>
+          <s-option value="right">{t("display.posRight")}</s-option>
         </s-select>
         <s-select
-          label="Image shape"
+          label={t("display.imageShape")}
           value={config.imageShape}
           onChange={(e: Event) =>
             updateConfig(
@@ -90,12 +90,12 @@ export function DisplayPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="rounded">Rounded</s-option>
-          <s-option value="circle">Circle</s-option>
-          <s-option value="square">Square</s-option>
+          <s-option value="rounded">{t("display.shapeRounded")}</s-option>
+          <s-option value="circle">{t("display.shapeCircle")}</s-option>
+          <s-option value="square">{t("display.shapeSquare")}</s-option>
         </s-select>
         <s-select
-          label="Button size"
+          label={t("display.buttonSize")}
           value={config.buttonSize}
           onChange={(e: Event) =>
             updateConfig(
@@ -105,9 +105,9 @@ export function DisplayPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="normal">Normal</s-option>
-          <s-option value="large">Large</s-option>
-          <s-option value="full">Full width</s-option>
+          <s-option value="normal">{t("common.normal")}</s-option>
+          <s-option value="large">{t("common.large")}</s-option>
+          <s-option value="full">{t("display.sizeFull")}</s-option>
         </s-select>
       </s-grid>
     </s-stack>

@@ -1,13 +1,13 @@
 import styles from "../../../styles/dashboard.module.css";
 import type { PanelProps } from "../../types";
 
-export function PagesPanel({ config, updateConfig }: PanelProps) {
+export function PagesPanel({ config, updateConfig, t }: PanelProps) {
   return (
     <s-stack gap="base">
-      <s-heading>Sticky bar — show on</s-heading>
+      <s-heading>{t("pages.stickyShowOn")}</s-heading>
       <div className={styles.toggleRow}>
         <s-switch
-          label="Product pages"
+          label={t("pages.product")}
           checked={config.showOnProduct}
           onChange={(e: Event) =>
             updateConfig(
@@ -17,7 +17,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Collection pages"
+          label={t("pages.collection")}
           checked={config.showOnCollection}
           onChange={(e: Event) =>
             updateConfig(
@@ -27,7 +27,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Homepage"
+          label={t("pages.home")}
           checked={config.showOnHome}
           onChange={(e: Event) =>
             updateConfig(
@@ -37,7 +37,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Search results"
+          label={t("pages.search")}
           checked={config.showOnSearch}
           onChange={(e: Event) =>
             updateConfig(
@@ -47,7 +47,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Other pages"
+          label={t("pages.other")}
           checked={config.showOnOther}
           onChange={(e: Event) =>
             updateConfig(
@@ -57,7 +57,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show on mobile"
+          label={t("pages.mobile")}
           checked={config.showMobile}
           onChange={(e: Event) =>
             updateConfig(
@@ -67,7 +67,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show on desktop"
+          label={t("pages.desktop")}
           checked={config.showDesktop}
           onChange={(e: Event) =>
             updateConfig(
@@ -78,14 +78,11 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
         />
       </div>
 
-      <s-heading>Cart drawer — show on</s-heading>
-      <s-paragraph>
-        Independent of the sticky bar. Controls where the cart drawer can open
-        (including header cart icon).
-      </s-paragraph>
+      <s-heading>{t("pages.drawerShowOn")}</s-heading>
+      <s-paragraph>{t("pages.drawerHelp")}</s-paragraph>
       <div className={styles.toggleRow}>
         <s-switch
-          label="Product pages"
+          label={t("pages.product")}
           checked={config.drawerShowOnProduct}
           onChange={(e: Event) =>
             updateConfig(
@@ -95,7 +92,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Collection pages"
+          label={t("pages.collection")}
           checked={config.drawerShowOnCollection}
           onChange={(e: Event) =>
             updateConfig(
@@ -105,7 +102,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Homepage"
+          label={t("pages.home")}
           checked={config.drawerShowOnHome}
           onChange={(e: Event) =>
             updateConfig(
@@ -115,7 +112,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Search results"
+          label={t("pages.search")}
           checked={config.drawerShowOnSearch}
           onChange={(e: Event) =>
             updateConfig(
@@ -125,7 +122,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Other pages"
+          label={t("pages.other")}
           checked={config.drawerShowOnOther}
           onChange={(e: Event) =>
             updateConfig(
@@ -135,7 +132,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show drawer on mobile"
+          label={t("pages.drawerMobile")}
           checked={config.drawerShowMobile}
           onChange={(e: Event) =>
             updateConfig(
@@ -145,7 +142,7 @@ export function PagesPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show drawer on desktop"
+          label={t("pages.drawerDesktop")}
           checked={config.drawerShowDesktop}
           onChange={(e: Event) =>
             updateConfig(

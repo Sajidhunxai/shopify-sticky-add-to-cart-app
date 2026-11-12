@@ -14,6 +14,10 @@
     "decrease_quantity": "数量を減らす",
     "increase_quantity": "数量を増やす",
     "quantity": "数量",
+    "qty": "数量 {{ count }}",
+    "delete": "削除",
+    "remove": "削除",
+    "update_failed": "カートを更新できませんでした",
     "add_failed": "カートに追加できませんでした",
     "add_success": "カートに追加しました",
     "unavailable": "この商品は利用できません"

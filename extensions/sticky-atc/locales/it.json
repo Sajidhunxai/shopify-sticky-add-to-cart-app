@@ -14,6 +14,10 @@
     "decrease_quantity": "Diminuisci quantità",
     "increase_quantity": "Aumenta quantità",
     "quantity": "Quantità",
+    "qty": "Qtà {{ count }}",
+    "delete": "Elimina",
+    "remove": "Rimuovi",
+    "update_failed": "Impossibile aggiornare il carrello",
     "add_failed": "Impossibile aggiungere al carrello",
     "add_success": "Aggiunto al carrello",
     "unavailable": "Questo prodotto non è disponibile"

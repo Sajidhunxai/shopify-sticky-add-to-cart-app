@@ -1,11 +1,11 @@
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import type { PanelProps } from "../../types";
 
-export function TrustPanel({ config, updateConfig }: PanelProps) {
+export function TrustPanel({ config, updateConfig, t }: PanelProps) {
   return (
     <s-stack gap="base">
       <s-switch
-        label="Show trust badges under checkout"
+        label={t("trust.enable")}
         checked={config.trustBadgesEnabled}
         onChange={(e: Event) =>
           updateConfig(
@@ -15,7 +15,7 @@ export function TrustPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-text-field
-        label="Trust text"
+        label={t("trust.text")}
         value={config.trustBadgesText}
         onChange={(e: Event) =>
           updateConfig(

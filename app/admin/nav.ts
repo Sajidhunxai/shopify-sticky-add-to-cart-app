@@ -1,3 +1,5 @@
+import type { TranslateFn } from "../i18n";
+
 export type NavId =
   | "design"
   | "header"
@@ -17,56 +19,56 @@ export type NavId =
 
 export type NavItem = {
   id: NavId;
-  label: string;
+  labelKey: string;
   soon?: boolean;
 };
 
 export type NavGroup = {
-  title: string;
+  titleKey: string;
   items: NavItem[];
 };
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    title: "General",
+    titleKey: "nav.general",
     items: [
-      { id: "design", label: "Design" },
-      { id: "header", label: "Header" },
-      { id: "display", label: "Display style" },
+      { id: "design", labelKey: "nav.design" },
+      { id: "header", labelKey: "nav.header" },
+      { id: "display", labelKey: "nav.display" },
     ],
   },
   {
-    title: "Body",
+    titleKey: "nav.body",
     items: [
-      { id: "cart-items", label: "Cart items" },
-      { id: "announcements", label: "Announcements" },
-      { id: "rewards", label: "Tiered rewards" },
-      { id: "recommendations", label: "Recommendations" },
-      { id: "discounts", label: "Discount codes" },
+      { id: "cart-items", labelKey: "nav.cartItems" },
+      { id: "announcements", labelKey: "nav.announcements" },
+      { id: "rewards", labelKey: "nav.rewards" },
+      { id: "recommendations", labelKey: "nav.recommendations" },
+      { id: "discounts", labelKey: "nav.discounts" },
     ],
   },
   {
-    title: "Footer",
+    titleKey: "nav.footer",
     items: [
-      { id: "cart-summary", label: "Cart summary" },
-      { id: "trust", label: "Trust badges" },
+      { id: "cart-summary", labelKey: "nav.cartSummary" },
+      { id: "trust", labelKey: "nav.trust" },
     ],
   },
   {
-    title: "Settings",
+    titleKey: "nav.settings",
     items: [
-      { id: "templates", label: "HTML / CSS / templates" },
-      { id: "pages", label: "Pages & devices" },
-      { id: "behavior", label: "Behavior" },
-      { id: "plan", label: "Plan & billing" },
-      { id: "setup", label: "Setup" },
+      { id: "templates", labelKey: "nav.templates" },
+      { id: "pages", labelKey: "nav.pages" },
+      { id: "behavior", labelKey: "nav.behavior" },
+      { id: "plan", labelKey: "nav.plan" },
+      { id: "setup", labelKey: "nav.setup" },
     ],
   },
 ];
 
-export function getNavLabel(id: NavId): string {
-  return (
-    NAV_GROUPS.flatMap((g) => g.items).find((i) => i.id === id)?.label ||
-    "Design"
-  );
+export function getNavLabel(id: NavId, t?: TranslateFn): string {
+  const key =
+    NAV_GROUPS.flatMap((g) => g.items).find((i) => i.id === id)?.labelKey ||
+    "nav.design";
+  return t ? t(key) : key;
 }

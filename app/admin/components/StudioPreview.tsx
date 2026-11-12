@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import styles from "../../styles/dashboard.module.css";
+import { useI18n } from "../../i18n";
 import type { BarConfig } from "../../models/bar-config";
 import {
   activeRewardTiers,
@@ -198,6 +199,7 @@ export function StudioPreview({
   onShowDrawerChange,
   onShowEmptyChange,
 }: StudioPreviewProps) {
+  const { t } = useI18n();
   const previewBg =
     config.backgroundStyle === "gradient"
       ? `linear-gradient(135deg, ${hexToRgba(config.backgroundColor, config.backgroundOpacity)}, ${hexToRgba(config.backgroundColor, Math.max(40, config.backgroundOpacity - 25))})`
@@ -232,7 +234,7 @@ export function StudioPreview({
   };
 
   return (
-    <aside className={styles.studioPreview} aria-label="Live preview">
+    <aside className={styles.studioPreview} aria-label={t("preview.livePreview")}>
       <div className={styles.previewShell}>
         <div className={styles.previewChrome}>
           <span className={styles.previewDot} />
@@ -257,7 +259,7 @@ export function StudioPreview({
                 checked={showDrawerPreview}
                 onChange={(e) => onShowDrawerChange(e.target.checked)}
               />
-              Show drawer
+              {t("preview.showDrawer")}
             </label>
             <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <input
@@ -265,10 +267,10 @@ export function StudioPreview({
                 checked={showEmptyPreview}
                 onChange={(e) => onShowEmptyChange(e.target.checked)}
               />
-              Show empty cart
+              {t("preview.showEmptyCart")}
             </label>
             {!showEmptyPreview && (
-              <span style={{ opacity: 0.75 }}>Sample items shown</span>
+              <span style={{ opacity: 0.75 }}>{t("preview.sampleItems")}</span>
             )}
           </div>
         )}
@@ -283,15 +285,15 @@ export function StudioPreview({
               <p className={styles.previewTitle}>Classic Canvas Sneaker</p>
               <p className={styles.previewSubtitle}>
                 {config.displayMode === "quickbuy"
-                  ? "Quick Buy preview"
+                  ? t("preview.quickBuyPreview")
                   : config.displayMode === "slider"
-                    ? "Bar + cart drawer preview"
-                    : "Product page mock"}
+                    ? t("preview.barDrawerPreview")
+                    : t("preview.productPageMock")}
               </p>
             </div>
           </div>
           <button type="button" className={styles.previewNativeBtn}>
-            Native Add to cart
+            {t("preview.nativeAddToCart")}
           </button>
 
           {config.displayMode === "quickbuy" ? (
@@ -920,7 +922,7 @@ export function StudioPreview({
                         color: config.textColor,
                       }}
                     >
-                      Your cart is empty
+                      {t("preview.cartEmpty")}
                     </p>
                     <p
                       style={{
@@ -1074,9 +1076,9 @@ export function StudioPreview({
                               : 12;
                         const removeLabel =
                           config.cartLineRemoveStyle === "delete"
-                            ? "Delete"
+                            ? t("preview.delete")
                             : config.cartLineRemoveStyle === "remove"
-                              ? "Remove"
+                              ? t("preview.remove")
                               : config.cartLineRemoveStyle === "trash"
                                 ? "🗑"
                                 : "×";
@@ -1086,7 +1088,7 @@ export function StudioPreview({
                           !config.cartLineQtyEnabled
                             ? ""
                             : config.cartLineQtyStyle === "plain"
-                              ? `<p class="satc-slider__item-meta">Qty ${item.qty}</p>`
+                              ? `<p class="satc-slider__item-meta">${t("preview.qty", { count: item.qty })}</p>`
                               : `<div class="satc-slider__line-qty"><span style="padding:${qtyPad}">−</span><span style="padding:${qtyPad}">${item.qty}</span><span style="padding:${qtyPad}">+</span></div>`;
                         const removeHtml = config.cartLineRemoveEnabled
                           ? `<span style="font-size:${removeFont}px;opacity:.75">${removeLabel}</span>`
@@ -1196,7 +1198,7 @@ export function StudioPreview({
                                       opacity: 0.75,
                                     }}
                                   >
-                                    Qty {item.qty}
+                                    {t("preview.qty", { count: item.qty })}
                                   </span>
                                 ) : (
                                   <div
@@ -1359,7 +1361,7 @@ export function StudioPreview({
                 {!showEmptyPreview && (
                   <div className={styles.previewSliderFooter}>
                     <div style={{ color: config.textColor }}>
-                      <span>Subtotal</span>
+                      <span>{t("preview.subtotal")}</span>
                       <strong>$68.00</strong>
                     </div>
                     <div
@@ -1370,7 +1372,7 @@ export function StudioPreview({
                         borderRadius: `${config.buttonRadius}px`,
                       }}
                     >
-                      {config.drawerCheckoutText || "Checkout"}
+                      {config.drawerCheckoutText || t("preview.checkout")}
                     </div>
                   </div>
                 )}

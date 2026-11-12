@@ -15,7 +15,7 @@ type PickedProduct = {
   variants?: Array<{ id?: string | number; available?: boolean }>;
 };
 
-export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
+export function RecommendationsPanel({ config, updateConfig, t }: PanelProps) {
   const shopify = useAppBridge();
 
   const pickCollection = async () => {
@@ -87,13 +87,13 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
     <s-stack gap="base">
       <s-stack direction="inline" gap="base">
         <s-badge tone={config.recommendationsEnabled ? "success" : "neutral"}>
-          {config.recommendationsEnabled ? "Active" : "Disabled"}
+          {config.recommendationsEnabled ? t("common.active") : t("common.disabled")}
         </s-badge>
         <s-switch
           label={
             config.recommendationsEnabled
-              ? "Disable recommendations"
-              : "Enable recommendations"
+              ? t("recommendations.disable")
+              : t("recommendations.enable")
           }
           checked={config.recommendationsEnabled}
           onChange={(e: Event) =>
@@ -105,13 +105,10 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
         />
       </s-stack>
 
-      <s-paragraph>
-        Show product recommendations customers can add in one click — on empty
-        carts and optionally when items are already in the cart.
-      </s-paragraph>
+      <s-paragraph>{t("recommendations.help")}</s-paragraph>
 
       <s-switch
-        label="Show recommendations when cart has items"
+        label={t("recommendations.withItems")}
         checked={config.recommendationsShowWithItems}
         onChange={(e: Event) =>
           updateConfig(
@@ -121,7 +118,7 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-switch
-        label="Hide products already in the cart"
+        label={t("recommendations.hideInCart")}
         checked={config.recommendationsHideInCart}
         onChange={(e: Event) =>
           updateConfig(
@@ -132,7 +129,7 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
       />
 
       <s-select
-        label="Product source"
+        label={t("recommendations.source")}
         value={config.recommendationsSource}
         onChange={(e: Event) =>
           updateConfig(
@@ -142,16 +139,16 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
           )
         }
       >
-        <s-option value="collection">Collection</s-option>
-        <s-option value="products">Specific products</s-option>
+        <s-option value="collection">{t("recommendations.collection")}</s-option>
+        <s-option value="products">{t("recommendations.sourceProducts")}</s-option>
       </s-select>
 
       {config.recommendationsSource === "collection" ? (
         <s-stack gap="small-200">
           <s-text-field
-            label="Collection handle"
+            label={t("recommendations.collectionHandle")}
             value={config.recommendationsCollection}
-            details="e.g. all, bestsellers — or pick a collection below"
+            details={t("recommendations.collectionHandleHelp")}
             onChange={(e: Event) =>
               updateConfig(
                 "recommendationsCollection",
@@ -159,14 +156,16 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
               )
             }
           />
-          <s-button onClick={pickCollection}>Pick collection</s-button>
+          <s-button onClick={pickCollection}>{t("recommendations.pickCollection")}</s-button>
         </s-stack>
       ) : (
         <s-stack gap="small-200">
           <s-paragraph>
             {config.recommendationsProducts.length
-              ? `${config.recommendationsProducts.length} product(s) selected`
-              : "No products selected yet."}
+              ? t("recommendations.productsSelected", {
+                  count: config.recommendationsProducts.length,
+                })
+              : t("recommendations.noneSelected")}
           </s-paragraph>
           {config.recommendationsProducts.map((p) => (
             <s-stack key={p.handle} direction="inline" gap="base">
@@ -174,20 +173,20 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
                 <strong>{p.title}</strong> · {p.handle}
               </s-paragraph>
               <s-button variant="tertiary" onClick={() => removeProduct(p.handle)}>
-                Remove
+                {t("common.remove")}
               </s-button>
             </s-stack>
           ))}
           <s-button onClick={pickProducts}>
             {config.recommendationsProducts.length
-              ? "Edit products"
-              : "Pick products"}
+              ? t("recommendations.editProducts")
+              : t("recommendations.pickProducts")}
           </s-button>
         </s-stack>
       )}
 
       <s-text-field
-        label="Empty cart helper text"
+        label={t("recommendations.emptyText")}
         value={config.recommendationsEmptyText}
         onChange={(e: Event) =>
           updateConfig(
@@ -197,7 +196,7 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-text-field
-        label="Recommendations header"
+        label={t("recommendations.header")}
         value={config.recommendationsHeader}
         onChange={(e: Event) =>
           updateConfig(
@@ -207,7 +206,7 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-number-field
-        label="Maximum recommendations"
+        label={t("recommendations.max")}
         value={String(config.recommendationsMax)}
         min={1}
         max={8}
@@ -219,7 +218,7 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-text-field
-        label="Add button text"
+        label={t("recommendations.addText")}
         value={config.recommendationsAddText}
         onChange={(e: Event) =>
           updateConfig(
@@ -230,7 +229,7 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
       />
 
       <s-select
-        label="Recommendation animation"
+        label={t("recommendations.animation")}
         value={config.recommendationsAnimation}
         onChange={(e: Event) =>
           updateConfig(
@@ -239,15 +238,15 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
           )
         }
       >
-        <s-option value="stagger">Stagger fade-up</s-option>
-        <s-option value="fade">Fade in</s-option>
-        <s-option value="slide">Slide in</s-option>
-        <s-option value="none">None</s-option>
+        <s-option value="stagger">{t("recommendations.animStagger")}</s-option>
+        <s-option value="fade">{t("recommendations.animFade")}</s-option>
+        <s-option value="slide">{t("recommendations.animSlide")}</s-option>
+        <s-option value="none">{t("common.none")}</s-option>
       </s-select>
 
-      <s-heading>Shop now button</s-heading>
+      <s-heading>{t("recommendations.shopNowHeading")}</s-heading>
       <s-switch
-        label="Show Shop now button on empty cart"
+        label={t("recommendations.shopNow")}
         checked={config.recommendationsShopNowEnabled}
         onChange={(e: Event) =>
           updateConfig(
@@ -257,7 +256,7 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-text-field
-        label="Button text"
+        label={t("recommendations.shopText")}
         value={config.recommendationsShopNowText}
         onChange={(e: Event) =>
           updateConfig(
@@ -267,7 +266,7 @@ export function RecommendationsPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-text-field
-        label="Button URL"
+        label={t("recommendations.shopUrl")}
         value={config.recommendationsShopNowUrl}
         onChange={(e: Event) =>
           updateConfig(

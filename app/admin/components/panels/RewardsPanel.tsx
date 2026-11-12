@@ -96,6 +96,7 @@ export function RewardsPanel({
   config,
   updateConfig,
   updateRewardTier,
+  t,
 }: RewardsPanelProps) {
   const shopify = useAppBridge();
   const fileFetcher = useFetcher<ResolveFileActionData>();
@@ -195,9 +196,7 @@ export function RewardsPanel({
         }
       ).intents;
       if (!intents?.invoke) {
-        setFileError(
-          "Shopify Files picker is unavailable in this admin session. Update the app embed / App Bridge.",
-        );
+        setFileError(t("rewards.filesUnavailable"));
         return;
       }
       const activity = await intents.invoke("pick:shopify/File", {
@@ -218,7 +217,7 @@ export function RewardsPanel({
       const message =
         err instanceof Error
           ? err.message
-          : "Could not open Shopify Files. Re-auth the app after scopes update.";
+          : t("rewards.filesError");
       setFileError(message);
     }
   };
@@ -234,13 +233,13 @@ export function RewardsPanel({
     <s-stack gap="base">
       <s-stack direction="inline" gap="base">
         <s-badge tone={config.rewardEnabled ? "success" : "neutral"}>
-          {config.rewardEnabled ? "Active" : "Disabled"}
+          {config.rewardEnabled ? t("common.active") : t("common.disabled")}
         </s-badge>
         <s-switch
           label={
             config.rewardEnabled
-              ? "Disable tiered rewards"
-              : "Enable tiered rewards"
+              ? t("rewards.disable")
+              : t("rewards.enable")
           }
           checked={config.rewardEnabled}
           onChange={(e: Event) =>
@@ -253,7 +252,7 @@ export function RewardsPanel({
       </s-stack>
 
       <s-switch
-        label="Show rewards on empty cart"
+        label={t("rewards.showEmpty")}
         checked={config.rewardShowOnEmpty}
         onChange={(e: Event) =>
           updateConfig(
@@ -263,10 +262,10 @@ export function RewardsPanel({
         }
       />
 
-      <s-heading>Colors</s-heading>
+      <s-heading>{t("rewards.colors")}</s-heading>
       <s-stack direction="inline" gap="base">
         <s-switch
-          label="Use theme colors"
+          label={t("rewards.useTheme")}
           checked={themeOn}
           onChange={(e: Event) =>
             updateConfig(
@@ -276,13 +275,13 @@ export function RewardsPanel({
           }
         />
         <s-button variant="tertiary" onClick={resetRewardColors}>
-          Reset colors
+          {t("rewards.resetColors")}
         </s-button>
       </s-stack>
       <s-paragraph>
         {themeOn
-          ? "Rewards strip uses theme accent / foreground tokens on the storefront."
-          : "Custom colors below are applied to the rewards bar on the storefront."}
+          ? t("rewards.themeHelpOn")
+          : t("rewards.themeHelpOff")}
       </s-paragraph>
 
       <div
@@ -316,7 +315,7 @@ export function RewardsPanel({
           className={styles.rewardColorPreviewText}
           style={{ color: previewText }}
         >
-          Live color preview
+          {t("rewards.livePreview")}
         </p>
       </div>
 
@@ -325,10 +324,10 @@ export function RewardsPanel({
           <div className={styles.colorLegend}>
             {(
               [
-                ["Background", config.rewardBg],
-                ["Progress", config.rewardFg],
-                ["Icon", config.rewardIconColor],
-                ["Text", config.rewardTextColor],
+                [t("rewards.legendBackground"), config.rewardBg],
+                [t("rewards.legendProgress"), config.rewardFg],
+                [t("rewards.legendIcon"), config.rewardIconColor],
+                [t("rewards.legendText"), config.rewardTextColor],
               ] as const
             ).map(([label, hex]) => (
               <div key={label} className={styles.colorSwatch}>
@@ -345,7 +344,7 @@ export function RewardsPanel({
           </div>
           <s-grid gridTemplateColumns="1fr 1fr" gap="base">
             <s-color-field
-              label="Background"
+              label={t("rewards.legendBackground")}
               value={config.rewardBg}
               onChange={(e: Event) => {
                 const value = colorFromEvent(e);
@@ -353,7 +352,7 @@ export function RewardsPanel({
               }}
             />
             <s-color-field
-              label="Progress / foreground"
+              label={t("rewards.progressFg")}
               value={config.rewardFg}
               onChange={(e: Event) => {
                 const value = colorFromEvent(e);
@@ -361,7 +360,7 @@ export function RewardsPanel({
               }}
             />
             <s-color-field
-              label="Message text"
+              label={t("rewards.messageText")}
               value={config.rewardTextColor}
               onChange={(e: Event) => {
                 const value = colorFromEvent(e);
@@ -373,9 +372,9 @@ export function RewardsPanel({
       )}
 
       <s-color-field
-        label="Icon color"
+        label={t("rewards.iconColor")}
         value={config.rewardIconColor}
-        details="Applies to built-in SVG icons (PNG uploads keep their own colors)."
+        details={t("rewards.iconColorHelp")}
         onChange={(e: Event) => {
           const value = colorFromEvent(e);
           if (value) updateConfig("rewardIconColor", value);
@@ -383,7 +382,7 @@ export function RewardsPanel({
       />
 
       <s-text-field
-        label="Text after completing full rewards bar"
+        label={t("rewards.completeText")}
         value={config.rewardCompleteText}
         onChange={(e: Event) =>
           updateConfig(
@@ -394,7 +393,7 @@ export function RewardsPanel({
       />
 
       <s-select
-        label="Rewards calculation"
+        label={t("rewards.mode")}
         value={config.rewardCalcMode}
         onChange={(e: Event) =>
           updateConfig(
@@ -405,21 +404,18 @@ export function RewardsPanel({
           )
         }
       >
-        <s-option value="total">Cart total ($)</s-option>
-        <s-option value="quantity">Cart quantity (#)</s-option>
+        <s-option value="total">{t("rewards.modeTotal")}</s-option>
+        <s-option value="quantity">{t("rewards.modeQty")}</s-option>
       </s-select>
 
-      <s-heading>Progress bar design</s-heading>
-      <s-paragraph>
-        Mix layout, fill style, and message position. Preview updates on the
-        right — Save to publish to the storefront.
-      </s-paragraph>
+      <s-heading>{t("rewards.barDesign")}</s-heading>
+      <s-paragraph>{t("rewards.barDesignHelp")}</s-paragraph>
 
-      <div className={styles.layoutPicker} role="radiogroup" aria-label="Bar layout">
+      <div className={styles.layoutPicker} role="radiogroup" aria-label={t("rewards.layout")}>
         {(
           [
-            ["stacked", "Bar below", "Milestones on top, progress bar underneath"],
-            ["middle", "Line in middle", "Progress line runs through the icons"],
+            ["stacked", t("rewards.layoutStacked"), t("rewards.layoutStackedHint")],
+            ["middle", t("rewards.layoutMiddle"), t("rewards.layoutMiddleHint")],
           ] as const
         ).map(([value, label, hint]) => (
           <button
@@ -454,7 +450,7 @@ export function RewardsPanel({
       </div>
 
       <s-select
-        label="Progress fill style"
+        label={t("rewards.fillStyle")}
         value={config.rewardBarStyle}
         onChange={(e: Event) =>
           updateConfig(
@@ -463,13 +459,13 @@ export function RewardsPanel({
           )
         }
       >
-        <s-option value="gradient">Gradient</s-option>
-        <s-option value="solid">Solid</s-option>
-        <s-option value="striped">Striped</s-option>
+        <s-option value="gradient">{t("rewards.fillGradient")}</s-option>
+        <s-option value="solid">{t("rewards.fillSolid")}</s-option>
+        <s-option value="striped">{t("rewards.fillStriped")}</s-option>
       </s-select>
 
       <s-select
-        label="Message position"
+        label={t("rewards.messagePosition")}
         value={config.rewardMessagePosition}
         onChange={(e: Event) =>
           updateConfig(
@@ -479,13 +475,13 @@ export function RewardsPanel({
           )
         }
       >
-        <s-option value="below">Below progress</s-option>
-        <s-option value="above">Above progress</s-option>
+        <s-option value="below">{t("rewards.msgBelow")}</s-option>
+        <s-option value="above">{t("rewards.msgAbove")}</s-option>
       </s-select>
 
-      <s-heading>Icons</s-heading>
+      <s-heading>{t("rewards.icons")}</s-heading>
       <s-switch
-        label="Show milestone icons"
+        label={t("rewards.showIcons")}
         checked={config.rewardShowIcons}
         onChange={(e: Event) =>
           updateConfig(
@@ -495,9 +491,9 @@ export function RewardsPanel({
         }
       />
       <s-select
-        label="Icon position"
+        label={t("rewards.iconPosition")}
         value={config.rewardIconPosition}
-        details="Inside = on the progress line. Outside = above or below the bar."
+        details={t("rewards.iconPositionHelp")}
         onChange={(e: Event) => {
           const value = (e.currentTarget as HTMLSelectElement)
             .value as RewardIconPosition;
@@ -509,16 +505,16 @@ export function RewardsPanel({
           }
         }}
       >
-        <s-option value="inside">Inside (on the line)</s-option>
-        <s-option value="outside-top">Outside — top</s-option>
-        <s-option value="outside-bottom">Outside — bottom</s-option>
+        <s-option value="inside">{t("rewards.iconInside")}</s-option>
+        <s-option value="outside-top">{t("rewards.iconOutsideTop")}</s-option>
+        <s-option value="outside-bottom">{t("rewards.iconOutsideBottom")}</s-option>
       </s-select>
       <s-number-field
-        label="Icon size (px)"
+        label={t("rewards.iconSize")}
         value={String(config.rewardIconSize ?? 28)}
         min={14}
         max={48}
-        details="Diameter of each milestone circle (14–48)."
+        details={t("rewards.iconSizeHelp")}
         onChange={(e: Event) =>
           updateConfig(
             "rewardIconSize",
@@ -533,7 +529,7 @@ export function RewardsPanel({
         }
       />
       <s-select
-        label="Icon style"
+        label={t("rewards.iconStyle")}
         value={config.rewardIconStyle}
         onChange={(e: Event) =>
           updateConfig(
@@ -542,16 +538,16 @@ export function RewardsPanel({
           )
         }
       >
-        <s-option value="filled">Filled</s-option>
-        <s-option value="outline">Outline</s-option>
-        <s-option value="soft">Soft</s-option>
-        <s-option value="plain">Plain</s-option>
+        <s-option value="filled">{t("rewards.styleFilled")}</s-option>
+        <s-option value="outline">{t("rewards.styleOutline")}</s-option>
+        <s-option value="soft">{t("rewards.styleSoft")}</s-option>
+        <s-option value="plain">{t("rewards.stylePlain")}</s-option>
       </s-select>
 
       <s-select
-        label="Rewards animation"
+        label={t("rewards.animation")}
         value={config.rewardAnimation}
-        details="Progress bar and unlock motion on the storefront"
+        details={t("rewards.animationHelp")}
         onChange={(e: Event) =>
           updateConfig(
             "rewardAnimation",
@@ -559,16 +555,16 @@ export function RewardsPanel({
           )
         }
       >
-        <s-option value="smooth">Smooth fill</s-option>
-        <s-option value="pulse">Pulse on unlock</s-option>
-        <s-option value="glow">Glow progress</s-option>
-        <s-option value="bounce">Bounce milestones</s-option>
-        <s-option value="none">None</s-option>
+        <s-option value="smooth">{t("rewards.animSmooth")}</s-option>
+        <s-option value="pulse">{t("rewards.animPulse")}</s-option>
+        <s-option value="glow">{t("rewards.animGlow")}</s-option>
+        <s-option value="bounce">{t("rewards.animBounce")}</s-option>
+        <s-option value="none">{t("common.none")}</s-option>
       </s-select>
 
-      <s-heading>Tiers</s-heading>
-      <div className={styles.tierTabs} role="tablist" aria-label="Reward tiers">
-        {config.rewardTiers.map((t, index) => (
+      <s-heading>{t("rewards.tiers")}</s-heading>
+      <div className={styles.tierTabs} role="tablist" aria-label={t("rewards.tiers")}>
+        {config.rewardTiers.map((tierItem, index) => (
           <button
             key={`tier-tab-${index}`}
             type="button"
@@ -579,8 +575,8 @@ export function RewardsPanel({
             }`}
             onClick={() => setActiveTier(index)}
           >
-            Tier {index + 1}
-            {t.enabled ? "" : " · off"}
+            {t("rewards.tierN", { n: index + 1 })}
+            {tierItem.enabled ? "" : t("rewards.tabOff")}
           </button>
         ))}
       </div>
@@ -588,9 +584,9 @@ export function RewardsPanel({
       {tier && (
         <div className={styles.tierCard} role="tabpanel">
           <s-stack direction="inline" gap="base">
-            <strong>Tier {activeTier + 1}</strong>
+            <strong>{t("rewards.tierN", { n: activeTier + 1 })}</strong>
             <s-switch
-              label="Enabled"
+              label={t("rewards.tierEnabled")}
               checked={tier.enabled}
               onChange={(e: Event) =>
                 updateRewardTier(activeTier, {
@@ -601,7 +597,7 @@ export function RewardsPanel({
           </s-stack>
 
           <s-select
-            label="Reward type"
+            label={t("rewards.rewardType")}
             value={tier.rewardType || "custom"}
             onChange={(e: Event) =>
               updateRewardTier(activeTier, {
@@ -610,17 +606,17 @@ export function RewardsPanel({
               })
             }
           >
-            <s-option value="shipping">Shipping</s-option>
-            <s-option value="discount">Discount</s-option>
-            <s-option value="product">Product</s-option>
-            <s-option value="custom">Custom</s-option>
+            <s-option value="shipping">{t("rewards.typeShipping")}</s-option>
+            <s-option value="discount">{t("rewards.typeDiscount")}</s-option>
+            <s-option value="product">{t("rewards.typeProduct")}</s-option>
+            <s-option value="custom">{t("rewards.typeCustom")}</s-option>
           </s-select>
 
           <s-number-field
             label={
               config.rewardCalcMode === "quantity"
-                ? "Minimum quantity"
-                : "Minimum amount"
+                ? t("rewards.minQuantity")
+                : t("rewards.minAmount")
             }
             value={String(tier.minAmount)}
             min={1}
@@ -631,7 +627,7 @@ export function RewardsPanel({
             }
           />
           <s-text-field
-            label="Reward description"
+            label={t("rewards.tierDescription")}
             value={tier.description}
             onChange={(e: Event) =>
               updateRewardTier(activeTier, {
@@ -640,7 +636,7 @@ export function RewardsPanel({
             }
           />
           <s-text-field
-            label="Title before achieving (use [AMOUNT])"
+            label={t("rewards.titleBefore")}
             value={tier.titleBefore}
             onChange={(e: Event) =>
               updateRewardTier(activeTier, {
@@ -649,12 +645,9 @@ export function RewardsPanel({
             }
           />
 
-          <s-heading>Tier icon</s-heading>
-          <s-paragraph>
-            Choose a built-in icon, or pick/upload an image or SVG from Shopify
-            Files for this tier only.
-          </s-paragraph>
-          <div className={styles.iconPresetGrid} role="listbox" aria-label="Tier icon">
+          <s-heading>{t("rewards.tierIcon")}</s-heading>
+          <s-paragraph>{t("rewards.tierIconHelp")}</s-paragraph>
+          <div className={styles.iconPresetGrid} role="listbox" aria-label={t("rewards.tierIcon")}>
             {REWARD_ICON_PRESETS.map((preset) => (
               <button
                 key={preset.id}
@@ -681,7 +674,7 @@ export function RewardsPanel({
                 <span className={styles.iconPresetGlyph} aria-hidden="true">
                   <PresetGlyph id={preset.id} />
                 </span>
-                <span>{preset.label}</span>
+                <span>{t(`rewards.preset.${preset.id}`)}</span>
               </button>
             ))}
           </div>
@@ -702,7 +695,7 @@ export function RewardsPanel({
                       }}
                     />
                     <div className={styles.rewardProductMeta}>
-                      <strong>Custom icon</strong>
+                      <strong>{t("rewards.customIcon")}</strong>
                       <span>{tier.iconUrl}</span>
                     </div>
                     <s-button
@@ -710,28 +703,28 @@ export function RewardsPanel({
                       onClick={pickShopifyFile}
                       disabled={fileBusy}
                     >
-                      {fileBusy ? "Loading…" : "Change file"}
+                      {fileBusy ? t("common.loading") : t("rewards.changeFile")}
                     </s-button>
                     <s-button
                       variant="tertiary"
                       tone="critical"
                       onClick={clearCustomIcon}
                     >
-                      Remove
+                      {t("common.remove")}
                     </s-button>
                   </>
                 ) : (
                   <s-button onClick={pickShopifyFile} disabled={fileBusy}>
                     {fileBusy
-                      ? "Loading…"
-                      : "+ Upload or choose from Shopify Files"}
+                      ? t("common.loading")
+                      : t("rewards.uploadFile")}
                   </s-button>
                 )}
               </div>
               <s-text-field
-                label="Or paste image URL (PNG / SVG / JPG)"
+                label={t("rewards.pasteUrl")}
                 value={tier.iconUrl || ""}
-                details="After picking a file or pasting a URL, click Save to publish to the storefront."
+                details={t("rewards.pasteUrlHelp")}
                 onChange={(e: Event) => {
                   const url = (e.currentTarget as HTMLInputElement).value.trim();
                   updateRewardTier(activeTier, {
@@ -748,33 +741,30 @@ export function RewardsPanel({
 
           {tier.rewardType === "product" && (
             <>
-              <s-heading>Product</s-heading>
-              <s-paragraph>
-                Pick a product for this milestone. When unlocked, shoppers can
-                open it from the rewards strip.
-              </s-paragraph>
+              <s-heading>{t("rewards.productHeading")}</s-heading>
+              <s-paragraph>{t("rewards.productHelp")}</s-paragraph>
               {tier.productTitle || tier.productHandle ? (
                 <div className={styles.rewardProductRow}>
                   <div className={styles.rewardProductMeta}>
-                    <strong>{tier.productTitle || "Selected product"}</strong>
+                    <strong>{tier.productTitle || t("rewards.selectedProduct")}</strong>
                     <span>
                       {tier.productHandle
                         ? `/products/${tier.productHandle}`
-                        : tier.productUrl || "No URL"}
+                        : tier.productUrl || t("rewards.noUrl")}
                     </span>
                   </div>
                   <s-button variant="tertiary" onClick={pickProduct}>
-                    Change
+                    {t("common.change")}
                   </s-button>
                   <s-button variant="tertiary" tone="critical" onClick={clearProduct}>
-                    Remove
+                    {t("common.remove")}
                   </s-button>
                 </div>
               ) : (
-                <s-button onClick={pickProduct}>+ Add product</s-button>
+                <s-button onClick={pickProduct}>{t("rewards.addProduct")}</s-button>
               )}
               <s-text-field
-                label="Product title (optional override)"
+                label={t("rewards.productTitleOverride")}
                 value={tier.productTitle || ""}
                 onChange={(e: Event) =>
                   updateRewardTier(activeTier, {
@@ -783,9 +773,9 @@ export function RewardsPanel({
                 }
               />
               <s-text-field
-                label="Product handle"
+                label={t("rewards.productHandle")}
                 value={tier.productHandle || ""}
-                details="e.g. free-gift — used as /products/handle if URL is empty"
+                details={t("rewards.productHandleHelp")}
                 onChange={(e: Event) =>
                   updateRewardTier(activeTier, {
                     productHandle: (e.currentTarget as HTMLInputElement).value,
@@ -793,7 +783,7 @@ export function RewardsPanel({
                 }
               />
               <s-text-field
-                label="Product URL (optional)"
+                label={t("rewards.productUrl")}
                 value={tier.productUrl || ""}
                 onChange={(e: Event) =>
                   updateRewardTier(activeTier, {
@@ -809,7 +799,7 @@ export function RewardsPanel({
       <FeatureCustomTemplate
         featureKey="rewards"
         extraKeys={["rewardTier"]}
-        title="Custom rewards HTML"
+        title={t("rewards.customHtml")}
         config={config}
         updateConfig={updateConfig}
       />

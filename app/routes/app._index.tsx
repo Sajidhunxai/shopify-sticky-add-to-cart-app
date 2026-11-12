@@ -41,6 +41,7 @@ import { TrustPanel } from "../admin/components/panels/TrustPanel";
 import { useBarConfigStudio } from "../admin/hooks/useBarConfigStudio";
 import { getNavLabel } from "../admin/nav";
 import { serializeBarConfigToFormData } from "../admin/serialize-config";
+import { LanguageSelect, useI18n } from "../i18n";
 import styles from "../styles/dashboard.module.css";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -181,6 +182,7 @@ export default function Index() {
   const navigation = useNavigation();
   const submit = useSubmit();
   const shopify = useAppBridge();
+  const { t } = useI18n();
   const busy = navigation.state !== "idle";
   const isPro = plan === "pro";
 
@@ -206,26 +208,29 @@ export default function Index() {
     submit(serializeBarConfigToFormData(config), { method: "post" });
   };
 
-  const activeLabel = getNavLabel(nav);
+  const activeLabel = getNavLabel(nav, t);
+  const panelProps = { config, updateConfig, t };
 
   return (
-    <s-page heading="Sticky Add to Cart">
+    <s-page heading={t("app.name")}>
       <s-button
         slot="primary-action"
         variant="primary"
         onClick={handleSave}
         {...(busy ? { loading: true } : {})}
       >
-        Save settings
+        {t("app.saveSettings")}
       </s-button>
+
+      <div style={{ margin: "0 0 12px" }}>
+        <LanguageSelect />
+      </div>
 
       <s-banner
         tone={config.enabled ? "success" : "warning"}
-        heading={config.enabled ? "Sticky bar ready" : "Sticky bar is off"}
+        heading={config.enabled ? t("app.bannerOn") : t("app.bannerOff")}
       >
-        {config.enabled
-          ? "Use the left menu to edit Design, Header, Cart items, and more. Save to sync the storefront."
-          : "Turn the sticky bar on under Cart items / Setup, then save."}
+        {config.enabled ? t("app.bannerOnBody") : t("app.bannerOffBody")}
       </s-banner>
 
       <div className={styles.studio}>
@@ -239,59 +244,38 @@ export default function Index() {
         <section className={styles.studioPanel}>
           <header className={styles.panelHeader}>
             <h2 className={styles.panelTitle}>{activeLabel}</h2>
-            <p className={styles.panelSub}>
-              Changes update the preview instantly. Click Save settings to
-              publish.
-            </p>
+            <p className={styles.panelSub}>{t("app.panelHint")}</p>
           </header>
 
-          {nav === "design" && (
-            <DesignPanel config={config} updateConfig={updateConfig} />
-          )}
-          {nav === "header" && (
-            <HeaderPanel config={config} updateConfig={updateConfig} />
-          )}
-          {nav === "display" && (
-            <DisplayPanel config={config} updateConfig={updateConfig} />
-          )}
-          {nav === "cart-items" && (
-            <CartItemsPanel config={config} updateConfig={updateConfig} />
-          )}
-          {nav === "announcements" && (
-            <AnnouncementsPanel config={config} updateConfig={updateConfig} />
-          )}
+          {nav === "design" && <DesignPanel {...panelProps} />}
+          {nav === "header" && <HeaderPanel {...panelProps} />}
+          {nav === "display" && <DisplayPanel {...panelProps} />}
+          {nav === "cart-items" && <CartItemsPanel {...panelProps} />}
+          {nav === "announcements" && <AnnouncementsPanel {...panelProps} />}
           {nav === "rewards" && (
             <RewardsPanel
-              config={config}
-              updateConfig={updateConfig}
+              {...panelProps}
               updateRewardTier={updateRewardTier}
             />
           )}
           {nav === "recommendations" && (
-            <RecommendationsPanel config={config} updateConfig={updateConfig} />
+            <RecommendationsPanel {...panelProps} />
           )}
-          {nav === "discounts" && (
-            <DiscountsPanel config={config} updateConfig={updateConfig} />
-          )}
-          {nav === "trust" && (
-            <TrustPanel config={config} updateConfig={updateConfig} />
-          )}
-          {nav === "cart-summary" && (
-            <CartSummaryPanel config={config} updateConfig={updateConfig} />
-          )}
-          {nav === "pages" && (
-            <PagesPanel config={config} updateConfig={updateConfig} />
-          )}
-          {nav === "behavior" && (
-            <BehaviorPanel config={config} updateConfig={updateConfig} />
-          )}
-          {nav === "templates" && (
-            <TemplatesPanel config={config} updateConfig={updateConfig} />
-          )}
+          {nav === "discounts" && <DiscountsPanel {...panelProps} />}
+          {nav === "trust" && <TrustPanel {...panelProps} />}
+          {nav === "cart-summary" && <CartSummaryPanel {...panelProps} />}
+          {nav === "pages" && <PagesPanel {...panelProps} />}
+          {nav === "behavior" && <BehaviorPanel {...panelProps} />}
+          {nav === "templates" && <TemplatesPanel {...panelProps} />}
           {nav === "plan" && (
-            <PlanPanel isPro={isPro} hideBranding={hideBranding} busy={busy} />
+            <PlanPanel
+              isPro={isPro}
+              hideBranding={hideBranding}
+              busy={busy}
+              t={t}
+            />
           )}
-          {nav === "setup" && <SetupPanel shop={shop} busy={busy} />}
+          {nav === "setup" && <SetupPanel shop={shop} busy={busy} t={t} />}
         </section>
 
         <StudioPreview
@@ -303,7 +287,7 @@ export default function Index() {
           onShowDrawerChange={setPreviewDrawerManual}
           onShowEmptyChange={setPreviewEmpty}
         />
-        </div>
+      </div>
     </s-page>
   );
 }

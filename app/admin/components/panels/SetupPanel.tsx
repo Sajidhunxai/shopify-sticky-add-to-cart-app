@@ -1,11 +1,11 @@
 import { Form } from "react-router";
 import type { SetupPanelProps } from "../../types";
 
-export function SetupPanel({ busy, shop }: SetupPanelProps) {
+export function SetupPanel({ busy, shop, t }: SetupPanelProps) {
   return (
     <s-stack gap="base">
       <s-paragraph>
-        Store: <strong>{shop}</strong>
+        {t("setup.store")} <strong>{shop}</strong>
       </s-paragraph>
       <s-stack direction="inline" gap="base">
         <s-button
@@ -13,7 +13,7 @@ export function SetupPanel({ busy, shop }: SetupPanelProps) {
           target="_blank"
           variant="secondary"
         >
-          Open Theme Editor
+          {t("setup.openThemeEditor")}
         </s-button>
         <Form method="post">
           <input type="hidden" name="intent" value="sync" />
@@ -22,36 +22,23 @@ export function SetupPanel({ busy, shop }: SetupPanelProps) {
             variant="tertiary"
             {...(busy ? { loading: true } : {})}
           >
-            Sync storefront
+            {t("plan.sync")}
           </s-button>
         </Form>
         <s-button href="/app/additional" variant="tertiary">
-          Setup help
+          {t("app.navSetup")}
         </s-button>
       </s-stack>
-      <s-heading>Settings → storefront checklist</s-heading>
+      <s-heading>{t("setup.checklistHeading")}</s-heading>
       <s-unordered-list>
-        <s-list-item>Enable the App embed once in Theme Editor</s-list-item>
-        <s-list-item>
-          Set Display style → Cart drawer (for drawer + cart icon intercept)
-        </s-list-item>
-        <s-list-item>
-          Configure Design / Header / Tiered rewards / Recommendations here
-        </s-list-item>
-        <s-list-item>
-          Under Pages &amp; devices, set sticky bar and Cart drawer — show on
-          flags separately
-        </s-list-item>
-        <s-list-item>Click Save settings (syncs metafield to storefront)</s-list-item>
-        <s-list-item>
-          After the first Save, admin settings fully override Theme Editor
-          color/text defaults for this embed
-        </s-list-item>
-        <s-list-item>Hard-refresh the storefront, then open the cart drawer</s-list-item>
-        <s-list-item>
-          To replace the theme cart drawer: theme Cart type → Page. Full steps
-          under Setup help.
-        </s-list-item>
+        <s-list-item>{t("setup.check1")}</s-list-item>
+        <s-list-item>{t("setup.check2")}</s-list-item>
+        <s-list-item>{t("setup.check3")}</s-list-item>
+        <s-list-item>{t("setup.check4")}</s-list-item>
+        <s-list-item>{t("setup.check5")}</s-list-item>
+        <s-list-item>{t("setup.check6")}</s-list-item>
+        <s-list-item>{t("setup.check7")}</s-list-item>
+        <s-list-item>{t("setup.check8")}</s-list-item>
       </s-unordered-list>
     </s-stack>
   );

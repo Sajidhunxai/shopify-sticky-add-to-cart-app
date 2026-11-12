@@ -3,18 +3,18 @@ import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import { colorFromEvent } from "../../fields/color";
 import type { PanelProps } from "../../types";
 
-export function AnnouncementsPanel({ config, updateConfig }: PanelProps) {
+export function AnnouncementsPanel({ config, updateConfig, t }: PanelProps) {
   return (
     <s-stack gap="base">
       <s-stack direction="inline" gap="base">
         <s-badge tone={config.announcementEnabled ? "success" : "neutral"}>
-          {config.announcementEnabled ? "Active" : "Disabled"}
+          {config.announcementEnabled ? t("common.active") : t("common.disabled")}
         </s-badge>
         <s-switch
           label={
             config.announcementEnabled
-              ? "Disable announcement"
-              : "Enable announcement"
+              ? t("announcements.disable")
+              : t("announcements.enable")
           }
           checked={config.announcementEnabled}
           onChange={(e: Event) =>
@@ -27,7 +27,7 @@ export function AnnouncementsPanel({ config, updateConfig }: PanelProps) {
       </s-stack>
 
       <s-select
-        label="Height"
+        label={t("announcements.height")}
         value={config.announcementHeight}
         onChange={(e: Event) =>
           updateConfig(
@@ -37,13 +37,13 @@ export function AnnouncementsPanel({ config, updateConfig }: PanelProps) {
           )
         }
       >
-        <s-option value="slim">Slim</s-option>
-        <s-option value="normal">Normal</s-option>
-        <s-option value="thick">Thick</s-option>
+        <s-option value="slim">{t("announcements.slim")}</s-option>
+        <s-option value="normal">{t("common.normal")}</s-option>
+        <s-option value="thick">{t("common.thick")}</s-option>
       </s-select>
 
       <s-select
-        label="Position"
+        label={t("announcements.position")}
         value={config.announcementPosition}
         onChange={(e: Event) =>
           updateConfig(
@@ -52,12 +52,12 @@ export function AnnouncementsPanel({ config, updateConfig }: PanelProps) {
           )
         }
       >
-        <s-option value="before">Before products</s-option>
-        <s-option value="after">After products</s-option>
+        <s-option value="before">{t("announcements.before")}</s-option>
+        <s-option value="after">{t("announcements.after")}</s-option>
       </s-select>
 
       <s-text-field
-        label="Timer duration (MM:SS)"
+        label={t("announcements.timer")}
         value={config.announcementTimer}
         onChange={(e: Event) =>
           updateConfig(
@@ -66,26 +66,23 @@ export function AnnouncementsPanel({ config, updateConfig }: PanelProps) {
           )
         }
       />
-      <s-paragraph>
-        Use MM:SS format (example: 15:00). Put <strong>{"{timer}"}</strong> in
-        the announcement text to show the countdown.
-      </s-paragraph>
+      <s-paragraph>{t("announcements.timerHelp")}</s-paragraph>
 
       <label className={styles.codeFieldLabel} htmlFor="announcement-text">
-        Announcement text
+        {t("announcements.text")}
       </label>
       <textarea
         id="announcement-text"
         className={styles.codeField}
         rows={3}
         value={config.announcementText}
-        placeholder="Your products are reserved for {timer}!"
+        placeholder={t("announcements.textPlaceholder")}
         onChange={(e) => updateConfig("announcementText", e.target.value)}
         style={{ background: "#fff", color: "#111", minHeight: 72 }}
       />
 
       <s-number-field
-        label="Font size"
+        label={t("announcements.fontSize")}
         value={String(config.announcementFontSize)}
         min={10}
         max={24}
@@ -99,7 +96,7 @@ export function AnnouncementsPanel({ config, updateConfig }: PanelProps) {
 
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-color-field
-          label="Background color"
+          label={t("announcements.bg")}
           value={config.announcementBg}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -107,7 +104,7 @@ export function AnnouncementsPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Border color"
+          label={t("announcements.border")}
           value={config.announcementBorderColor}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -115,7 +112,7 @@ export function AnnouncementsPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Text color"
+          label={t("announcements.textColor")}
           value={config.announcementTextColor}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);

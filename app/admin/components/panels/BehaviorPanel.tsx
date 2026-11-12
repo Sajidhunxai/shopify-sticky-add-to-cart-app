@@ -1,11 +1,11 @@
 import type { DrawerAnimation } from "../../../models/bar-config";
 import type { PanelProps } from "../../types";
 
-export function BehaviorPanel({ config, updateConfig }: PanelProps) {
+export function BehaviorPanel({ config, updateConfig, t }: PanelProps) {
   return (
     <s-stack gap="base">
       <s-switch
-        label="Hide when main Add to cart is visible"
+        label={t("behavior.hideNearForm")}
         checked={config.hideNearForm}
         onChange={(e: Event) =>
           updateConfig(
@@ -15,9 +15,9 @@ export function BehaviorPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-select
-        label="Cart drawer animation"
+        label={t("behavior.drawerAnim")}
         value={config.drawerAnimation}
-        details="Motion when the cart drawer opens and closes"
+        details={t("behavior.drawerAnimHelp")}
         onChange={(e: Event) =>
           updateConfig(
             "drawerAnimation",
@@ -25,14 +25,14 @@ export function BehaviorPanel({ config, updateConfig }: PanelProps) {
           )
         }
       >
-        <s-option value="slide">Slide</s-option>
-        <s-option value="fade">Fade</s-option>
-        <s-option value="scale">Scale</s-option>
-        <s-option value="none">None</s-option>
+        <s-option value="slide">{t("behavior.animSlide")}</s-option>
+        <s-option value="fade">{t("behavior.animFade")}</s-option>
+        <s-option value="scale">{t("behavior.animScale")}</s-option>
+        <s-option value="none">{t("common.none")}</s-option>
       </s-select>
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-number-field
-          label="Show after scroll — mobile (px)"
+          label={t("behavior.scrollMobile")}
           value={String(config.showAfterScroll)}
           min={0}
           onChange={(e: Event) =>
@@ -43,7 +43,7 @@ export function BehaviorPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-number-field
-          label="Show after scroll — desktop (px)"
+          label={t("behavior.scrollDesktop")}
           value={String(config.showAfterScrollDesktop)}
           min={0}
           onChange={(e: Event) =>
@@ -54,7 +54,7 @@ export function BehaviorPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-number-field
-          label="Edge offset (px)"
+          label={t("behavior.edgeOffset")}
           value={String(config.desktopBottomOffset)}
           min={0}
           onChange={(e: Event) =>
@@ -65,7 +65,7 @@ export function BehaviorPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-number-field
-          label="Desktop max width"
+          label={t("behavior.desktopMaxWidth")}
           value={String(config.desktopMaxWidth)}
           min={280}
           onChange={(e: Event) =>

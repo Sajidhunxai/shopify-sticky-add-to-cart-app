@@ -2,13 +2,13 @@ import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import { colorFromEvent } from "../../fields/color";
 import type { PanelProps } from "../../types";
 
-export function HeaderPanel({ config, updateConfig }: PanelProps) {
+export function HeaderPanel({ config, updateConfig, t }: PanelProps) {
   return (
     <s-stack gap="base">
-      <s-heading>General</s-heading>
+      <s-heading>{t("nav.general")}</s-heading>
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-select
-          label="Height"
+          label={t("header.headerHeight")}
           value={config.drawerHeaderHeight}
           onChange={(e: Event) =>
             updateConfig(
@@ -17,11 +17,11 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="slim">Slim</s-option>
-          <s-option value="tall">Tall</s-option>
+          <s-option value="slim">{t("common.slim")}</s-option>
+          <s-option value="tall">{t("common.tall")}</s-option>
         </s-select>
         <s-select
-          label="Bottom border"
+          label={t("header.headerBorder")}
           value={config.drawerHeaderBorder}
           onChange={(e: Event) =>
             updateConfig(
@@ -30,11 +30,11 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="none">None</s-option>
-          <s-option value="thin">Thin</s-option>
+          <s-option value="none">{t("common.none")}</s-option>
+          <s-option value="thin">{t("common.thin")}</s-option>
         </s-select>
         <s-color-field
-          label="Header background"
+          label={t("header.headerBg")}
           value={config.drawerHeaderBg}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -43,9 +43,9 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
         />
       </s-grid>
 
-      <s-heading>Title</s-heading>
+      <s-heading>{t("header.titleHeading")}</s-heading>
       <s-text-field
-        label="Text (use {{cart_quantity}} for item count)"
+        label={t("header.titleText")}
         value={config.drawerTitle}
         onChange={(e: Event) =>
           updateConfig(
@@ -56,7 +56,7 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
       />
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-select
-          label="Alignment"
+          label={t("header.titleAlign")}
           value={config.drawerTitleAlign}
           onChange={(e: Event) =>
             updateConfig(
@@ -65,11 +65,11 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="left">Side</s-option>
-          <s-option value="center">Center</s-option>
+          <s-option value="left">{t("header.alignSide")}</s-option>
+          <s-option value="center">{t("common.center")}</s-option>
         </s-select>
         <s-select
-          label="Font weight"
+          label={t("header.titleWeight")}
           value={config.drawerTitleWeight}
           onChange={(e: Event) =>
             updateConfig(
@@ -79,12 +79,12 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="normal">Normal</s-option>
-          <s-option value="semibold">Semibold</s-option>
-          <s-option value="bold">Bold</s-option>
+          <s-option value="normal">{t("common.normal")}</s-option>
+          <s-option value="semibold">{t("common.semibold")}</s-option>
+          <s-option value="bold">{t("common.bold")}</s-option>
         </s-select>
         <s-number-field
-          label="Font size"
+          label={t("header.titleSize")}
           value={String(config.drawerTitleSize)}
           min={12}
           max={28}
@@ -97,10 +97,10 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
         />
       </s-grid>
 
-      <s-heading>Close button</s-heading>
+      <s-heading>{t("header.closeHeading")}</s-heading>
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-select
-          label="Location"
+          label={t("header.closeSide")}
           value={config.drawerCloseSide}
           onChange={(e: Event) =>
             updateConfig(
@@ -109,11 +109,11 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="left">Left</s-option>
-          <s-option value="right">Right</s-option>
+          <s-option value="left">{t("common.left")}</s-option>
+          <s-option value="right">{t("common.right")}</s-option>
         </s-select>
         <s-select
-          label="Icon size"
+          label={t("header.closeSize")}
           value={config.drawerCloseIconSize}
           onChange={(e: Event) =>
             updateConfig(
@@ -123,12 +123,12 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="small">Small</s-option>
-          <s-option value="medium">Medium</s-option>
-          <s-option value="large">Large</s-option>
+          <s-option value="small">{t("common.small")}</s-option>
+          <s-option value="medium">{t("common.medium")}</s-option>
+          <s-option value="large">{t("common.large")}</s-option>
         </s-select>
         <s-select
-          label="Border"
+          label={t("header.closeBorder")}
           value={config.drawerCloseBorder}
           onChange={(e: Event) =>
             updateConfig(
@@ -138,13 +138,13 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="none">None</s-option>
-          <s-option value="thin">Thin</s-option>
-          <s-option value="normal">Normal</s-option>
-          <s-option value="thick">Thick</s-option>
+          <s-option value="none">{t("common.none")}</s-option>
+          <s-option value="thin">{t("common.thin")}</s-option>
+          <s-option value="normal">{t("common.normal")}</s-option>
+          <s-option value="thick">{t("common.thick")}</s-option>
         </s-select>
         <s-color-field
-          label="Icon color"
+          label={t("header.closeColor")}
           value={config.drawerCloseColor}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -152,7 +152,7 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Background color"
+          label={t("header.closeBg")}
           value={config.drawerCloseBg}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -160,7 +160,7 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Background hover color"
+          label={t("header.closeHover")}
           value={config.drawerCloseHoverBg}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -169,9 +169,9 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
         />
       </s-grid>
 
-      <s-heading>Drawer backdrop</s-heading>
+      <s-heading>{t("header.backdrop")}</s-heading>
       <s-switch
-        label="Blur page behind drawer"
+        label={t("header.blurPage")}
         checked={config.drawerBackdropBlur}
         onChange={(e: Event) =>
           updateConfig(
@@ -181,7 +181,7 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-number-field
-        label="Backdrop darkness (0–100)"
+        label={t("header.backdropDarkness")}
         value={String(config.drawerBackdropOpacity)}
         min={0}
         max={100}
@@ -193,9 +193,9 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
         }
       />
 
-      <s-heading>Sticky bar button text</s-heading>
+      <s-heading>{t("header.buttonText")}</s-heading>
       <s-text-field
-        label="Add to cart button text"
+        label={t("header.addToCartText")}
         value={config.buttonText}
         onChange={(e: Event) =>
           updateConfig(
@@ -205,7 +205,7 @@ export function HeaderPanel({ config, updateConfig }: PanelProps) {
         }
       />
       <s-text-field
-        label="Sold out text"
+        label={t("header.soldOutText")}
         value={config.soldOutText}
         onChange={(e: Event) =>
           updateConfig(

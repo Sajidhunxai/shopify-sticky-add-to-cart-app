@@ -3,18 +3,18 @@ import type { BarConfig } from "../../../models/bar-config";
 import { colorFromEvent } from "../../fields/color";
 import type { PanelProps } from "../../types";
 
-export function DesignPanel({ config, updateConfig }: PanelProps) {
+export function DesignPanel({ config, updateConfig, t }: PanelProps) {
   return (
     <s-stack gap="base">
       <div className={styles.colorLegend}>
         {(
           [
-            ["Popup background", config.backgroundColor],
-            ["Title & price", config.textColor],
-            ["Button", config.buttonBackground],
-            ["Button text", config.buttonTextColor],
-            ["Accent", config.accentColor],
-            ["Border", config.borderColor],
+            [t("design.legendPopupBg"), config.backgroundColor],
+            [t("design.legendTitlePrice"), config.textColor],
+            [t("design.legendButton"), config.buttonBackground],
+            [t("design.legendButtonText"), config.buttonTextColor],
+            [t("design.legendAccent"), config.accentColor],
+            [t("design.legendBorder"), config.borderColor],
           ] as const
         ).map(([label, hex]) => (
           <div key={label} className={styles.colorSwatch}>
@@ -30,14 +30,11 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
         ))}
       </div>
 
-      <s-heading>Theme typography</s-heading>
-      <s-paragraph>
-        Use the store theme’s font and text color by default. Turn these off to
-        force custom values below.
-      </s-paragraph>
+      <s-heading>{t("design.themeTypography")}</s-heading>
+      <s-paragraph>{t("design.themeTypographyHelp")}</s-paragraph>
       <s-stack direction="inline" gap="base">
         <s-switch
-          label="Use theme font family"
+          label={t("design.themeFont")}
           checked={config.inheritThemeFont}
           onChange={(e: Event) =>
             updateConfig(
@@ -47,7 +44,7 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Use theme text color"
+          label={t("design.themeText")}
           checked={config.inheritThemeTextColor}
           onChange={(e: Event) =>
             updateConfig(
@@ -69,13 +66,13 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
             updateConfig("borderColor", "#e5e7eb");
           }}
         >
-          Reset design colors
+          {t("design.resetColors")}
         </s-button>
       </s-stack>
 
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-color-field
-          label="Popup / bar background"
+          label={t("design.popupBarBg")}
           value={config.backgroundColor}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -85,8 +82,8 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
         <s-color-field
           label={
             config.inheritThemeTextColor
-              ? "Title & price text (custom fallback)"
-              : "Title & price text"
+              ? t("design.titlePriceFallback")
+              : t("design.titlePrice")
           }
           value={config.textColor}
           onChange={(e: Event) => {
@@ -95,7 +92,7 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Button color"
+          label={t("design.buttonBg")}
           value={config.buttonBackground}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -103,7 +100,7 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Button text color"
+          label={t("design.buttonText")}
           value={config.buttonTextColor}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -111,7 +108,7 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Accent color (drawer highlights)"
+          label={t("design.accentDrawer")}
           value={config.accentColor}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -119,7 +116,7 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Border color"
+          label={t("design.borderColor")}
           value={config.borderColor}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -127,7 +124,7 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-select
-          label="Background style"
+          label={t("design.backgroundStyle")}
           value={config.backgroundStyle}
           onChange={(e: Event) =>
             updateConfig(
@@ -137,12 +134,12 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
             )
           }
         >
-          <s-option value="solid">Solid color</s-option>
-          <s-option value="blur">Glass blur</s-option>
-          <s-option value="gradient">Soft gradient</s-option>
+          <s-option value="solid">{t("design.solid")}</s-option>
+          <s-option value="blur">{t("design.blur")}</s-option>
+          <s-option value="gradient">{t("design.gradient")}</s-option>
         </s-select>
         <s-number-field
-          label="Background opacity %"
+          label={t("design.opacityPct")}
           value={String(config.backgroundOpacity)}
           min={40}
           max={100}
@@ -154,7 +151,7 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-number-field
-          label="Corner radius (bar)"
+          label={t("design.barRadius")}
           value={String(config.barRadius)}
           min={0}
           onChange={(e: Event) =>
@@ -165,7 +162,7 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-number-field
-          label="Button corner radius"
+          label={t("design.buttonRadius")}
           value={String(config.buttonRadius)}
           min={0}
           onChange={(e: Event) =>
@@ -177,7 +174,7 @@ export function DesignPanel({ config, updateConfig }: PanelProps) {
         />
       </s-grid>
       <s-switch
-        label="Show shadow"
+        label={t("design.shadow")}
         checked={config.showShadow}
         onChange={(e: Event) =>
           updateConfig(

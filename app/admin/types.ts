@@ -1,4 +1,5 @@
 import type { BarConfig, RewardTier } from "../models/bar-config";
+import type { TranslateFn } from "../i18n";
 
 export type UpdateConfig = <K extends keyof BarConfig>(
   key: K,
@@ -14,6 +15,7 @@ export type PanelProps = {
   config: BarConfig;
   updateConfig: UpdateConfig;
   updateRewardTier?: UpdateRewardTier;
+  t: TranslateFn;
 };
 
 export type RewardsPanelProps = PanelProps & {
@@ -24,9 +26,11 @@ export type PlanPanelProps = {
   isPro: boolean;
   hideBranding: boolean;
   busy: boolean;
+  t: TranslateFn;
 };
 
 export type SetupPanelProps = {
   shop: string;
   busy: boolean;
+  t: TranslateFn;
 };

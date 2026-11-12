@@ -2,17 +2,13 @@ import styles from "../../../styles/dashboard.module.css";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import type { PanelProps } from "../../types";
 
-export function TemplatesPanel({ config, updateConfig }: PanelProps) {
+export function TemplatesPanel({ config, updateConfig, t }: PanelProps) {
   return (
     <s-stack gap="base">
-      <s-paragraph>
-        Custom HTML / CSS / JS per cart-drawer feature. Editors start empty —
-        use the tabs below to edit. Mustache: <code>{"{{name}}"}</code>{" "}
-        (escaped) and <code>{"{{{html}}}"}</code> (raw).
-      </s-paragraph>
+      <s-paragraph>{t("templates.intro")}</s-paragraph>
 
       <label className={styles.codeFieldLabel} htmlFor="global-custom-css">
-        Global drawer CSS
+        {t("templates.globalCss")}
       </label>
       <div className={styles.codeEditor}>
         <textarea
@@ -20,7 +16,7 @@ export function TemplatesPanel({ config, updateConfig }: PanelProps) {
           className={styles.codeEditorField}
           rows={6}
           spellCheck={false}
-          placeholder="Type global CSS here… e.g. .satc-slider__panel { }"
+          placeholder={t("templates.globalCssPlaceholder")}
           value={config.customCss}
           onChange={(e) => updateConfig("customCss", e.target.value)}
         />
@@ -42,7 +38,7 @@ export function TemplatesPanel({ config, updateConfig }: PanelProps) {
         ]}
         config={config}
         updateConfig={updateConfig}
-        title="Feature templates"
+        title={t("templates.featureTemplates")}
       />
     </s-stack>
   );

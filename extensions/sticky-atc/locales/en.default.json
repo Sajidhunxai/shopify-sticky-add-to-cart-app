@@ -14,6 +14,10 @@
     "decrease_quantity": "Decrease quantity",
     "increase_quantity": "Increase quantity",
     "quantity": "Quantity",
+    "qty": "Qty {{ count }}",
+    "delete": "Delete",
+    "remove": "Remove",
+    "update_failed": "Couldn’t update cart",
     "add_failed": "Couldn’t add to cart",
     "add_success": "Added to cart",
     "unavailable": "This product is unavailable"

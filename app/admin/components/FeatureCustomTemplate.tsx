@@ -7,6 +7,7 @@ import {
   type FeatureTemplateKey,
 } from "../../models/feature-templates";
 import type { BarConfig } from "../../models/bar-config";
+import { useI18n } from "../../i18n";
 
 type CodeTab = "html" | "css" | "js";
 
@@ -18,16 +19,16 @@ type Props = {
   title?: string;
 };
 
-const CODE_TABS: { id: CodeTab; label: string }[] = [
-  { id: "html", label: "HTML" },
-  { id: "css", label: "CSS" },
-  { id: "js", label: "JS" },
+const CODE_TABS: { id: CodeTab; labelKey: string }[] = [
+  { id: "html", labelKey: "featureTemplate.html" },
+  { id: "css", labelKey: "featureTemplate.css" },
+  { id: "js", labelKey: "featureTemplate.js" },
 ];
 
-const SHORT_HINTS: Record<CodeTab, string> = {
-  html: "Edit the default HTML… Keep satc-slider__* classes so layout stays intact.",
-  css: "Optional CSS… Scoped to this feature automatically.",
-  js: "Optional JS… Runs after this feature renders (root, featureKey, slider).",
+const SHORT_HINT_KEYS: Record<CodeTab, string> = {
+  html: "featureTemplate.hintHtml",
+  css: "featureTemplate.hintCss",
+  js: "featureTemplate.hintJs",
 };
 
 export function FeatureCustomTemplate({
@@ -35,8 +36,10 @@ export function FeatureCustomTemplate({
   config,
   updateConfig,
   extraKeys = [],
-  title = "Custom template",
+  title: titleProp,
 }: Props) {
+  const { t } = useI18n();
+  const title = titleProp ?? t("featureTemplate.title");
   const featureTabs = [featureKey, ...extraKeys];
   const [activeFeature, setActiveFeature] =
     useState<FeatureTemplateKey>(featureTabs[0]);
@@ -101,20 +104,17 @@ export function FeatureCustomTemplate({
     <s-stack gap="base">
       <s-heading>{title}</s-heading>
       <s-stack direction="inline" gap="base">
-        <s-badge tone="caution">Technical skills required</s-badge>
+        <s-badge tone="caution">{t("featureTemplate.technical")}</s-badge>
       </s-stack>
       <s-paragraph>
-        When you enable this, the built-in HTML is copied into the editor so
-        layout stays intact. Edit classes/text or add your own — keep{" "}
-        <code>satc-slider__*</code> wrappers and data attributes. Placeholders:{" "}
-        {meta.placeholders}
+        {t("featureTemplate.intro", { placeholders: meta.placeholders })}
       </s-paragraph>
 
       {featureTabs.length > 1 && (
         <div
           className={styles.tierTabs}
           role="tablist"
-          aria-label={`${title} features`}
+          aria-label={t("featureTemplate.featuresAria", { title })}
         >
           {featureTabs.map((key) => (
             <button
@@ -130,8 +130,8 @@ export function FeatureCustomTemplate({
                 setCodeTab("html");
               }}
             >
-              {FEATURE_TEMPLATE_META[key].label}
-              {templates[key]?.enabled ? " · on" : ""}
+              {t(`featureTemplate.labels.${key}`)}
+              {templates[key]?.enabled ? t("featureTemplate.tabOn") : ""}
             </button>
           ))}
         </div>
@@ -139,13 +139,13 @@ export function FeatureCustomTemplate({
 
       <s-stack direction="inline" gap="base">
         <s-badge tone={current.enabled ? "success" : "neutral"}>
-          {current.enabled ? "Active" : "Inactive"}
+          {current.enabled ? t("common.active") : t("featureTemplate.inactive")}
         </s-badge>
         <s-switch
           label={
             current.enabled
-              ? "Disable custom template"
-              : "Enable custom template"
+              ? t("featureTemplate.disableTemplate")
+              : t("featureTemplate.enableTemplate")
           }
           checked={current.enabled}
           onChange={(e: Event) =>
@@ -155,7 +155,7 @@ export function FeatureCustomTemplate({
           }
         />
         <s-switch
-          label="Replace built-in markup"
+          label={t("featureTemplate.replace")}
           checked={current.replaceDefault}
           onChange={(e: Event) => {
             const on = (e.currentTarget as HTMLInputElement).checked;
@@ -174,7 +174,7 @@ export function FeatureCustomTemplate({
       </s-stack>
 
       <div className={styles.codeEditor}>
-        <div className={styles.codeEditorTabs} role="tablist" aria-label="Code">
+        <div className={styles.codeEditorTabs} role="tablist" aria-label={t("featureTemplate.code")}>
           {CODE_TABS.map((tab) => {
             const filled =
               tab.id === "html"
@@ -193,7 +193,7 @@ export function FeatureCustomTemplate({
                 }`}
                 onClick={() => setCodeTab(tab.id)}
               >
-                {tab.label}
+                {t(tab.labelKey)}
                 {filled ? " ·" : ""}
               </button>
             );
@@ -205,7 +205,7 @@ export function FeatureCustomTemplate({
           className={styles.codeEditorField}
           rows={16}
           spellCheck={false}
-          placeholder={SHORT_HINTS[codeTab]}
+          placeholder={t(SHORT_HINT_KEYS[codeTab])}
           value={editorValue}
           onChange={(e) => setEditorValue(e.target.value)}
         />
@@ -228,7 +228,7 @@ export function FeatureCustomTemplate({
             }
           }}
         >
-          Restore default {codeTab.toUpperCase()}
+          {t("featureTemplate.restoreDefault", { kind: codeTab.toUpperCase() })}
         </s-button>
         <s-button
           variant="tertiary"
@@ -238,13 +238,13 @@ export function FeatureCustomTemplate({
             else patch({ js: "" });
           }}
         >
-          Clear {codeTab.toUpperCase()}
+          {t("featureTemplate.clear", { kind: codeTab.toUpperCase() })}
         </s-button>
         <s-button
           variant="tertiary"
           onClick={() => patch(emptyFeatureTemplate())}
         >
-          Reset all
+          {t("featureTemplate.resetAll")}
         </s-button>
       </s-stack>
     </s-stack>

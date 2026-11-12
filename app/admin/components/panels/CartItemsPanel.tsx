@@ -3,17 +3,14 @@ import { colorFromEvent } from "../../fields/color";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import type { PanelProps } from "../../types";
 
-export function CartItemsPanel({ config, updateConfig }: PanelProps) {
+export function CartItemsPanel({ config, updateConfig, t }: PanelProps) {
   return (
     <s-stack gap="base">
-      <s-heading>Sticky bar (product page)</s-heading>
-      <s-paragraph>
-        These options control the sticky Add to cart bar, not the cart drawer
-        lines.
-      </s-paragraph>
+      <s-heading>{t("cartItems.stickyHeading")}</s-heading>
+      <s-paragraph>{t("cartItems.stickyHelp")}</s-paragraph>
       <div className={styles.toggleRow}>
         <s-switch
-          label="Enable sticky bar"
+          label={t("cartItems.enableSticky")}
           checked={config.enabled}
           onChange={(e: Event) =>
             updateConfig(
@@ -23,7 +20,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show product image"
+          label={t("cartItems.showImage")}
           checked={config.showImage}
           onChange={(e: Event) =>
             updateConfig(
@@ -33,7 +30,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show product title"
+          label={t("cartItems.showTitle")}
           checked={config.showTitle}
           onChange={(e: Event) =>
             updateConfig(
@@ -43,7 +40,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show price"
+          label={t("cartItems.showPrice")}
           checked={config.showPrice}
           onChange={(e: Event) =>
             updateConfig(
@@ -53,7 +50,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show quantity selector on sticky bar"
+          label={t("cartItems.showQtyBar")}
           checked={config.showQuantity}
           onChange={(e: Event) =>
             updateConfig(
@@ -66,7 +63,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
 
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-number-field
-          label="Sticky bar image size"
+          label={t("cartItems.barImageSize")}
           value={String(config.imageSize)}
           min={32}
           max={120}
@@ -84,7 +81,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-number-field
-          label="Sticky bar content gap"
+          label={t("cartItems.barGap")}
           value={String(config.contentGap)}
           min={4}
           max={32}
@@ -103,15 +100,12 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
         />
       </s-grid>
 
-      <s-heading>Cart drawer line items</s-heading>
-      <s-paragraph>
-        Layout and controls for products already in the cart drawer. Uncheck
-        “Show empty cart” in the preview to see sample lines.
-      </s-paragraph>
+      <s-heading>{t("cartItems.drawerHeading")}</s-heading>
+      <s-paragraph>{t("cartItems.drawerHelp")}</s-paragraph>
 
       <div className={styles.toggleRow}>
         <s-switch
-          label="Show product image"
+          label={t("cartItems.showImage")}
           checked={config.cartLineShowImage}
           onChange={(e: Event) =>
             updateConfig(
@@ -121,7 +115,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show product title"
+          label={t("cartItems.showTitle")}
           checked={config.cartLineShowTitle}
           onChange={(e: Event) =>
             updateConfig(
@@ -131,7 +125,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show price"
+          label={t("cartItems.showPrice")}
           checked={config.cartLineShowPrice}
           onChange={(e: Event) =>
             updateConfig(
@@ -141,7 +135,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show variant / options"
+          label={t("cartItems.showVariant")}
           checked={config.cartLineShowVariant}
           onChange={(e: Event) =>
             updateConfig(
@@ -151,7 +145,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show quantity +/- on cart lines"
+          label={t("cartItems.showLineQty")}
           checked={config.cartLineQtyEnabled}
           onChange={(e: Event) =>
             updateConfig(
@@ -161,7 +155,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-switch
-          label="Show remove control"
+          label={t("cartItems.showRemove")}
           checked={config.cartLineRemoveEnabled}
           onChange={(e: Event) =>
             updateConfig(
@@ -174,7 +168,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
 
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-number-field
-          label="Line image size"
+          label={t("cartItems.lineImageSize")}
           value={String(config.cartLineImageSize)}
           min={32}
           max={120}
@@ -192,7 +186,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-number-field
-          label="Image corner radius"
+          label={t("cartItems.imageRadius")}
           value={String(config.cartLineImageRadius)}
           min={0}
           max={40}
@@ -210,7 +204,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-number-field
-          label="Title size"
+          label={t("cartItems.titleSize")}
           value={String(config.cartLineTitleSize)}
           min={10}
           max={22}
@@ -228,7 +222,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-number-field
-          label="Price size"
+          label={t("cartItems.priceSize")}
           value={String(config.cartLinePriceSize)}
           min={10}
           max={22}
@@ -246,7 +240,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }
         />
         <s-number-field
-          label="Content gap"
+          label={t("cartItems.contentGap")}
           value={String(config.cartLineGap)}
           min={4}
           max={28}
@@ -265,9 +259,9 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
         />
       </s-grid>
 
-      <s-heading>Quantity control</s-heading>
+      <s-heading>{t("cartItems.qtyHeading")}</s-heading>
       <s-select
-        label="Quantity style"
+        label={t("cartItems.qtyStyle")}
         value={config.cartLineQtyStyle}
         onChange={(e: Event) => {
           const value = (e.currentTarget as HTMLSelectElement).value;
@@ -277,11 +271,11 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           );
         }}
       >
-        <s-option value="stepper">Stepper (− / +)</s-option>
-        <s-option value="plain">Plain text (Qty 1)</s-option>
+        <s-option value="stepper">{t("cartItems.qtyStepper")}</s-option>
+        <s-option value="plain">{t("cartItems.qtyPlain")}</s-option>
       </s-select>
       <s-select
-        label="Quantity size"
+        label={t("cartItems.qtySize")}
         value={config.cartLineQtySize}
         onChange={(e: Event) => {
           const value = (e.currentTarget as HTMLSelectElement).value;
@@ -291,14 +285,14 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           );
         }}
       >
-        <s-option value="small">Small</s-option>
-        <s-option value="medium">Medium</s-option>
-        <s-option value="large">Large</s-option>
+        <s-option value="small">{t("common.small")}</s-option>
+        <s-option value="medium">{t("common.medium")}</s-option>
+        <s-option value="large">{t("common.large")}</s-option>
       </s-select>
 
-      <s-heading>Remove control</s-heading>
+      <s-heading>{t("cartItems.removeHeading")}</s-heading>
       <s-select
-        label="Remove style"
+        label={t("cartItems.removeStyle")}
         value={config.cartLineRemoveStyle}
         onChange={(e: Event) => {
           const value = (e.currentTarget as HTMLSelectElement).value;
@@ -310,13 +304,13 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           );
         }}
       >
-        <s-option value="x">× icon</s-option>
-        <s-option value="delete">Delete text</s-option>
-        <s-option value="remove">Remove text</s-option>
-        <s-option value="trash">Trash icon</s-option>
+        <s-option value="x">{t("cartItems.removeX")}</s-option>
+        <s-option value="delete">{t("cartItems.removeDelete")}</s-option>
+        <s-option value="remove">{t("cartItems.removeRemove")}</s-option>
+        <s-option value="trash">{t("cartItems.removeTrash")}</s-option>
       </s-select>
       <s-select
-        label="Remove size"
+        label={t("cartItems.removeSize")}
         value={config.cartLineRemoveSize}
         onChange={(e: Event) => {
           const value = (e.currentTarget as HTMLSelectElement).value;
@@ -326,15 +320,15 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           );
         }}
       >
-        <s-option value="small">Small</s-option>
-        <s-option value="medium">Medium</s-option>
-        <s-option value="large">Large</s-option>
+        <s-option value="small">{t("common.small")}</s-option>
+        <s-option value="medium">{t("common.medium")}</s-option>
+        <s-option value="large">{t("common.large")}</s-option>
       </s-select>
 
-      <s-heading>Cart line colors</s-heading>
+      <s-heading>{t("cartItems.colorsHeading")}</s-heading>
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-color-field
-          label="Line background"
+          label={t("cartItems.lineBg")}
           value={
             config.cartLineBg === "transparent" ? "#ffffff" : config.cartLineBg
           }
@@ -344,7 +338,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Line text"
+          label={t("cartItems.lineText")}
           value={config.cartLineTextColor || config.textColor || "#111111"}
           onChange={(e: Event) => {
             const value = colorFromEvent(e);
@@ -352,7 +346,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Line border"
+          label={t("cartItems.lineBorder")}
           value={
             config.cartLineBorderColor.startsWith("#")
               ? config.cartLineBorderColor
@@ -364,7 +358,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Quantity background"
+          label={t("cartItems.qtyBg")}
           value={
             config.cartLineQtyBg === "transparent"
               ? "#ffffff"
@@ -376,7 +370,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Quantity text"
+          label={t("cartItems.qtyText")}
           value={
             config.cartLineQtyText ||
             config.cartLineTextColor ||
@@ -389,7 +383,7 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }}
         />
         <s-color-field
-          label="Remove color"
+          label={t("cartItems.removeColor")}
           value={
             config.cartLineRemoveColor ||
             config.cartLineTextColor ||
@@ -402,24 +396,15 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
           }}
         />
       </s-grid>
-      <s-paragraph>
-        Tip: set line background to a light gray (e.g. #F3F4F6) so items read as
-        cards. Save settings to sync colors to the storefront.
-      </s-paragraph>
+      <s-paragraph>{t("cartItems.colorsTip")}</s-paragraph>
 
       <FeatureCustomTemplate
         featureKey="cartItem"
         config={config}
         updateConfig={updateConfig}
-        title="Custom cart line template"
+        title={t("cartItems.customHtml")}
       />
-      <s-paragraph>
-        Custom HTML must keep <code>{"{{{qty_controls}}}"}</code> and{" "}
-        <code>{"{{{remove_button}}}"}</code>, and use{" "}
-        <code>satc-slider__item</code> (or <code>satc-slider__line</code>) classes.
-        Click “Load default HTML” if the editor is empty, enable the template, then
-        Save settings.
-      </s-paragraph>
+      <s-paragraph>{t("cartItems.customHtmlHelp")}</s-paragraph>
     </s-stack>
   );
 }
