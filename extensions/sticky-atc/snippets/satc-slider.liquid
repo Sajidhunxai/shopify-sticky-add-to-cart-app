@@ -41,31 +41,32 @@
     data-toast-show-err="{% if satc_toast_show_err == false or satc_toast_show_err == 'false' %}false{% else %}true{% endif %}"
     data-toast-show-remove="{% if satc_toast_show_remove == false or satc_toast_show_remove == 'false' %}false{% else %}true{% endif %}"
     data-toast-show-update="{% if satc_toast_show_update == true or satc_toast_show_update == 'true' %}true{% else %}false{% endif %}"
-    data-i18n-cart-empty="{{ 'general.cart_empty' | t | escape }}"
-    data-i18n-adding="{{ 'general.adding' | t | escape }}"
-    data-i18n-added="{{ 'general.added' | t | escape }}"
-    data-i18n-try-again="{{ 'general.try_again' | t | escape }}"
-    data-i18n-add-failed="{{ 'general.add_failed' | t | escape }}"
-    data-i18n-add-success="{{ 'general.add_success' | t | escape }}"
-    data-i18n-unavailable="{{ 'general.unavailable' | t | escape }}"
-    data-i18n-delete="{{ 'general.delete' | t | escape }}"
-    data-i18n-remove="{{ 'general.remove' | t | escape }}"
-    data-i18n-removed="{{ 'general.removed' | t | escape }}"
-    data-i18n-updated="{{ 'general.updated' | t | escape }}"
-    data-i18n-updating="{{ 'general.updating' | t | escape }}"
-    data-i18n-qty="{{ 'general.qty' | t: count: '__COUNT__' | escape }}"
-    data-i18n-update-failed="{{ 'general.update_failed' | t | escape }}"
-    data-i18n-decrease-qty="{{ 'general.decrease_quantity' | t | escape }}"
-    data-i18n-increase-qty="{{ 'general.increase_quantity' | t | escape }}"
-    data-i18n-tier-free-shipping="{{ 'general.tier_free_shipping' | t | escape }}"
-    data-i18n-tier-free-express="{{ 'general.tier_free_express' | t | escape }}"
-    data-i18n-tier-free-gift="{{ 'general.tier_free_gift' | t | escape }}"
-    data-i18n-tier-vip-reward="{{ 'general.tier_vip_reward' | t | escape }}"
-    data-i18n-away-free-shipping="{{ 'general.away_free_shipping' | t | escape }}"
-    data-i18n-away-free-express="{{ 'general.away_free_express' | t | escape }}"
-    data-i18n-away-free-gift="{{ 'general.away_free_gift' | t | escape }}"
-    data-i18n-away-vip-reward="{{ 'general.away_vip_reward' | t | escape }}"
-    data-i18n-away-generic="{{ 'general.away_generic' | t | escape }}"
+    data-shop-locale="{{ satc_lang | default: 'en' | escape }}"
+    data-i18n-cart-empty="{{ satc_i18n_cart_empty | escape }}"
+    data-i18n-adding="{{ satc_i18n_adding | escape }}"
+    data-i18n-added="{{ satc_i18n_added | escape }}"
+    data-i18n-try-again="{{ satc_i18n_try | escape }}"
+    data-i18n-add-failed="{{ satc_i18n_add_fail | escape }}"
+    data-i18n-add-success="{{ satc_i18n_add_ok | escape }}"
+    data-i18n-unavailable="{{ satc_i18n_unavail | escape }}"
+    data-i18n-delete="{{ satc_i18n_delete | escape }}"
+    data-i18n-remove="{{ satc_i18n_remove | escape }}"
+    data-i18n-removed="{{ satc_i18n_removed | escape }}"
+    data-i18n-updated="{{ satc_i18n_updated | escape }}"
+    data-i18n-updating="{{ satc_i18n_updating | escape }}"
+    data-i18n-qty="{{ satc_i18n_qty | escape }}"
+    data-i18n-update-failed="{{ satc_i18n_upd_fail | escape }}"
+    data-i18n-decrease-qty="{{ satc_i18n_dec | escape }}"
+    data-i18n-increase-qty="{{ satc_i18n_inc | escape }}"
+    data-i18n-tier-free-shipping="{{ satc_i18n_tier1 | escape }}"
+    data-i18n-tier-free-express="{{ satc_i18n_tier2 | escape }}"
+    data-i18n-tier-free-gift="{{ satc_i18n_tier3 | escape }}"
+    data-i18n-tier-vip-reward="{{ satc_i18n_tier4 | escape }}"
+    data-i18n-away-free-shipping="{{ satc_i18n_away1 | escape }}"
+    data-i18n-away-free-express="{{ satc_i18n_away2 | escape }}"
+    data-i18n-away-free-gift="{{ satc_i18n_away3 | escape }}"
+    data-i18n-away-vip-reward="{{ satc_i18n_away4 | escape }}"
+    data-i18n-away-generic="{{ satc_i18n_away | escape }}"
     style="
       --satc-toast-radius: {{ satc_toast_radius | default: 10 }}px;
       --satc-toast-font: {{ satc_toast_font | default: 13 }}px;
@@ -233,7 +234,7 @@
       <div class="satc-slider__accent" aria-hidden="true"></div>
       <header class="satc-slider__header">
         <h2 class="satc-slider__title" data-satc-drawer-title>{{ satc_drawer_title }}</h2>
-        <button type="button" class="satc-slider__close" data-satc-slider-close aria-label="{{ 'general.close' | t | escape }}">
+        <button type="button" class="satc-slider__close" data-satc-slider-close aria-label="{{ satc_i18n_close | escape }}">
           ×
         </button>
       </header>
@@ -273,7 +274,7 @@
         </div>
       {% endif %}
       <div class="satc-slider__body" data-satc-slider-items>
-        <p class="satc-slider__empty">{{ 'general.cart_empty' | t }}</p>
+        <p class="satc-slider__empty">{{ satc_i18n_cart_empty }}</p>
       </div>
       {% if satc_ann_on == true or satc_ann_on == 'true' %}
         {% if satc_ann_pos == 'after' %}
@@ -302,7 +303,7 @@
           </form>
         {% endif %}
         <div class="satc-slider__total">
-          <span>{{ 'general.subtotal' | t }}</span>
+          <span>{{ satc_subtotal_label }}</span>
           <strong data-satc-slider-total>—</strong>
         </div>
         <a class="satc-slider__checkout" href="/checkout" data-satc-slider-checkout>

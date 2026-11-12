@@ -340,54 +340,231 @@
 {% if satc_display_mode == blank %}{% assign satc_display_mode = 'bar' %}{% endif %}
 {% if satc_accent == blank %}{% assign satc_accent = satc_btn_bg %}{% endif %}
 {% comment %}
-  Saved English defaults must not lock the storefront to English.
-  When the value is blank or still the app’s English default, use theme locale.
+  Apply shop-language chrome copy (include shares scope with this snippet).
 {% endcomment %}
-{% if satc_button_label == blank or satc_button_label == 'Add to cart' %}
-  {% assign satc_button_label = 'general.add_to_cart' | t %}
-{% endif %}
-{% if satc_sold_out == blank or satc_sold_out == 'Sold out' %}
-  {% assign satc_sold_out = 'general.sold_out' | t %}
-{% endif %}
-{% if satc_drawer_title == blank or satc_drawer_title == 'Your cart' or satc_drawer_title == 'Your cart {{cart_quantity}}' or satc_drawer_title == 'YOUR CART ({{cart_quantity}})' %}
-  {% assign satc_drawer_title = 'general.your_cart_count' | t %}
-{% endif %}
-{% if satc_drawer_checkout == blank or satc_drawer_checkout == 'Checkout' %}
-  {% assign satc_drawer_checkout = 'general.checkout' | t %}
-{% endif %}
-{% if satc_ann_text == blank or satc_ann_text == 'Your products are reserved for {timer}!' %}
-  {% assign satc_ann_text = 'general.reserved_for' | t %}
-{% endif %}
-{% if satc_reward_done == blank or satc_reward_done == 'Free shipping unlocked!' or satc_reward_done == "You've unlocked free shipping!" %}
-  {% assign satc_reward_done = 'general.free_shipping_unlocked' | t %}
-{% endif %}
-{% if satc_ship_done == blank or satc_ship_done == 'Free shipping unlocked!' or satc_ship_done == "You've unlocked free shipping!" %}
-  {% assign satc_ship_done = 'general.free_shipping_unlocked' | t %}
-{% endif %}
-{% if satc_rec_empty == blank or satc_rec_empty == 'Add your favorite items to your cart.' %}
-  {% assign satc_rec_empty = 'general.add_favorites' | t %}
-{% endif %}
-{% if satc_rec_header == blank or satc_rec_header == 'You may also like' %}
-  {% assign satc_rec_header = 'general.you_may_also_like' | t %}
-{% endif %}
-{% if satc_rec_add == blank or satc_rec_add == 'Add' %}
-  {% assign satc_rec_add = 'general.add' | t %}
-{% endif %}
-{% if satc_rec_shop_text == blank or satc_rec_shop_text == 'Shop now' %}
-  {% assign satc_rec_shop_text = 'general.shop_now' | t %}
-{% endif %}
-{% if satc_disc_ph == blank or satc_disc_ph == 'Discount code' %}
-  {% assign satc_disc_ph = 'general.discount_code' | t %}
-{% endif %}
-{% if satc_disc_btn == blank or satc_disc_btn == 'Apply' %}
-  {% assign satc_disc_btn = 'general.apply' | t %}
-{% endif %}
-{% if satc_trust_text == blank or satc_trust_text == 'Secure checkout · Free returns · 24/7 support' %}
-  {% assign satc_trust_text = 'general.trust_default' | t %}
-{% endif %}
-{% if satc_ship_text == blank or satc_ship_text == "You're {{amount_remaining}} away from free shipping!" or satc_ship_text == "You're [AMOUNT] away from free shipping!" %}
-  {% assign satc_ship_text = 'general.away_free_shipping' | t %}
-{% endif %}
+{% comment %}
+  Force chrome copy from the customer-facing shop language.
+  Theme app embed `| t` can stay on English when Markets/primary locale disagree;
+  localization.language is what shoppers actually browse in.
+{% endcomment %}
+{% assign satc_lang = localization.language.iso_code | default: request.locale.iso_code | default: 'en' | downcase %}
+{% assign satc_lang = satc_lang | split: '-' | first %}
+
+{% case satc_lang %}
+  {% when 'es' %}
+    {% assign satc_l_add = 'Añadir al carrito' %}
+    {% assign satc_l_sold = 'Agotado' %}
+    {% assign satc_l_title = 'TU CARRITO ({{cart_quantity}})' %}
+    {% assign satc_l_checkout = 'Pagar' %}
+    {% assign satc_l_ann = '¡Tus productos están reservados por {timer}!' %}
+    {% assign satc_l_reward_done = '¡Envío gratis desbloqueado!' %}
+    {% assign satc_l_rec_empty = 'Añade tus productos favoritos al carrito.' %}
+    {% assign satc_l_rec_header = 'También te puede gustar' %}
+    {% assign satc_l_rec_add = 'Añadir' %}
+    {% assign satc_l_rec_shop = 'Comprar ahora' %}
+    {% assign satc_l_disc_ph = 'Código de descuento' %}
+    {% assign satc_l_disc_btn = 'Aplicar' %}
+    {% assign satc_l_trust = 'Pago seguro · Devoluciones gratis · Soporte 24/7' %}
+    {% assign satc_l_ship = '¡Te faltan [AMOUNT] para el envío gratis!' %}
+    {% assign satc_l_subtotal = 'Subtotal' %}
+    {% assign satc_l_cart_empty = 'Tu carrito está vacío' %}
+    {% assign satc_l_qty = 'Cant. __COUNT__' %}
+    {% assign satc_l_adding = 'Añadiendo…' %}
+    {% assign satc_l_added = 'Añadido ✓' %}
+    {% assign satc_l_try = 'Reintentar' %}
+    {% assign satc_l_add_fail = 'No se pudo añadir al carrito' %}
+    {% assign satc_l_add_ok = 'Añadido al carrito' %}
+    {% assign satc_l_unavail = 'Este producto no está disponible' %}
+    {% assign satc_l_delete = 'Eliminar' %}
+    {% assign satc_l_remove = 'Quitar' %}
+    {% assign satc_l_removed = 'Eliminado del carrito' %}
+    {% assign satc_l_updated = 'Carrito actualizado' %}
+    {% assign satc_l_updating = 'Actualizando…' %}
+    {% assign satc_l_upd_fail = 'No se pudo actualizar el carrito' %}
+    {% assign satc_l_dec = 'Reducir cantidad' %}
+    {% assign satc_l_inc = 'Aumentar cantidad' %}
+    {% assign satc_l_close = 'Cerrar' %}
+    {% assign satc_l_tier1 = 'Envío gratis' %}
+    {% assign satc_l_tier2 = 'Express gratis' %}
+    {% assign satc_l_tier3 = 'Regalo gratis' %}
+    {% assign satc_l_tier4 = 'Recompensa VIP' %}
+    {% assign satc_l_away1 = '¡Te faltan [AMOUNT] para el envío gratis!' %}
+    {% assign satc_l_away2 = '¡Te faltan [AMOUNT] para el envío express gratis!' %}
+    {% assign satc_l_away3 = '¡Te faltan [AMOUNT] para un regalo gratis!' %}
+    {% assign satc_l_away4 = '¡Te faltan [AMOUNT] para la recompensa VIP!' %}
+    {% assign satc_l_away = '¡Te faltan [AMOUNT]!' %}
+  {% when 'de' %}
+    {% assign satc_l_add = 'In den Warenkorb' %}
+    {% assign satc_l_sold = 'Ausverkauft' %}
+    {% assign satc_l_title = 'DEIN WARENKORB ({{cart_quantity}})' %}
+    {% assign satc_l_checkout = 'Zur Kasse' %}
+    {% assign satc_l_ann = 'Deine Produkte sind noch {timer} für dich reserviert!' %}
+    {% assign satc_l_reward_done = 'Kostenloser Versand freigeschaltet!' %}
+    {% assign satc_l_rec_empty = 'Füge deine Lieblingsartikel hinzu.' %}
+    {% assign satc_l_rec_header = 'Das könnte dir auch gefallen' %}
+    {% assign satc_l_rec_add = 'Hinzufügen' %}
+    {% assign satc_l_rec_shop = 'Jetzt einkaufen' %}
+    {% assign satc_l_disc_ph = 'Rabattcode' %}
+    {% assign satc_l_disc_btn = 'Anwenden' %}
+    {% assign satc_l_trust = 'Sicherer Checkout · Kostenlose Rückgabe · Support rund um die Uhr' %}
+    {% assign satc_l_ship = 'Noch [AMOUNT] bis zum kostenlosen Versand!' %}
+    {% assign satc_l_subtotal = 'Zwischensumme' %}
+    {% assign satc_l_cart_empty = 'Dein Warenkorb ist leer' %}
+    {% assign satc_l_qty = 'Anz. __COUNT__' %}
+    {% assign satc_l_adding = 'Wird hinzugefügt…' %}
+    {% assign satc_l_added = 'Hinzugefügt ✓' %}
+    {% assign satc_l_try = 'Erneut versuchen' %}
+    {% assign satc_l_add_fail = 'Konnte nicht hinzugefügt werden' %}
+    {% assign satc_l_add_ok = 'Zum Warenkorb hinzugefügt' %}
+    {% assign satc_l_unavail = 'Dieses Produkt ist nicht verfügbar' %}
+    {% assign satc_l_delete = 'Löschen' %}
+    {% assign satc_l_remove = 'Entfernen' %}
+    {% assign satc_l_removed = 'Aus dem Warenkorb entfernt' %}
+    {% assign satc_l_updated = 'Warenkorb aktualisiert' %}
+    {% assign satc_l_updating = 'Wird aktualisiert…' %}
+    {% assign satc_l_upd_fail = 'Warenkorb konnte nicht aktualisiert werden' %}
+    {% assign satc_l_dec = 'Menge verringern' %}
+    {% assign satc_l_inc = 'Menge erhöhen' %}
+    {% assign satc_l_close = 'Schließen' %}
+    {% assign satc_l_tier1 = 'Kostenloser Versand' %}
+    {% assign satc_l_tier2 = 'Kostenloser Express' %}
+    {% assign satc_l_tier3 = 'Gratisgeschenk' %}
+    {% assign satc_l_tier4 = 'VIP-Belohnung' %}
+    {% assign satc_l_away1 = 'Noch [AMOUNT] bis zum kostenlosen Versand!' %}
+    {% assign satc_l_away2 = 'Noch [AMOUNT] bis zum kostenlosen Expressversand!' %}
+    {% assign satc_l_away3 = 'Noch [AMOUNT] bis zum Gratisgeschenk!' %}
+    {% assign satc_l_away4 = 'Noch [AMOUNT] bis zur VIP-Belohnung!' %}
+    {% assign satc_l_away = 'Noch [AMOUNT]!' %}
+  {% when 'fr' %}
+    {% assign satc_l_add = 'Ajouter au panier' %}
+    {% assign satc_l_sold = 'Épuisé' %}
+    {% assign satc_l_title = 'VOTRE PANIER ({{cart_quantity}})' %}
+    {% assign satc_l_checkout = 'Payer' %}
+    {% assign satc_l_ann = 'Vos produits sont réservés pour {timer} !' %}
+    {% assign satc_l_reward_done = 'Livraison gratuite débloquée !' %}
+    {% assign satc_l_rec_empty = 'Ajoutez vos articles préférés au panier.' %}
+    {% assign satc_l_rec_header = 'Vous aimerez aussi' %}
+    {% assign satc_l_rec_add = 'Ajouter' %}
+    {% assign satc_l_rec_shop = 'Acheter' %}
+    {% assign satc_l_disc_ph = 'Code promo' %}
+    {% assign satc_l_disc_btn = 'Appliquer' %}
+    {% assign satc_l_trust = 'Paiement sécurisé · Retours gratuits · Support 24/7' %}
+    {% assign satc_l_ship = 'Plus que [AMOUNT] pour la livraison gratuite !' %}
+    {% assign satc_l_subtotal = 'Sous-total' %}
+    {% assign satc_l_cart_empty = 'Votre panier est vide' %}
+    {% assign satc_l_qty = 'Qté __COUNT__' %}
+    {% assign satc_l_adding = 'Ajout…' %}
+    {% assign satc_l_added = 'Ajouté ✓' %}
+    {% assign satc_l_try = 'Réessayer' %}
+    {% assign satc_l_add_fail = 'Impossible d’ajouter' %}
+    {% assign satc_l_add_ok = 'Ajouté au panier' %}
+    {% assign satc_l_unavail = 'Produit indisponible' %}
+    {% assign satc_l_delete = 'Supprimer' %}
+    {% assign satc_l_remove = 'Retirer' %}
+    {% assign satc_l_removed = 'Retiré du panier' %}
+    {% assign satc_l_updated = 'Panier mis à jour' %}
+    {% assign satc_l_updating = 'Mise à jour…' %}
+    {% assign satc_l_upd_fail = 'Impossible de mettre à jour le panier' %}
+    {% assign satc_l_dec = 'Diminuer la quantité' %}
+    {% assign satc_l_inc = 'Augmenter la quantité' %}
+    {% assign satc_l_close = 'Fermer' %}
+    {% assign satc_l_tier1 = 'Livraison gratuite' %}
+    {% assign satc_l_tier2 = 'Express gratuit' %}
+    {% assign satc_l_tier3 = 'Cadeau offert' %}
+    {% assign satc_l_tier4 = 'Récompense VIP' %}
+    {% assign satc_l_away1 = 'Plus que [AMOUNT] pour la livraison gratuite !' %}
+    {% assign satc_l_away2 = 'Plus que [AMOUNT] pour la livraison express gratuite !' %}
+    {% assign satc_l_away3 = 'Plus que [AMOUNT] pour un cadeau offert !' %}
+    {% assign satc_l_away4 = 'Plus que [AMOUNT] pour la récompense VIP !' %}
+    {% assign satc_l_away = 'Plus que [AMOUNT] !' %}
+  {% else %}
+    {% assign satc_l_add = 'general.add_to_cart' | t %}
+    {% assign satc_l_sold = 'general.sold_out' | t %}
+    {% assign satc_l_title = 'general.your_cart_count' | t %}
+    {% assign satc_l_checkout = 'general.checkout' | t %}
+    {% assign satc_l_ann = 'general.reserved_for' | t %}
+    {% assign satc_l_reward_done = 'general.free_shipping_unlocked' | t %}
+    {% assign satc_l_rec_empty = 'general.add_favorites' | t %}
+    {% assign satc_l_rec_header = 'general.you_may_also_like' | t %}
+    {% assign satc_l_rec_add = 'general.add' | t %}
+    {% assign satc_l_rec_shop = 'general.shop_now' | t %}
+    {% assign satc_l_disc_ph = 'general.discount_code' | t %}
+    {% assign satc_l_disc_btn = 'general.apply' | t %}
+    {% assign satc_l_trust = 'general.trust_default' | t %}
+    {% assign satc_l_ship = 'general.away_free_shipping' | t %}
+    {% assign satc_l_subtotal = 'general.subtotal' | t %}
+    {% assign satc_l_cart_empty = 'general.cart_empty' | t %}
+    {% assign satc_l_qty = 'general.qty' | t: count: '__COUNT__' %}
+    {% assign satc_l_adding = 'general.adding' | t %}
+    {% assign satc_l_added = 'general.added' | t %}
+    {% assign satc_l_try = 'general.try_again' | t %}
+    {% assign satc_l_add_fail = 'general.add_failed' | t %}
+    {% assign satc_l_add_ok = 'general.add_success' | t %}
+    {% assign satc_l_unavail = 'general.unavailable' | t %}
+    {% assign satc_l_delete = 'general.delete' | t %}
+    {% assign satc_l_remove = 'general.remove' | t %}
+    {% assign satc_l_removed = 'general.removed' | t %}
+    {% assign satc_l_updated = 'general.updated' | t %}
+    {% assign satc_l_updating = 'general.updating' | t %}
+    {% assign satc_l_upd_fail = 'general.update_failed' | t %}
+    {% assign satc_l_dec = 'general.decrease_quantity' | t %}
+    {% assign satc_l_inc = 'general.increase_quantity' | t %}
+    {% assign satc_l_close = 'general.close' | t %}
+    {% assign satc_l_tier1 = 'general.tier_free_shipping' | t %}
+    {% assign satc_l_tier2 = 'general.tier_free_express' | t %}
+    {% assign satc_l_tier3 = 'general.tier_free_gift' | t %}
+    {% assign satc_l_tier4 = 'general.tier_vip_reward' | t %}
+    {% assign satc_l_away1 = 'general.away_free_shipping' | t %}
+    {% assign satc_l_away2 = 'general.away_free_express' | t %}
+    {% assign satc_l_away3 = 'general.away_free_gift' | t %}
+    {% assign satc_l_away4 = 'general.away_vip_reward' | t %}
+    {% assign satc_l_away = 'general.away_generic' | t %}
+{% endcase %}
+
+{% comment %} Replace blank or English defaults with shop-language copy {% endcomment %}
+{% if satc_button_label == blank or satc_button_label == 'Add to cart' %}{% assign satc_button_label = satc_l_add %}{% endif %}
+{% if satc_sold_out == blank or satc_sold_out == 'Sold out' %}{% assign satc_sold_out = satc_l_sold %}{% endif %}
+{% if satc_drawer_title == blank or satc_drawer_title == 'Your cart' or satc_drawer_title == 'Your cart {{cart_quantity}}' or satc_drawer_title == 'YOUR CART ({{cart_quantity}})' %}{% assign satc_drawer_title = satc_l_title %}{% endif %}
+{% if satc_drawer_checkout == blank or satc_drawer_checkout == 'Checkout' %}{% assign satc_drawer_checkout = satc_l_checkout %}{% endif %}
+{% if satc_ann_text == blank or satc_ann_text == 'Your products are reserved for {timer}!' %}{% assign satc_ann_text = satc_l_ann %}{% endif %}
+{% if satc_reward_done == blank or satc_reward_done == 'Free shipping unlocked!' or satc_reward_done == "You've unlocked free shipping!" %}{% assign satc_reward_done = satc_l_reward_done %}{% endif %}
+{% if satc_ship_done == blank or satc_ship_done == 'Free shipping unlocked!' or satc_ship_done == "You've unlocked free shipping!" %}{% assign satc_ship_done = satc_l_reward_done %}{% endif %}
+{% if satc_rec_empty == blank or satc_rec_empty == 'Add your favorite items to your cart.' %}{% assign satc_rec_empty = satc_l_rec_empty %}{% endif %}
+{% if satc_rec_header == blank or satc_rec_header == 'You may also like' %}{% assign satc_rec_header = satc_l_rec_header %}{% endif %}
+{% if satc_rec_add == blank or satc_rec_add == 'Add' %}{% assign satc_rec_add = satc_l_rec_add %}{% endif %}
+{% if satc_rec_shop_text == blank or satc_rec_shop_text == 'Shop now' %}{% assign satc_rec_shop_text = satc_l_rec_shop %}{% endif %}
+{% if satc_disc_ph == blank or satc_disc_ph == 'Discount code' %}{% assign satc_disc_ph = satc_l_disc_ph %}{% endif %}
+{% if satc_disc_btn == blank or satc_disc_btn == 'Apply' %}{% assign satc_disc_btn = satc_l_disc_btn %}{% endif %}
+{% if satc_trust_text == blank or satc_trust_text == 'Secure checkout · Free returns · 24/7 support' %}{% assign satc_trust_text = satc_l_trust %}{% endif %}
+{% if satc_ship_text == blank or satc_ship_text == "You're {{amount_remaining}} away from free shipping!" or satc_ship_text == "You're [AMOUNT] away from free shipping!" %}{% assign satc_ship_text = satc_l_ship %}{% endif %}
+
+{% assign satc_subtotal_label = satc_l_subtotal %}
+{% assign satc_i18n_cart_empty = satc_l_cart_empty %}
+{% assign satc_i18n_qty = satc_l_qty %}
+{% assign satc_i18n_adding = satc_l_adding %}
+{% assign satc_i18n_added = satc_l_added %}
+{% assign satc_i18n_try = satc_l_try %}
+{% assign satc_i18n_add_fail = satc_l_add_fail %}
+{% assign satc_i18n_add_ok = satc_l_add_ok %}
+{% assign satc_i18n_unavail = satc_l_unavail %}
+{% assign satc_i18n_delete = satc_l_delete %}
+{% assign satc_i18n_remove = satc_l_remove %}
+{% assign satc_i18n_removed = satc_l_removed %}
+{% assign satc_i18n_updated = satc_l_updated %}
+{% assign satc_i18n_updating = satc_l_updating %}
+{% assign satc_i18n_upd_fail = satc_l_upd_fail %}
+{% assign satc_i18n_dec = satc_l_dec %}
+{% assign satc_i18n_inc = satc_l_inc %}
+{% assign satc_i18n_close = satc_l_close %}
+{% assign satc_i18n_tier1 = satc_l_tier1 %}
+{% assign satc_i18n_tier2 = satc_l_tier2 %}
+{% assign satc_i18n_tier3 = satc_l_tier3 %}
+{% assign satc_i18n_tier4 = satc_l_tier4 %}
+{% assign satc_i18n_away1 = satc_l_away1 %}
+{% assign satc_i18n_away2 = satc_l_away2 %}
+{% assign satc_i18n_away3 = satc_l_away3 %}
+{% assign satc_i18n_away4 = satc_l_away4 %}
+{% assign satc_i18n_away = satc_l_away %}
 {% if satc_scroll_desktop == blank %}{% assign satc_scroll_desktop = 0 %}{% endif %}
 {% if satc_bg_style == blank %}{% assign satc_bg_style = 'solid' %}{% endif %}
 {% if satc_bg_opacity == blank %}{% assign satc_bg_opacity = 100 %}{% endif %}
@@ -547,7 +724,13 @@
   satc_sold_out: satc_sold_out,
   satc_text: satc_text,
   satc_theme_font: satc_theme_font,
-  satc_theme_text: satc_theme_text
+  satc_theme_text: satc_theme_text,
+  satc_i18n_adding: satc_i18n_adding,
+  satc_i18n_added: satc_i18n_added,
+  satc_i18n_try: satc_i18n_try,
+  satc_i18n_add_fail: satc_i18n_add_fail,
+  satc_i18n_add_ok: satc_i18n_add_ok,
+  satc_i18n_cart_empty: satc_i18n_cart_empty
 %}
 
 {% unless render_mode == 'bar' %}
@@ -669,6 +852,34 @@
     satc_title_weight: satc_title_weight,
     satc_trust_on: satc_trust_on,
     satc_trust_text: satc_trust_text,
+    satc_lang: satc_lang,
+    satc_subtotal_label: satc_subtotal_label,
+    satc_i18n_cart_empty: satc_i18n_cart_empty,
+    satc_i18n_qty: satc_i18n_qty,
+    satc_i18n_adding: satc_i18n_adding,
+    satc_i18n_added: satc_i18n_added,
+    satc_i18n_try: satc_i18n_try,
+    satc_i18n_add_fail: satc_i18n_add_fail,
+    satc_i18n_add_ok: satc_i18n_add_ok,
+    satc_i18n_unavail: satc_i18n_unavail,
+    satc_i18n_delete: satc_i18n_delete,
+    satc_i18n_remove: satc_i18n_remove,
+    satc_i18n_removed: satc_i18n_removed,
+    satc_i18n_updated: satc_i18n_updated,
+    satc_i18n_updating: satc_i18n_updating,
+    satc_i18n_upd_fail: satc_i18n_upd_fail,
+    satc_i18n_dec: satc_i18n_dec,
+    satc_i18n_inc: satc_i18n_inc,
+    satc_i18n_close: satc_i18n_close,
+    satc_i18n_tier1: satc_i18n_tier1,
+    satc_i18n_tier2: satc_i18n_tier2,
+    satc_i18n_tier3: satc_i18n_tier3,
+    satc_i18n_tier4: satc_i18n_tier4,
+    satc_i18n_away1: satc_i18n_away1,
+    satc_i18n_away2: satc_i18n_away2,
+    satc_i18n_away3: satc_i18n_away3,
+    satc_i18n_away4: satc_i18n_away4,
+    satc_i18n_away: satc_i18n_away,
     block: block
   %}
 {% endunless %}
