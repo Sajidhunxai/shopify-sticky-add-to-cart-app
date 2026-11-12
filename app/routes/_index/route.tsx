@@ -11,132 +11,115 @@ const OG_IMAGE = `${SITE_URL}/docs/studio-overview.jpg`;
 const DEMO_VIDEO_ID = "ApBgbYCQHZM";
 
 const FEATURES = [
-  {
-    title: "Sticky Add to cart bar",
-    body: "Product image, title, price, and ATC stay in view while shoppers scroll — especially on mobile.",
-    href: "#feature-sticky-bar",
-  },
-  {
-    title: "Cart drawer",
-    body: "Optional slide-out cart with announcements, line items, checkout, and trust badges.",
-    href: "#feature-drawer",
-  },
-  {
-    title: "Tiered rewards",
-    body: "Free shipping / gift milestones with progress fill, icons, colors, and custom HTML.",
-    href: "#feature-rewards",
-  },
-  {
-    title: "Recommendations",
-    body: "Upsell from a collection or hand-picked products in empty and filled carts.",
-    href: "#feature-recommendations",
-  },
-  {
-    title: "Live admin preview",
-    body: "Configure Design, Header, Rewards, and more with a live drawer preview before you save.",
-    href: "#feature-studio",
-  },
-  {
-    title: "Custom templates",
-    body: "Optional HTML / CSS / JS per drawer block when you need full control.",
-    href: "#feature-templates",
-  },
+  { title: "Sticky bar", href: "#feature-sticky-bar" },
+  { title: "Cart drawer", href: "#feature-drawer" },
+  { title: "Rewards", href: "#feature-rewards" },
+  { title: "Recommendations", href: "#feature-recommendations" },
+  { title: "Live studio", href: "#feature-studio" },
+  { title: "Templates", href: "#feature-templates" },
 ] as const;
 
 const FEATURE_DETAILS = [
   {
     id: "feature-sticky-bar",
-    eyebrow: "Sticky bar",
+    eyebrow: "01 · Sticky bar",
     title: "Keep Add to cart visible while shoppers scroll",
-    body: "On product pages the sticky bar pins product image, title, price, variants summary, and the Add to cart button so buyers never lose the buy action — especially on long mobile product pages.",
+    body: "Pin product image, title, price, and the ATC button on long product pages so buyers never lose the buy action — especially on mobile.",
     bullets: [
-      "Show or hide image, title, price, and button independently",
-      "Match your brand with colors, radius, shadow, and optional theme fonts",
-      "Control when it appears (scroll threshold, hide when main ATC is in view)",
-      "Works on desktop and mobile with Pages & devices settings",
+      "Toggle image, title, price, and button",
+      "Brand colors, radius, shadow, theme fonts",
+      "Scroll threshold and hide-when-visible rules",
+      "Desktop and mobile page targeting",
     ],
     image: "/docs/display-modes.jpg",
-    imageAlt: "Sticky Add to Cart display modes including the sticky bar",
+    imageAlt: "Display mode options for the sticky Add to cart bar",
+    imageFocus: "center top",
     docsHref: "/docs/design",
     docsLabel: "Design docs",
   },
   {
     id: "feature-drawer",
-    eyebrow: "Cart drawer",
-    title: "A conversion-focused cart that opens from the sticky bar",
-    body: "Switch Display style to Sticky Cart + Drawer to open a slide-out cart instead of relying only on the theme cart. Add announcements, line controls, checkout, discounts, and trust copy in one place.",
+    eyebrow: "02 · Cart drawer",
+    title: "A conversion cart that opens from the sticky bar",
+    body: "Use Sticky Cart + Drawer for a slide-out cart with announcements, line controls, checkout, discounts, and trust copy — without editing theme code.",
     bullets: [
-      "Header title, close control, and optional backdrop blur",
-      "Line items with quantity steppers and remove actions",
-      "Announcement strip with optional countdown timer",
-      "Cart summary, discount field, and trust badges under checkout",
+      "Header, close control, optional backdrop blur",
+      "Quantity steppers and remove actions",
+      "Announcement strip with countdown",
+      "Summary, discount field, trust badges",
     ],
     image: "/docs/cart-drawer.jpg",
-    imageAlt: "Sticky ATC cart drawer with announcement, rewards, and checkout",
+    imageAlt: "Cart drawer with rewards progress and checkout",
+    imageFocus: "right center",
     docsHref: "/docs/display",
-    docsLabel: "Display style docs",
+    docsLabel: "Display docs",
   },
   {
     id: "feature-rewards",
-    eyebrow: "Tiered rewards",
-    title: "Free shipping and gift milestones that push AOV up",
-    body: "Show a live progress bar toward cart goals (spend amount or item quantity). Each tier has its own threshold, label, unlock message, reward type, and icon — including custom PNG icons from Shopify Files.",
+    eyebrow: "03 · Tiered rewards",
+    title: "Milestones that push average order value up",
+    body: "Show live progress toward free shipping, discounts, or gifts. Each tier has its own threshold, message, reward type, and icon — including custom PNGs.",
     bullets: [
-      "Multiple tiers: free shipping, discount, free product, or custom",
-      "Progress fill, track colors, icon size/color, and message position",
-      "Layouts such as line-in-middle or icons above the track",
-      "Optional custom HTML template with Mustache placeholders for tiers",
+      "Goals by cart total or quantity",
+      "Shipping, discount, product, or custom rewards",
+      "Progress colors, icon size, message position",
+      "Optional Mustache HTML for full control",
     ],
     image: "/docs/rewards-bar.jpg",
-    imageAlt: "Tiered rewards progress bar with milestone icons in the cart drawer",
+    imageAlt: "Tiered rewards progress bar with milestone icons",
+    imageFocus: "center center",
     docsHref: "/docs/rewards",
     docsLabel: "Rewards docs",
   },
   {
     id: "feature-recommendations",
-    eyebrow: "Recommendations",
+    eyebrow: "04 · Recommendations",
     title: "Upsell in empty and filled carts",
-    body: "Surface related products from a collection or hand-picked products so shoppers can add another item without leaving the drawer. Great for bundles, bestsellers, and “complete the look.”",
+    body: "Suggest related products from a collection or hand-picked list so shoppers can add another item without leaving the drawer.",
     bullets: [
-      "Source from a collection or manual product picker",
-      "Header copy, Add button label, and max products shown",
-      "Show differently for empty cart vs items already in cart",
-      "Optional entrance animation and custom tile HTML",
+      "Collection or manual product source",
+      "Separate empty vs filled cart copy",
+      "Max products, labels, optional Shop now",
+      "Entrance animation and custom tile HTML",
     ],
-    image: "/docs/cart-drawer.jpg",
-    imageAlt: "Cart drawer ready for product recommendations and upsells",
+    image: "/docs/theme-embed.jpg",
+    imageAlt: "Theme app embed setup that powers storefront recommendations",
+    imageFocus: "center top",
     docsHref: "/docs/recommendations",
     docsLabel: "Recommendations docs",
+    mock: "recs" as const,
   },
   {
     id: "feature-studio",
-    eyebrow: "Admin studio",
-    title: "Configure everything with a live preview",
-    body: "The Dashboard studio mirrors the storefront drawer: change Design, Header, Rewards, Recommendations, and more on the left, watch the preview update on the right, then Save settings to publish.",
+    eyebrow: "05 · Admin studio",
+    title: "Configure with a live preview, then save",
+    body: "Edit Design, Header, Rewards, and more on the left while the drawer preview updates on the right. Save settings to sync the storefront.",
     bullets: [
-      "Left nav for Design, Display, Rewards, Templates, and more",
-      "Preview updates as you edit supported settings",
-      "Save settings syncs metafield config to the theme app embed",
-      "Hard-refresh the storefront after save to confirm live changes",
+      "Studio nav for every drawer block",
+      "Preview updates as you configure",
+      "One Save publishes to the theme embed",
+      "Hard-refresh to confirm live changes",
     ],
     image: "/docs/studio-overview.jpg",
-    imageAlt: "Sticky ATC admin studio with settings and live cart drawer preview",
+    imageAlt: "Admin studio with settings and live drawer preview",
+    imageFocus: "left top",
     docsHref: "/docs/overview",
     docsLabel: "Overview docs",
   },
   {
     id: "feature-templates",
-    eyebrow: "Custom HTML",
-    title: "Go beyond defaults with per-feature templates",
-    body: "When you need full control, enable custom HTML / CSS / JS for rewards, announcements, recommendations, and other drawer blocks. Use Mustache placeholders for cart data and tier loops.",
+    eyebrow: "06 · Custom templates",
+    title: "Go beyond defaults when you need to",
+    body: "Enable HTML / CSS / JS per drawer feature. Use Mustache placeholders for cart data and tier loops while keeping progress and timers working.",
     bullets: [
-      "Per-feature HTML, CSS, and JS editors in Templates",
-      "Mustache support for {{variables}} and {{#tiers}} loops",
-      "Keep required data attributes so timers and progress still work",
-      "Preview-friendly defaults so you can iterate safely before save",
+      "Per-feature HTML, CSS, and JS editors",
+      "{{variables}} and {{#tiers}} loops",
+      "Required data attributes stay intact",
+      "Safe iteration in preview before save",
     ],
     image: "/docs/custom-html.jpg",
-    imageAlt: "Custom HTML CSS JS template editor for Sticky ATC drawer features",
+    imageAlt: "Custom HTML CSS JS template editor",
+    imageFocus: "center top",
     docsHref: "/docs/templates",
     docsLabel: "Templates docs",
   },
@@ -370,16 +353,15 @@ export default function Landing() {
       </main>
 
       <section className={styles.sectionIntro} id="features" aria-labelledby="features-heading">
-        <h2 id="features-heading">Features built for Shopify product pages</h2>
+        <h2 id="features-heading">Built for Shopify product pages</h2>
         <p className={styles.sectionLead}>
-          Everything you configure in the Dashboard studio syncs to your storefront
-          after Save settings. Jump to a detailed section below.
+          Sticky bar, cart drawer, rewards, and upsells — configured in the studio,
+          published with Save settings.
         </p>
-        <div className={styles.features}>
+        <div className={styles.featureJump}>
           {FEATURES.map((feature) => (
-            <a key={feature.title} className={styles.featureCard} href={feature.href}>
-              <h3>{feature.title}</h3>
-              <p>{feature.body}</p>
+            <a key={feature.title} href={feature.href}>
+              {feature.title}
             </a>
           ))}
         </div>
@@ -404,20 +386,39 @@ export default function Landing() {
                   <li key={bullet}>{bullet}</li>
                 ))}
               </ul>
-              <p className={styles.inlineLinks}>
-                <Link to={feature.docsHref}>{feature.docsLabel}</Link>
-                {" · "}
-                <a href="#features">Back to features</a>
-              </p>
+              <Link className={styles.featureDocLink} to={feature.docsHref}>
+                {feature.docsLabel} →
+              </Link>
             </div>
             <figure className={styles.featureDetailMedia}>
-              <img
-                src={feature.image}
-                alt={feature.imageAlt}
-                width={960}
-                height={640}
-                loading="lazy"
-              />
+              {"mock" in feature && feature.mock === "recs" ? (
+                <div className={styles.recsMock} aria-hidden="true">
+                  <p className={styles.recsMockTitle}>You may also like</p>
+                  <div className={styles.recsMockRow}>
+                    <div className={styles.recsMockCard}>
+                      <span className={styles.recsMockThumb} />
+                      <span>Linen tote</span>
+                      <strong>$28</strong>
+                      <em>Add</em>
+                    </div>
+                    <div className={styles.recsMockCard}>
+                      <span className={styles.recsMockThumb} />
+                      <span>Canvas pouch</span>
+                      <strong>$18</strong>
+                      <em>Add</em>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <img
+                  src={feature.image}
+                  alt={feature.imageAlt}
+                  width={960}
+                  height={640}
+                  loading="lazy"
+                  style={{ objectPosition: feature.imageFocus }}
+                />
+              )}
             </figure>
           </section>
         ))}
@@ -425,18 +426,37 @@ export default function Landing() {
 
       <section className={styles.sectionIntro} id="how-it-works" aria-labelledby="how-heading">
         <h2 id="how-heading">How it works</h2>
+        <p className={styles.sectionLead}>
+          Live in minutes with a theme app embed — no theme code edits.
+        </p>
         <ol className={styles.steps}>
           <li>
-            <strong>Install</strong> from the Shopify App Store and open the app.
+            <span className={styles.stepNum}>1</span>
+            <div>
+              <strong>Install</strong>
+              <p>Get the app from the Shopify App Store and open the Dashboard.</p>
+            </div>
           </li>
           <li>
-            <strong>Enable</strong> the Sticky ATC App embed in your theme, then Save.
+            <span className={styles.stepNum}>2</span>
+            <div>
+              <strong>Enable embed</strong>
+              <p>Turn on Sticky ATC in Theme → App embeds, then Save the theme.</p>
+            </div>
           </li>
           <li>
-            <strong>Configure</strong> Design, Display style, Rewards, and more with live preview.
+            <span className={styles.stepNum}>3</span>
+            <div>
+              <strong>Configure</strong>
+              <p>Set Design, Display style, Rewards, and more with live preview.</p>
+            </div>
           </li>
           <li>
-            <strong>Save settings</strong> and hard-refresh a product page to go live.
+            <span className={styles.stepNum}>4</span>
+            <div>
+              <strong>Go live</strong>
+              <p>Click Save settings and hard-refresh a product page.</p>
+            </div>
           </li>
         </ol>
         <p className={styles.inlineLinks}>
