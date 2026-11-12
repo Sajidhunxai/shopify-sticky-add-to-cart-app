@@ -143,7 +143,12 @@
     "titleHeading": "Titel",
     "titleText": "Text ({{cart_quantity}} für die Artikelanzahl verwenden)",
     "alignSide": "Seite",
-    "closeHeading": "Schließen-Button"
+    "closeHeading": "Schließen-Button",
+    "copyAutoHint": "Lass die Standardtexte (oder setze sie unten zurück) — der Storefront übersetzt sie automatisch in die Shop-Sprache (ES, DE, FR…). Eigenen Text nur eingeben, wenn du eine feste Formulierung willst.",
+    "resetAutoCopy": "Titel & Buttons auf automatische Sprache zurücksetzen",
+    "addToCartText": "Text der „In den Warenkorb“-Schaltfläche",
+    "soldOutText": "Ausverkauft-Text",
+    "buttonText": "Text der Sticky-Leisten-Schaltfläche"
   },
   "display": {
     "heading": "Display style",
@@ -377,9 +382,11 @@
     "help": "Beim Anwenden eines Codes werden Kunden über Shopifys Rabatt-URL geleitet und können danach zur Kasse zurückkehren."
   },
   "cartSummary": {
-    "heading": "Cart summary",
-    "checkoutText": "Checkout button text",
-    "help": "Subtotal label follows the storefront language automatically.",
+    "heading": "Warenkorbübersicht",
+    "checkoutText": "Text der Checkout-Schaltfläche",
+    "help": "Das Zwischensumme-Label folgt automatisch der Storefront-Sprache.",
+    "checkoutAutoHint": "Standard-„Checkout“ wird im Storefront automatisch übersetzt (z. B. Pagar / Zur Kasse). Eigener Text bleibt unverändert.",
+    "resetCheckoutAuto": "Checkout-Text auf Automatik zurücksetzen",
     "openDrawerIfSupported": "Warenkorb-Drawer öffnen (falls unterstützt)",
     "tip": "Tipp: Stelle „Anzeigestil“ auf „Warenkorb-Drawer“ (erforderlich). „Warenkorb-Drawer öffnen“ öffnet dann den Drawer von Sticky ATC. Stelle außerdem den Warenkorbtyp des Themes auf „Seite“, damit das Header-Warenkorbsymbol nicht zu /cart springt.",
     "customTemplate": "Eigene Fußzeilen-/Checkout-Vorlage"

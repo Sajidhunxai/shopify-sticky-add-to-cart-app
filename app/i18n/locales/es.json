@@ -143,7 +143,12 @@
     "titleHeading": "Título",
     "titleText": "Texto (usa {{cart_quantity}} para el número de artículos)",
     "alignSide": "Lado",
-    "closeHeading": "Botón de cierre"
+    "closeHeading": "Botón de cierre",
+    "copyAutoHint": "Deja los textos por defecto (o restablécelos abajo) y el storefront los traduce automáticamente al idioma de cada tienda (ES, DE, FR…). Escribe texto personalizado solo si quieres fijar un wording concreto.",
+    "resetAutoCopy": "Restablecer título y botones al idioma automático",
+    "addToCartText": "Texto del botón Añadir al carrito",
+    "soldOutText": "Texto de agotado",
+    "buttonText": "Texto del botón de la barra sticky"
   },
   "display": {
     "heading": "Display style",
@@ -377,9 +382,11 @@
     "help": "Al aplicar un código, los clientes pasan por la URL de descuento de Shopify y después pueden volver al pago."
   },
   "cartSummary": {
-    "heading": "Cart summary",
-    "checkoutText": "Checkout button text",
-    "help": "Subtotal label follows the storefront language automatically.",
+    "heading": "Resumen del carrito",
+    "checkoutText": "Texto del botón de pago",
+    "help": "La etiqueta de subtotal sigue automáticamente el idioma del storefront.",
+    "checkoutAutoHint": "El texto por defecto «Checkout» se traduce solo en el storefront (p. ej. Pagar / Zur Kasse). Un texto personalizado se muestra tal como lo escribes.",
+    "resetCheckoutAuto": "Restablecer texto de pago al automático",
     "openDrawerIfSupported": "Abrir panel del carrito (si es compatible)",
     "tip": "Consejo: configura Estilo de visualización → Panel del carrito (obligatorio). «Abrir panel del carrito» abrirá entonces el panel de Sticky ATC. Configura también el tipo de carrito del tema como Página para que el icono del carrito del encabezado no salte a /cart.",
     "customTemplate": "Plantilla personalizada de pie de página / pago"

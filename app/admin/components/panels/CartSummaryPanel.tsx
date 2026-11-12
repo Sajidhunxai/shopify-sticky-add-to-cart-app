@@ -1,4 +1,5 @@
 import type { BarConfig } from "../../../models/bar-config";
+import { DEFAULT_BAR_CONFIG } from "../../../models/bar-config";
 import { usePanelState } from "../../hooks/usePanelState";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 
@@ -21,6 +22,7 @@ export function CartSummaryPanel() {
         <s-option value="cart">{t("behavior.goCart")}</s-option>
         <s-option value="drawer">{t("cartSummary.openDrawerIfSupported")}</s-option>
       </s-select>
+      <s-paragraph>{t("cartSummary.checkoutAutoHint")}</s-paragraph>
       <s-text-field
         label={t("cartSummary.checkoutText")}
         value={config.drawerCheckoutText}
@@ -31,6 +33,16 @@ export function CartSummaryPanel() {
           )
         }
       />
+      <s-button
+        onClick={() =>
+          updateConfig(
+            "drawerCheckoutText",
+            DEFAULT_BAR_CONFIG.drawerCheckoutText,
+          )
+        }
+      >
+        {t("cartSummary.resetCheckoutAuto")}
+      </s-button>
       <s-paragraph>{t("cartSummary.tip")}</s-paragraph>
 
       <FeatureCustomTemplate

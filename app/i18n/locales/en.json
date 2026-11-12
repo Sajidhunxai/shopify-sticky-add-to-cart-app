@@ -143,7 +143,9 @@
     "titleHeading": "Title",
     "titleText": "Text (use {{cart_quantity}} for item count)",
     "alignSide": "Side",
-    "closeHeading": "Close button"
+    "closeHeading": "Close button",
+    "copyAutoHint": "Leave the default texts (or reset below) and the storefront auto-translates them to each shop’s language (ES, DE, FR…). Type custom copy only when you want to lock a specific wording.",
+    "resetAutoCopy": "Reset title & buttons to automatic language"
   },
   "display": {
     "heading": "Display style",
@@ -380,6 +382,8 @@
     "heading": "Cart summary",
     "checkoutText": "Checkout button text",
     "help": "Subtotal label follows the storefront language automatically.",
+    "checkoutAutoHint": "Default “Checkout” auto-translates on the storefront (e.g. Pagar / Zur Kasse). Custom text stays exactly as you type it.",
+    "resetCheckoutAuto": "Reset checkout text to automatic",
     "openDrawerIfSupported": "Open cart drawer (if supported)",
     "tip": "Tip: set Display style → Cart drawer (required). “Open cart drawer” then opens Sticky ATC’s drawer. Also set the theme Cart type to Page so the header bag does not jump to /cart.",
     "customTemplate": "Custom footer / checkout template"

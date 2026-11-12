@@ -1,11 +1,19 @@
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import { usePanelState } from "../../hooks/usePanelState";
 import { colorFromEvent } from "../../fields/color";
+import { DEFAULT_BAR_CONFIG } from "../../../models/bar-config";
 
 export function HeaderPanel() {
   const { config, updateConfig, t } = usePanelState();
+  const resetAutoCopy = () => {
+    updateConfig("drawerTitle", DEFAULT_BAR_CONFIG.drawerTitle);
+    updateConfig("buttonText", DEFAULT_BAR_CONFIG.buttonText);
+    updateConfig("soldOutText", DEFAULT_BAR_CONFIG.soldOutText);
+  };
   return (
     <s-stack gap="base">
+      <s-paragraph>{t("header.copyAutoHint")}</s-paragraph>
+      <s-button onClick={resetAutoCopy}>{t("header.resetAutoCopy")}</s-button>
       <s-heading>{t("nav.general")}</s-heading>
       <s-grid gridTemplateColumns="1fr 1fr" gap="base">
         <s-select
