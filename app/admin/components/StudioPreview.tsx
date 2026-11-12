@@ -266,6 +266,9 @@ export function StudioPreview({
               />
               Show empty cart
             </label>
+            {!showEmptyPreview && (
+              <span style={{ opacity: 0.75 }}>Sample items shown</span>
+            )}
           </div>
         )}
         <div
@@ -1022,49 +1025,180 @@ export function StudioPreview({
                   </div>
                 ) : (
                     <div style={{ padding: "10px 12px", flex: 1 }}>
-                      <div className={styles.previewSliderItem}>
-                        <div className={styles.previewSliderThumb} />
-                        <div>
-                          <p style={{ color: config.textColor }}>
-                            Classic Canvas Sneaker
-                          </p>
-                          {config.cartLineQtyEnabled ? (
+                      {(
+                        [
+                          {
+                            title: "Classic Canvas Sneaker",
+                            meta: "Size 9 · Black",
+                            qty: 1,
+                            price: "$68.00",
+                          },
+                          {
+                            title: "Linen Tote Bag",
+                            meta: "Natural",
+                            qty: 2,
+                            price: "$56.00",
+                          },
+                        ] as const
+                      ).map((item) => {
+                        const thumb = Math.min(
+                          120,
+                          Math.max(32, config.cartLineImageSize || 56),
+                        );
+                        const gap = Math.min(
+                          28,
+                          Math.max(4, config.cartLineGap || 12),
+                        );
+                        const qtyPad =
+                          config.cartLineQtySize === "large"
+                            ? "5px 10px"
+                            : config.cartLineQtySize === "small"
+                              ? "2px 6px"
+                              : "3px 8px";
+                        const qtyFont =
+                          config.cartLineQtySize === "large"
+                            ? 13
+                            : config.cartLineQtySize === "small"
+                              ? 10
+                              : 11;
+                        const removeFont =
+                          config.cartLineRemoveSize === "large"
+                            ? 14
+                            : config.cartLineRemoveSize === "small"
+                              ? 10
+                              : 12;
+                        const removeLabel =
+                          config.cartLineRemoveStyle === "delete"
+                            ? "Delete"
+                            : config.cartLineRemoveStyle === "remove"
+                              ? "Remove"
+                              : config.cartLineRemoveStyle === "trash"
+                                ? "🗑"
+                                : "×";
+                        return (
+                          <div
+                            key={item.title}
+                            style={{
+                              display: "grid",
+                              gridTemplateColumns: config.cartLineShowImage
+                                ? `${thumb}px 1fr auto`
+                                : "1fr auto",
+                              gap,
+                              alignItems: "start",
+                              padding: "10px 0",
+                              borderBottom: "1px solid rgba(0,0,0,0.06)",
+                            }}
+                          >
+                            {config.cartLineShowImage ? (
+                              <div
+                                style={{
+                                  width: thumb,
+                                  height: thumb,
+                                  borderRadius: config.cartLineImageRadius,
+                                  background:
+                                    "linear-gradient(135deg, #94a3b8, #64748b)",
+                                }}
+                              />
+                            ) : null}
+                            <div style={{ minWidth: 0 }}>
+                              {config.cartLineShowTitle && (
+                                <p
+                                  style={{
+                                    margin: 0,
+                                    fontWeight: 650,
+                                    fontSize: config.cartLineTitleSize,
+                                    lineHeight: 1.25,
+                                    color: config.textColor,
+                                  }}
+                                >
+                                  {item.title}
+                                </p>
+                              )}
+                              {config.cartLineShowVariant && (
+                                <p
+                                  style={{
+                                    margin: "4px 0 0",
+                                    fontSize: Math.max(
+                                      10,
+                                      config.cartLineTitleSize - 3,
+                                    ),
+                                    opacity: 0.7,
+                                    color: config.textColor,
+                                  }}
+                                >
+                                  {item.meta}
+                                </p>
+                              )}
+                              {config.cartLineQtyEnabled &&
+                                (config.cartLineQtyStyle === "plain" ? (
+                                  <span
+                                    style={{
+                                      display: "inline-block",
+                                      marginTop: 6,
+                                      fontSize: qtyFont,
+                                      color: config.textColor,
+                                      opacity: 0.75,
+                                    }}
+                                  >
+                                    Qty {item.qty}
+                                  </span>
+                                ) : (
+                                  <div
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      marginTop: 8,
+                                      border: "1px solid rgba(0,0,0,0.15)",
+                                      borderRadius: 6,
+                                      fontSize: qtyFont,
+                                    }}
+                                  >
+                                    <span style={{ padding: qtyPad }}>−</span>
+                                    <span style={{ padding: qtyPad }}>
+                                      {item.qty}
+                                    </span>
+                                    <span style={{ padding: qtyPad }}>+</span>
+                                  </div>
+                                ))}
+                            </div>
                             <div
                               style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                marginTop: 4,
-                                border: "1px solid rgba(0,0,0,0.15)",
-                                borderRadius: 6,
-                                fontSize: 10,
+                                textAlign: "right",
+                                display: "grid",
+                                gap: 6,
+                                justifyItems: "end",
                               }}
                             >
-                              <span style={{ padding: "2px 6px" }}>−</span>
-                              <span style={{ padding: "2px 6px" }}>1</span>
-                              <span style={{ padding: "2px 6px" }}>+</span>
+                              {config.cartLineRemoveEnabled && (
+                                <div
+                                  style={{
+                                    color: config.textColor,
+                                    fontSize: removeFont,
+                                    lineHeight: 1,
+                                    opacity: 0.75,
+                                    fontWeight:
+                                      config.cartLineRemoveStyle === "x"
+                                        ? 400
+                                        : 650,
+                                  }}
+                                >
+                                  {removeLabel}
+                                </div>
+                              )}
+                              {config.cartLineShowPrice && (
+                                <strong
+                                  style={{
+                                    color: config.textColor,
+                                    fontSize: config.cartLinePriceSize,
+                                  }}
+                                >
+                                  {item.price}
+                                </strong>
+                              )}
                             </div>
-                          ) : (
-                            <span style={{ color: config.textColor }}>Qty 1</span>
-                          )}
-                        </div>
-                        <div style={{ textAlign: "right" }}>
-                          {config.cartLineRemoveEnabled && (
-                            <div
-                              style={{
-                                color: config.textColor,
-                                fontSize: 14,
-                                lineHeight: 1,
-                                opacity: 0.7,
-                              }}
-                            >
-                              ×
-                            </div>
-                          )}
-                          <strong style={{ color: config.textColor }}>
-                            $68.00
-                          </strong>
-                        </div>
-                      </div>
+                          </div>
+                        );
+                      })}
                       {config.recommendationsEnabled &&
                         config.recommendationsShowWithItems && (
                           <div style={{ padding: "8px 10px 4px" }}>

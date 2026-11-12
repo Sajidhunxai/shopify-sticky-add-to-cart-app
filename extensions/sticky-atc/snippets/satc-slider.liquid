@@ -69,6 +69,15 @@
     data-rec-anim="{{ satc_rec_anim | escape }}"
     data-line-qty="{% if satc_line_qty == true or satc_line_qty == 'true' %}true{% else %}false{% endif %}"
     data-line-remove="{% if satc_line_remove == true or satc_line_remove == 'true' %}true{% else %}false{% endif %}"
+    data-line-show-image="{% if satc_line_show_image == false or satc_line_show_image == 'false' %}false{% else %}true{% endif %}"
+    data-line-show-title="{% if satc_line_show_title == false or satc_line_show_title == 'false' %}false{% else %}true{% endif %}"
+    data-line-show-price="{% if satc_line_show_price == false or satc_line_show_price == 'false' %}false{% else %}true{% endif %}"
+    data-line-show-variant="{% if satc_line_show_variant == false or satc_line_show_variant == 'false' %}false{% else %}true{% endif %}"
+    data-line-image-size="{{ satc_line_image_size | default: 56 }}"
+    data-line-qty-style="{{ satc_line_qty_style | default: 'stepper' | escape }}"
+    data-line-qty-size="{{ satc_line_qty_size | default: 'medium' | escape }}"
+    data-line-remove-style="{{ satc_line_remove_style | default: 'x' | escape }}"
+    data-line-remove-size="{{ satc_line_remove_size | default: 'medium' | escape }}"
     data-checkout-text="{{ satc_drawer_checkout | escape }}"
     hidden
   >
@@ -163,6 +172,11 @@
         --satc-close-hover: {{ satc_close_hover }};
         --satc-close-color: {% if satc_theme_text == true or satc_theme_text == 'true' %}rgb(var(--color-foreground, 18, 18, 18)){% else %}{{ satc_close_color }}{% endif %};
         --satc-btn-radius: {{ satc_btn_radius }}px;
+        --satc-line-image-size: {{ satc_line_image_size | default: 56 }}px;
+        --satc-line-image-radius: {{ satc_line_image_radius | default: 8 }}px;
+        --satc-line-title-size: {{ satc_line_title_size | default: 14 }}px;
+        --satc-line-price-size: {{ satc_line_price_size | default: 14 }}px;
+        --satc-line-gap: {{ satc_line_gap | default: 12 }}px;
       "
     >
       <div class="satc-slider__accent" aria-hidden="true"></div>

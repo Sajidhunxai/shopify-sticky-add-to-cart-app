@@ -185,8 +185,22 @@ export type BarConfig = {
   drawerBackdropOpacity: number;
   /** Show +/- quantity controls on drawer cart lines */
   cartLineQtyEnabled: boolean;
-  /** Show remove (×) on drawer cart lines */
+  /** Show remove control on drawer cart lines */
   cartLineRemoveEnabled: boolean;
+  /** Cart line product image */
+  cartLineShowImage: boolean;
+  cartLineImageSize: number;
+  cartLineImageRadius: number;
+  cartLineShowTitle: boolean;
+  cartLineTitleSize: number;
+  cartLineShowPrice: boolean;
+  cartLinePriceSize: number;
+  cartLineShowVariant: boolean;
+  cartLineGap: number;
+  cartLineQtyStyle: "stepper" | "plain";
+  cartLineQtySize: "small" | "medium" | "large";
+  cartLineRemoveStyle: "x" | "delete" | "remove" | "trash";
+  cartLineRemoveSize: "small" | "medium" | "large";
   /** Cart drawer page/device visibility (independent of sticky bar flags) */
   drawerShowOnProduct: boolean;
   drawerShowOnCollection: boolean;
@@ -345,6 +359,19 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   drawerBackdropOpacity: 45,
   cartLineQtyEnabled: true,
   cartLineRemoveEnabled: true,
+  cartLineShowImage: true,
+  cartLineImageSize: 56,
+  cartLineImageRadius: 8,
+  cartLineShowTitle: true,
+  cartLineTitleSize: 14,
+  cartLineShowPrice: true,
+  cartLinePriceSize: 14,
+  cartLineShowVariant: true,
+  cartLineGap: 12,
+  cartLineQtyStyle: "stepper",
+  cartLineQtySize: "medium",
+  cartLineRemoveStyle: "x",
+  cartLineRemoveSize: "medium",
   drawerShowOnProduct: true,
   drawerShowOnCollection: true,
   drawerShowOnHome: true,
@@ -981,6 +1008,88 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       formData.get("cartLineRemoveEnabled"),
       DEFAULT_BAR_CONFIG.cartLineRemoveEnabled,
     ),
+    cartLineShowImage: asBool(
+      formData.get("cartLineShowImage"),
+      DEFAULT_BAR_CONFIG.cartLineShowImage,
+    ),
+    cartLineImageSize: Math.min(
+      120,
+      Math.max(
+        32,
+        asNumber(
+          formData.get("cartLineImageSize"),
+          DEFAULT_BAR_CONFIG.cartLineImageSize,
+        ),
+      ),
+    ),
+    cartLineImageRadius: Math.min(
+      40,
+      Math.max(
+        0,
+        asNumber(
+          formData.get("cartLineImageRadius"),
+          DEFAULT_BAR_CONFIG.cartLineImageRadius,
+        ),
+      ),
+    ),
+    cartLineShowTitle: asBool(
+      formData.get("cartLineShowTitle"),
+      DEFAULT_BAR_CONFIG.cartLineShowTitle,
+    ),
+    cartLineTitleSize: Math.min(
+      22,
+      Math.max(
+        10,
+        asNumber(
+          formData.get("cartLineTitleSize"),
+          DEFAULT_BAR_CONFIG.cartLineTitleSize,
+        ),
+      ),
+    ),
+    cartLineShowPrice: asBool(
+      formData.get("cartLineShowPrice"),
+      DEFAULT_BAR_CONFIG.cartLineShowPrice,
+    ),
+    cartLinePriceSize: Math.min(
+      22,
+      Math.max(
+        10,
+        asNumber(
+          formData.get("cartLinePriceSize"),
+          DEFAULT_BAR_CONFIG.cartLinePriceSize,
+        ),
+      ),
+    ),
+    cartLineShowVariant: asBool(
+      formData.get("cartLineShowVariant"),
+      DEFAULT_BAR_CONFIG.cartLineShowVariant,
+    ),
+    cartLineGap: Math.min(
+      28,
+      Math.max(
+        4,
+        asNumber(formData.get("cartLineGap"), DEFAULT_BAR_CONFIG.cartLineGap),
+      ),
+    ),
+    cartLineQtyStyle: (() => {
+      const raw = String(formData.get("cartLineQtyStyle") || "");
+      return raw === "plain" ? "plain" : "stepper";
+    })(),
+    cartLineQtySize: (() => {
+      const raw = String(formData.get("cartLineQtySize") || "");
+      if (raw === "small" || raw === "large") return raw;
+      return "medium";
+    })(),
+    cartLineRemoveStyle: (() => {
+      const raw = String(formData.get("cartLineRemoveStyle") || "");
+      if (raw === "delete" || raw === "remove" || raw === "trash") return raw;
+      return "x";
+    })(),
+    cartLineRemoveSize: (() => {
+      const raw = String(formData.get("cartLineRemoveSize") || "");
+      if (raw === "small" || raw === "large") return raw;
+      return "medium";
+    })(),
     drawerShowOnProduct: asBool(
       formData.get("drawerShowOnProduct"),
       DEFAULT_BAR_CONFIG.drawerShowOnProduct,

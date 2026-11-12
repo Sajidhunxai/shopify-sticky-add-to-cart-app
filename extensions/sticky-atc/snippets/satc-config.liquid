@@ -82,6 +82,19 @@
   {% assign satc_backdrop_opacity = cfg.drawerBackdropOpacity %}
   {% assign satc_line_qty = cfg.cartLineQtyEnabled %}
   {% assign satc_line_remove = cfg.cartLineRemoveEnabled %}
+  {% assign satc_line_show_image = cfg.cartLineShowImage %}
+  {% assign satc_line_image_size = cfg.cartLineImageSize %}
+  {% assign satc_line_image_radius = cfg.cartLineImageRadius %}
+  {% assign satc_line_show_title = cfg.cartLineShowTitle %}
+  {% assign satc_line_title_size = cfg.cartLineTitleSize %}
+  {% assign satc_line_show_price = cfg.cartLineShowPrice %}
+  {% assign satc_line_price_size = cfg.cartLinePriceSize %}
+  {% assign satc_line_show_variant = cfg.cartLineShowVariant %}
+  {% assign satc_line_gap = cfg.cartLineGap %}
+  {% assign satc_line_qty_style = cfg.cartLineQtyStyle %}
+  {% assign satc_line_qty_size = cfg.cartLineQtySize %}
+  {% assign satc_line_remove_style = cfg.cartLineRemoveStyle %}
+  {% assign satc_line_remove_size = cfg.cartLineRemoveSize %}
   {% assign satc_drawer_on_product = cfg.drawerShowOnProduct %}
   {% assign satc_drawer_on_collection = cfg.drawerShowOnCollection %}
   {% assign satc_drawer_on_home = cfg.drawerShowOnHome %}
@@ -211,6 +224,19 @@
   {% assign satc_backdrop_opacity = 45 %}
   {% assign satc_line_qty = true %}
   {% assign satc_line_remove = true %}
+  {% assign satc_line_show_image = true %}
+  {% assign satc_line_image_size = 56 %}
+  {% assign satc_line_image_radius = 8 %}
+  {% assign satc_line_show_title = true %}
+  {% assign satc_line_title_size = 14 %}
+  {% assign satc_line_show_price = true %}
+  {% assign satc_line_price_size = 14 %}
+  {% assign satc_line_show_variant = true %}
+  {% assign satc_line_gap = 12 %}
+  {% assign satc_line_qty_style = 'stepper' %}
+  {% assign satc_line_qty_size = 'medium' %}
+  {% assign satc_line_remove_style = 'x' %}
+  {% assign satc_line_remove_size = 'medium' %}
   {% assign satc_drawer_on_product = true %}
   {% assign satc_drawer_on_collection = true %}
   {% assign satc_drawer_on_home = true %}
@@ -332,6 +358,19 @@
 {% if satc_theme_text == nil %}{% assign satc_theme_text = true %}{% endif %}
 {% if satc_line_qty == nil %}{% assign satc_line_qty = true %}{% endif %}
 {% if satc_line_remove == nil %}{% assign satc_line_remove = true %}{% endif %}
+{% if satc_line_show_image == nil %}{% assign satc_line_show_image = true %}{% endif %}
+{% if satc_line_image_size == blank %}{% assign satc_line_image_size = 56 %}{% endif %}
+{% if satc_line_image_radius == blank %}{% assign satc_line_image_radius = 8 %}{% endif %}
+{% if satc_line_show_title == nil %}{% assign satc_line_show_title = true %}{% endif %}
+{% if satc_line_title_size == blank %}{% assign satc_line_title_size = 14 %}{% endif %}
+{% if satc_line_show_price == nil %}{% assign satc_line_show_price = true %}{% endif %}
+{% if satc_line_price_size == blank %}{% assign satc_line_price_size = 14 %}{% endif %}
+{% if satc_line_show_variant == nil %}{% assign satc_line_show_variant = true %}{% endif %}
+{% if satc_line_gap == blank %}{% assign satc_line_gap = 12 %}{% endif %}
+{% if satc_line_qty_style == blank %}{% assign satc_line_qty_style = 'stepper' %}{% endif %}
+{% if satc_line_qty_size == blank %}{% assign satc_line_qty_size = 'medium' %}{% endif %}
+{% if satc_line_remove_style == blank %}{% assign satc_line_remove_style = 'x' %}{% endif %}
+{% if satc_line_remove_size == blank %}{% assign satc_line_remove_size = 'medium' %}{% endif %}
 {% if satc_drawer_on_product == nil %}{% assign satc_drawer_on_product = true %}{% endif %}
 {% if satc_drawer_on_collection == nil %}{% assign satc_drawer_on_collection = true %}{% endif %}
 {% if satc_drawer_on_home == nil %}{% assign satc_drawer_on_home = true %}{% endif %}
@@ -457,6 +496,19 @@
     satc_hdr_h: satc_hdr_h,
     satc_line_qty: satc_line_qty,
     satc_line_remove: satc_line_remove,
+    satc_line_show_image: satc_line_show_image,
+    satc_line_image_size: satc_line_image_size,
+    satc_line_image_radius: satc_line_image_radius,
+    satc_line_show_title: satc_line_show_title,
+    satc_line_title_size: satc_line_title_size,
+    satc_line_show_price: satc_line_show_price,
+    satc_line_price_size: satc_line_price_size,
+    satc_line_show_variant: satc_line_show_variant,
+    satc_line_gap: satc_line_gap,
+    satc_line_qty_style: satc_line_qty_style,
+    satc_line_qty_size: satc_line_qty_size,
+    satc_line_remove_style: satc_line_remove_style,
+    satc_line_remove_size: satc_line_remove_size,
     satc_rec_add: satc_rec_add,
     satc_rec_anim: satc_rec_anim,
     satc_rec_collection: satc_rec_collection,

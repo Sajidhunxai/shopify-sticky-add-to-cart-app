@@ -514,6 +514,56 @@
 
   const lineQtyEnabled = slider?.dataset.lineQty !== "false";
   const lineRemoveEnabled = slider?.dataset.lineRemove !== "false";
+  const lineShowImage = slider?.dataset.lineShowImage !== "false";
+  const lineShowTitle = slider?.dataset.lineShowTitle !== "false";
+  const lineShowPrice = slider?.dataset.lineShowPrice !== "false";
+  const lineShowVariant = slider?.dataset.lineShowVariant !== "false";
+  const lineQtyStyle =
+    slider?.dataset.lineQtyStyle === "plain" ? "plain" : "stepper";
+  const lineQtySize = ["small", "large"].includes(slider?.dataset.lineQtySize)
+    ? slider.dataset.lineQtySize
+    : "medium";
+  const lineRemoveStyle = ["delete", "remove", "trash"].includes(
+    slider?.dataset.lineRemoveStyle,
+  )
+    ? slider.dataset.lineRemoveStyle
+    : "x";
+  const lineRemoveSize = ["small", "large"].includes(
+    slider?.dataset.lineRemoveSize,
+  )
+    ? slider.dataset.lineRemoveSize
+    : "medium";
+  const lineImageSize = Math.min(
+    120,
+    Math.max(32, Number(slider?.dataset.lineImageSize) || 56),
+  );
+
+  const trashSvg = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v6M14 11v6"/></svg>`;
+
+  const removeControlHtml = (key) => {
+    if (!lineRemoveEnabled) return "";
+    const label =
+      lineRemoveStyle === "delete"
+        ? "Delete"
+        : lineRemoveStyle === "remove"
+          ? "Remove"
+          : "Remove";
+    const inner =
+      lineRemoveStyle === "trash"
+        ? trashSvg
+        : lineRemoveStyle === "x"
+          ? "×"
+          : escapeHtml(
+              lineRemoveStyle === "delete" ? "Delete" : "Remove",
+            );
+    const styleClass =
+      lineRemoveStyle === "x"
+        ? "satc-slider__line-remove--x"
+        : lineRemoveStyle === "trash"
+          ? "satc-slider__line-remove--trash"
+          : "satc-slider__line-remove--text";
+    return `<button type="button" class="satc-slider__line-remove satc-slider__line-remove--${escapeHtml(lineRemoveSize)} ${styleClass}" data-satc-line-remove data-line-key="${escapeHtml(key)}" aria-label="${escapeHtml(label)}">${inner}</button>`;
+  };
 
   const changeLineQty = async (lineKey, quantity) => {
     if (!lineKey) return;
@@ -561,17 +611,33 @@
       .map((item) => {
         const key = item.key || String(item.id);
         const qty = Number(item.quantity) || 1;
-        const qtyControls = lineQtyEnabled
-          ? `<div class="satc-slider__line-qty" data-satc-line-qty>
+        const variantHtml =
+          lineShowVariant &&
+          item.variant_title &&
+          item.variant_title !== "Default Title"
+            ? `<p class="satc-slider__item-meta">${escapeHtml(item.variant_title)}</p>`
+            : "";
+        const qtyControls = !lineQtyEnabled
+          ? ""
+          : lineQtyStyle === "plain"
+            ? `<p class="satc-slider__item-meta">Qty ${qty}</p>`
+            : `<div class="satc-slider__line-qty satc-slider__line-qty--${escapeHtml(lineQtySize)}" data-satc-line-qty>
               <button type="button" class="satc-slider__line-qty-btn" data-satc-line-minus data-line-key="${escapeHtml(key)}" data-qty="${qty}" aria-label="Decrease">−</button>
               <span class="satc-slider__line-qty-val">${qty}</span>
               <button type="button" class="satc-slider__line-qty-btn" data-satc-line-plus data-line-key="${escapeHtml(key)}" data-qty="${qty}" aria-label="Increase">+</button>
-            </div>`
-          : `<p class="satc-slider__item-meta">Qty ${qty}</p>`;
-        const removeBtn = lineRemoveEnabled
-          ? `<button type="button" class="satc-slider__line-remove" data-satc-line-remove data-line-key="${escapeHtml(key)}" aria-label="Remove">×</button>`
-          : "";
+            </div>`;
+        const removeBtn = removeControlHtml(key);
         const priceLabel = money(item.final_line_price ?? item.line_price);
+        const imgSize = Math.min(120, Math.max(32, lineImageSize || 56));
+        const imageHtml = lineShowImage
+          ? `<img src="${escapeHtml(item.image || "")}" alt="" width="${imgSize}" height="${imgSize}" loading="lazy">`
+          : "";
+        const titleHtml = lineShowTitle
+          ? `<p class="satc-slider__item-title">${escapeHtml(item.product_title || item.title || "")}</p>`
+          : "";
+        const priceHtml = lineShowPrice
+          ? `<div class="satc-slider__item-price">${priceLabel}</div>`
+          : "";
         const itemTpl = getFeatureTpl("cartItem");
         if (itemTpl?.template && (itemTpl.replaceDefault || itemTpl.template)) {
           return wrapFeature(
@@ -582,6 +648,7 @@
                 quantity: qty,
                 price: priceLabel,
                 image: item.image || "",
+                variant: item.variant_title || "",
                 line_key: key,
                 qty_controls: qtyControls,
                 remove_button: removeBtn,
@@ -591,15 +658,16 @@
           );
         }
         const built = `
-          <div class="satc-slider__item" data-satc-line data-line-key="${escapeHtml(key)}">
-            <img src="${escapeHtml(item.image || "")}" alt="" width="56" height="56" loading="lazy">
+          <div class="satc-slider__item${lineShowImage ? "" : " satc-slider__item--no-image"}" data-satc-line data-line-key="${escapeHtml(key)}">
+            ${imageHtml}
             <div class="satc-slider__item-main">
-              <p class="satc-slider__item-title">${escapeHtml(item.product_title || item.title || "")}</p>
+              ${titleHtml}
+              ${variantHtml}
               ${qtyControls}
             </div>
             <div class="satc-slider__item-side">
               ${removeBtn}
-              <div class="satc-slider__item-price">${priceLabel}</div>
+              ${priceHtml}
             </div>
           </div>`;
         if (itemTpl?.html) {

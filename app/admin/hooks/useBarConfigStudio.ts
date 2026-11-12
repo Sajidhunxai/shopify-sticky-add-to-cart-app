@@ -46,11 +46,20 @@ export function useBarConfigStudio(initialConfig: BarConfig) {
     config.displayMode === "slider" &&
     config.enabled &&
     (previewDrawerManual ?? autoShowDrawer);
-  const showEmptyPreview = previewEmpty || nav === "recommendations";
+  // Recommendations default to empty cart; cart-items/summary open with sample lines.
+  const showEmptyPreview = previewEmpty;
 
   useEffect(() => {
     setConfig(initialConfig);
   }, [initialConfig]);
+
+  useEffect(() => {
+    if (nav === "cart-items" || nav === "cart-summary") {
+      setPreviewEmpty(false);
+    } else if (nav === "recommendations") {
+      setPreviewEmpty(true);
+    }
+  }, [nav]);
 
   const boundUpdateConfig: UpdateConfig = useCallback(
     (key, value) => updateConfig(setConfig, key, value),
