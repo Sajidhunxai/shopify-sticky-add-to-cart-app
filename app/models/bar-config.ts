@@ -201,6 +201,13 @@ export type BarConfig = {
   cartLineQtySize: "small" | "medium" | "large";
   cartLineRemoveStyle: "x" | "delete" | "remove" | "trash";
   cartLineRemoveSize: "small" | "medium" | "large";
+  /** Cart line colors */
+  cartLineBg: string;
+  cartLineTextColor: string;
+  cartLineBorderColor: string;
+  cartLineQtyBg: string;
+  cartLineQtyText: string;
+  cartLineRemoveColor: string;
   /** Cart drawer page/device visibility (independent of sticky bar flags) */
   drawerShowOnProduct: boolean;
   drawerShowOnCollection: boolean;
@@ -372,6 +379,12 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   cartLineQtySize: "medium",
   cartLineRemoveStyle: "x",
   cartLineRemoveSize: "medium",
+  cartLineBg: "transparent",
+  cartLineTextColor: "",
+  cartLineBorderColor: "rgba(0,0,0,0.06)",
+  cartLineQtyBg: "transparent",
+  cartLineQtyText: "",
+  cartLineRemoveColor: "",
   drawerShowOnProduct: true,
   drawerShowOnCollection: true,
   drawerShowOnHome: true,
@@ -1090,6 +1103,30 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       if (raw === "small" || raw === "large") return raw;
       return "medium";
     })(),
+    cartLineBg: asString(
+      formData.get("cartLineBg"),
+      DEFAULT_BAR_CONFIG.cartLineBg,
+    ),
+    cartLineTextColor: asString(
+      formData.get("cartLineTextColor"),
+      DEFAULT_BAR_CONFIG.cartLineTextColor,
+    ),
+    cartLineBorderColor: asString(
+      formData.get("cartLineBorderColor"),
+      DEFAULT_BAR_CONFIG.cartLineBorderColor,
+    ),
+    cartLineQtyBg: asString(
+      formData.get("cartLineQtyBg"),
+      DEFAULT_BAR_CONFIG.cartLineQtyBg,
+    ),
+    cartLineQtyText: asString(
+      formData.get("cartLineQtyText"),
+      DEFAULT_BAR_CONFIG.cartLineQtyText,
+    ),
+    cartLineRemoveColor: asString(
+      formData.get("cartLineRemoveColor"),
+      DEFAULT_BAR_CONFIG.cartLineRemoveColor,
+    ),
     drawerShowOnProduct: asBool(
       formData.get("drawerShowOnProduct"),
       DEFAULT_BAR_CONFIG.drawerShowOnProduct,

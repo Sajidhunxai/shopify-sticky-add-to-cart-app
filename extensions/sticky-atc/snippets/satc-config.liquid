@@ -95,6 +95,12 @@
   {% assign satc_line_qty_size = cfg.cartLineQtySize %}
   {% assign satc_line_remove_style = cfg.cartLineRemoveStyle %}
   {% assign satc_line_remove_size = cfg.cartLineRemoveSize %}
+  {% assign satc_line_bg = cfg.cartLineBg %}
+  {% assign satc_line_text = cfg.cartLineTextColor %}
+  {% assign satc_line_border = cfg.cartLineBorderColor %}
+  {% assign satc_line_qty_bg = cfg.cartLineQtyBg %}
+  {% assign satc_line_qty_text = cfg.cartLineQtyText %}
+  {% assign satc_line_remove_color = cfg.cartLineRemoveColor %}
   {% assign satc_drawer_on_product = cfg.drawerShowOnProduct %}
   {% assign satc_drawer_on_collection = cfg.drawerShowOnCollection %}
   {% assign satc_drawer_on_home = cfg.drawerShowOnHome %}
@@ -237,6 +243,12 @@
   {% assign satc_line_qty_size = 'medium' %}
   {% assign satc_line_remove_style = 'x' %}
   {% assign satc_line_remove_size = 'medium' %}
+  {% assign satc_line_bg = 'transparent' %}
+  {% assign satc_line_text = '' %}
+  {% assign satc_line_border = 'rgba(0,0,0,0.06)' %}
+  {% assign satc_line_qty_bg = 'transparent' %}
+  {% assign satc_line_qty_text = '' %}
+  {% assign satc_line_remove_color = '' %}
   {% assign satc_drawer_on_product = true %}
   {% assign satc_drawer_on_collection = true %}
   {% assign satc_drawer_on_home = true %}
@@ -371,6 +383,9 @@
 {% if satc_line_qty_size == blank %}{% assign satc_line_qty_size = 'medium' %}{% endif %}
 {% if satc_line_remove_style == blank %}{% assign satc_line_remove_style = 'x' %}{% endif %}
 {% if satc_line_remove_size == blank %}{% assign satc_line_remove_size = 'medium' %}{% endif %}
+{% if satc_line_bg == blank %}{% assign satc_line_bg = 'transparent' %}{% endif %}
+{% if satc_line_border == blank %}{% assign satc_line_border = 'rgba(0,0,0,0.06)' %}{% endif %}
+{% if satc_line_qty_bg == blank %}{% assign satc_line_qty_bg = 'transparent' %}{% endif %}
 {% if satc_drawer_on_product == nil %}{% assign satc_drawer_on_product = true %}{% endif %}
 {% if satc_drawer_on_collection == nil %}{% assign satc_drawer_on_collection = true %}{% endif %}
 {% if satc_drawer_on_home == nil %}{% assign satc_drawer_on_home = true %}{% endif %}
@@ -509,6 +524,12 @@
     satc_line_qty_size: satc_line_qty_size,
     satc_line_remove_style: satc_line_remove_style,
     satc_line_remove_size: satc_line_remove_size,
+    satc_line_bg: satc_line_bg,
+    satc_line_text: satc_line_text,
+    satc_line_border: satc_line_border,
+    satc_line_qty_bg: satc_line_qty_bg,
+    satc_line_qty_text: satc_line_qty_text,
+    satc_line_remove_color: satc_line_remove_color,
     satc_rec_add: satc_rec_add,
     satc_rec_anim: satc_rec_anim,
     satc_rec_collection: satc_rec_collection,

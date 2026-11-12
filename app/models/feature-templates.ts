@@ -87,14 +87,18 @@ export const FEATURE_TEMPLATE_META: Record<
   cartItem: {
     label: "Cart line item",
     placeholders:
-      "{{title}}, {{quantity}}, {{price}}, {{image}}, {{line_key}}, {{{qty_controls}}}, {{{remove_button}}}",
-    example: `<div class="satc-slider__line" data-line-key="{{line_key}}">
-  <img class="satc-slider__line-image" src="{{image}}" alt="" width="56" height="56">
-  <div class="satc-slider__line-info">
-    <p class="satc-slider__line-title">{{title}}</p>
+      "{{title}}, {{quantity}}, {{price}}, {{image}}, {{variant}}, {{line_key}}, {{{qty_controls}}}, {{{remove_button}}}",
+    example: `<div class="satc-slider__item" data-satc-line data-line-key="{{line_key}}">
+  <img class="satc-slider__item-image" src="{{image}}" alt="" loading="lazy">
+  <div class="satc-slider__item-main">
+    <p class="satc-slider__item-title">{{title}}</p>
+    {{#variant}}<p class="satc-slider__item-meta">{{variant}}</p>{{/variant}}
     {{{qty_controls}}}
   </div>
-  <div class="satc-slider__line-meta">{{price}} {{{remove_button}}}</div>
+  <div class="satc-slider__item-side">
+    {{{remove_button}}}
+    <div class="satc-slider__item-price">{{price}}</div>
+  </div>
 </div>`,
   },
   recommendations: {

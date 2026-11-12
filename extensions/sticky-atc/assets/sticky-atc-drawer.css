@@ -949,25 +949,58 @@
   display: none;
 }
 
-.satc-slider__item {
+.satc-slider__item,
+.satc-slider__line {
   display: grid;
   grid-template-columns: var(--satc-line-image-size, 56px) 1fr auto;
   gap: var(--satc-line-gap, 12px);
   align-items: start;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 12px;
+  margin: 0 0 8px;
+  border-radius: 10px;
+  border-bottom: 1px solid var(--satc-line-border, rgba(0, 0, 0, 0.06));
+  background: var(--satc-line-bg, transparent);
+  color: var(--satc-line-text, var(--satc-text, #111));
+  box-sizing: border-box;
 }
 
-.satc-slider__item--no-image {
+.satc-slider__item--no-image,
+.satc-slider__line--no-image {
   grid-template-columns: 1fr auto;
 }
 
-.satc-slider__item img {
+.satc-slider__item img,
+.satc-slider__item-image,
+.satc-slider__line-image {
   width: var(--satc-line-image-size, 56px);
   height: var(--satc-line-image-size, 56px);
   object-fit: cover;
   border-radius: var(--satc-line-image-radius, 8px);
   background: rgba(0, 0, 0, 0.05);
+}
+
+/* Aliases for older custom HTML examples using __line-* class names */
+.satc-slider__line-info {
+  min-width: 0;
+}
+
+.satc-slider__line-title {
+  margin: 0;
+  font-size: var(--satc-line-title-size, 14px);
+  font-weight: 600;
+  color: inherit !important;
+  line-height: 1.3;
+}
+
+.satc-slider__line-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  font-size: var(--satc-line-price-size, 14px);
+  font-weight: 650;
+  white-space: nowrap;
+  color: inherit;
 }
 
 .satc-slider__item-main {
@@ -978,7 +1011,7 @@
   margin: 0;
   font-size: var(--satc-line-title-size, 14px);
   font-weight: 600;
-  color: var(--satc-text, #111) !important;
+  color: var(--satc-line-text, var(--satc-text, #111)) !important;
   line-height: 1.3;
 }
 
@@ -986,6 +1019,7 @@
   margin: 4px 0 0;
   font-size: calc(var(--satc-line-title-size, 14px) - 3px);
   opacity: 0.75;
+  color: var(--satc-line-text, var(--satc-text, #111));
 }
 
 .satc-slider__item-side {
@@ -999,7 +1033,7 @@
   font-size: var(--satc-line-price-size, 14px);
   font-weight: 650;
   white-space: nowrap;
-  color: var(--satc-text, #111) !important;
+  color: var(--satc-line-text, var(--satc-text, #111)) !important;
 }
 
 .satc-slider__line-qty {
@@ -1010,7 +1044,8 @@
   border: 1px solid rgba(0, 0, 0, 0.14);
   border-radius: 8px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--satc-line-qty-bg, rgba(255, 255, 255, 0.08));
+  color: var(--satc-line-qty-text, var(--satc-line-text, var(--satc-text, #111)));
 }
 
 .satc-slider__line-qty-btn {
@@ -1018,7 +1053,7 @@
   height: 28px;
   border: 0;
   background: transparent;
-  color: var(--satc-text, #111);
+  color: inherit;
   cursor: pointer;
   font-size: 16px;
   line-height: 1;
@@ -1046,7 +1081,7 @@
   text-align: center;
   font-size: 12px;
   font-weight: 650;
-  color: var(--satc-text, #111) !important;
+  color: inherit !important;
 }
 
 .satc-slider__line-qty--small .satc-slider__line-qty-val {
@@ -1063,7 +1098,7 @@
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: var(--satc-text, #111);
+  color: var(--satc-line-remove, var(--satc-line-text, var(--satc-text, #111)));
   cursor: pointer;
   line-height: 1;
   opacity: 0.75;

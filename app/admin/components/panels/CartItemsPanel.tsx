@@ -1,4 +1,5 @@
 import styles from "../../../styles/dashboard.module.css";
+import { colorFromEvent } from "../../fields/color";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import type { PanelProps } from "../../types";
 
@@ -330,12 +331,95 @@ export function CartItemsPanel({ config, updateConfig }: PanelProps) {
         <s-option value="large">Large</s-option>
       </s-select>
 
+      <s-heading>Cart line colors</s-heading>
+      <s-grid gridTemplateColumns="1fr 1fr" gap="base">
+        <s-color-field
+          label="Line background"
+          value={
+            config.cartLineBg === "transparent" ? "#ffffff" : config.cartLineBg
+          }
+          onChange={(e: Event) => {
+            const value = colorFromEvent(e);
+            if (value) updateConfig("cartLineBg", value);
+          }}
+        />
+        <s-color-field
+          label="Line text"
+          value={config.cartLineTextColor || config.textColor || "#111111"}
+          onChange={(e: Event) => {
+            const value = colorFromEvent(e);
+            if (value) updateConfig("cartLineTextColor", value);
+          }}
+        />
+        <s-color-field
+          label="Line border"
+          value={
+            config.cartLineBorderColor.startsWith("#")
+              ? config.cartLineBorderColor
+              : "#e5e7eb"
+          }
+          onChange={(e: Event) => {
+            const value = colorFromEvent(e);
+            if (value) updateConfig("cartLineBorderColor", value);
+          }}
+        />
+        <s-color-field
+          label="Quantity background"
+          value={
+            config.cartLineQtyBg === "transparent"
+              ? "#ffffff"
+              : config.cartLineQtyBg
+          }
+          onChange={(e: Event) => {
+            const value = colorFromEvent(e);
+            if (value) updateConfig("cartLineQtyBg", value);
+          }}
+        />
+        <s-color-field
+          label="Quantity text"
+          value={
+            config.cartLineQtyText ||
+            config.cartLineTextColor ||
+            config.textColor ||
+            "#111111"
+          }
+          onChange={(e: Event) => {
+            const value = colorFromEvent(e);
+            if (value) updateConfig("cartLineQtyText", value);
+          }}
+        />
+        <s-color-field
+          label="Remove color"
+          value={
+            config.cartLineRemoveColor ||
+            config.cartLineTextColor ||
+            config.textColor ||
+            "#111111"
+          }
+          onChange={(e: Event) => {
+            const value = colorFromEvent(e);
+            if (value) updateConfig("cartLineRemoveColor", value);
+          }}
+        />
+      </s-grid>
+      <s-paragraph>
+        Tip: set line background to a light gray (e.g. #F3F4F6) so items read as
+        cards. Save settings to sync colors to the storefront.
+      </s-paragraph>
+
       <FeatureCustomTemplate
         featureKey="cartItem"
         config={config}
         updateConfig={updateConfig}
         title="Custom cart line template"
       />
+      <s-paragraph>
+        Custom HTML must keep <code>{"{{{qty_controls}}}"}</code> and{" "}
+        <code>{"{{{remove_button}}}"}</code>, and use{" "}
+        <code>satc-slider__item</code> (or <code>satc-slider__line</code>) classes.
+        Click “Load default HTML” if the editor is empty, enable the template, then
+        Save settings.
+      </s-paragraph>
     </s-stack>
   );
 }

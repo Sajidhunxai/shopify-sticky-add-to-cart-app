@@ -7,6 +7,7 @@ import {
   rewardProgressPct,
 } from "../preview/reward-progress";
 import { renderRewardsCustomPreview } from "../preview/reward-template";
+import { renderMustache, sanitizeFeatureHtml } from "../preview/mustache";
 
 function mixHexWithWhite(hex: string, whiteRatio = 0.82): string {
   const raw = String(hex || "#111111").replace("#", "");
@@ -1032,12 +1033,16 @@ export function StudioPreview({
                             meta: "Size 9 · Black",
                             qty: 1,
                             price: "$68.00",
+                            image:
+                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect fill='%2394a3b8' width='120' height='120'/%3E%3C/svg%3E",
                           },
                           {
                             title: "Linen Tote Bag",
                             meta: "Natural",
                             qty: 2,
                             price: "$56.00",
+                            image:
+                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect fill='%2364748b' width='120' height='120'/%3E%3C/svg%3E",
                           },
                         ] as const
                       ).map((item) => {
@@ -1075,6 +1080,50 @@ export function StudioPreview({
                               : config.cartLineRemoveStyle === "trash"
                                 ? "🗑"
                                 : "×";
+                        const lineText =
+                          config.cartLineTextColor || config.textColor;
+                        const qtyControlsHtml =
+                          !config.cartLineQtyEnabled
+                            ? ""
+                            : config.cartLineQtyStyle === "plain"
+                              ? `<p class="satc-slider__item-meta">Qty ${item.qty}</p>`
+                              : `<div class="satc-slider__line-qty"><span style="padding:${qtyPad}">−</span><span style="padding:${qtyPad}">${item.qty}</span><span style="padding:${qtyPad}">+</span></div>`;
+                        const removeHtml = config.cartLineRemoveEnabled
+                          ? `<span style="font-size:${removeFont}px;opacity:.75">${removeLabel}</span>`
+                          : "";
+                        const cartTpl = config.featureTemplates.cartItem;
+                        if (cartTpl?.enabled && cartTpl.template.trim()) {
+                          const html = sanitizeFeatureHtml(
+                            renderMustache(cartTpl.template, {
+                              title: item.title,
+                              quantity: item.qty,
+                              price: item.price,
+                              image: item.image,
+                              variant: item.meta,
+                              line_key: `preview-${item.title}`,
+                              qty_controls: qtyControlsHtml,
+                              remove_button: removeHtml,
+                            }),
+                          );
+                          return (
+                            <div
+                              key={item.title}
+                              data-satc-feature="cartItem"
+                              style={{
+                                background:
+                                  config.cartLineBg === "transparent"
+                                    ? undefined
+                                    : config.cartLineBg,
+                                color: lineText,
+                                borderBottom: `1px solid ${config.cartLineBorderColor}`,
+                                borderRadius: 10,
+                                marginBottom: 8,
+                                overflow: "hidden",
+                              }}
+                              dangerouslySetInnerHTML={{ __html: html }}
+                            />
+                          );
+                        }
                         return (
                           <div
                             key={item.title}
@@ -1085,8 +1134,15 @@ export function StudioPreview({
                                 : "1fr auto",
                               gap,
                               alignItems: "start",
-                              padding: "10px 0",
-                              borderBottom: "1px solid rgba(0,0,0,0.06)",
+                              padding: "10px",
+                              marginBottom: 8,
+                              borderRadius: 10,
+                              background:
+                                config.cartLineBg === "transparent"
+                                  ? undefined
+                                  : config.cartLineBg,
+                              color: lineText,
+                              border: `1px solid ${config.cartLineBorderColor}`,
                             }}
                           >
                             {config.cartLineShowImage ? (
@@ -1108,7 +1164,7 @@ export function StudioPreview({
                                     fontWeight: 650,
                                     fontSize: config.cartLineTitleSize,
                                     lineHeight: 1.25,
-                                    color: config.textColor,
+                                    color: lineText,
                                   }}
                                 >
                                   {item.title}
@@ -1123,7 +1179,7 @@ export function StudioPreview({
                                       config.cartLineTitleSize - 3,
                                     ),
                                     opacity: 0.7,
-                                    color: config.textColor,
+                                    color: lineText,
                                   }}
                                 >
                                   {item.meta}
@@ -1136,7 +1192,7 @@ export function StudioPreview({
                                       display: "inline-block",
                                       marginTop: 6,
                                       fontSize: qtyFont,
-                                      color: config.textColor,
+                                      color: lineText,
                                       opacity: 0.75,
                                     }}
                                   >
@@ -1151,6 +1207,12 @@ export function StudioPreview({
                                       border: "1px solid rgba(0,0,0,0.15)",
                                       borderRadius: 6,
                                       fontSize: qtyFont,
+                                      background:
+                                        config.cartLineQtyBg === "transparent"
+                                          ? undefined
+                                          : config.cartLineQtyBg,
+                                      color:
+                                        config.cartLineQtyText || lineText,
                                     }}
                                   >
                                     <span style={{ padding: qtyPad }}>−</span>
@@ -1172,7 +1234,8 @@ export function StudioPreview({
                               {config.cartLineRemoveEnabled && (
                                 <div
                                   style={{
-                                    color: config.textColor,
+                                    color:
+                                      config.cartLineRemoveColor || lineText,
                                     fontSize: removeFont,
                                     lineHeight: 1,
                                     opacity: 0.75,
@@ -1188,7 +1251,7 @@ export function StudioPreview({
                               {config.cartLineShowPrice && (
                                 <strong
                                   style={{
-                                    color: config.textColor,
+                                    color: lineText,
                                     fontSize: config.cartLinePriceSize,
                                   }}
                                 >

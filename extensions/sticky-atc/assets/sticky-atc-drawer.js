@@ -221,20 +221,23 @@
 
   const renderMustache = (tpl, data) => {
     let out = String(tpl || "");
-    // {{#list}}...{{/list}} — arrays of tier/card objects
+    // {{#key}}...{{/key}} — arrays, or truthy scalar sections
     out = out.replace(
       /\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g,
       (_, key, inner) => {
         const list = data[key];
-        if (!Array.isArray(list)) return "";
-        return list
-          .map((item) =>
-            renderMustache(inner, {
-              ...data,
-              ...(item && typeof item === "object" ? item : { value: item }),
-            }),
-          )
-          .join("");
+        if (Array.isArray(list)) {
+          return list
+            .map((item) =>
+              renderMustache(inner, {
+                ...data,
+                ...(item && typeof item === "object" ? item : { value: item }),
+              }),
+            )
+            .join("");
+        }
+        if (list == null || list === false || list === "") return "";
+        return renderMustache(inner, data);
       },
     );
     out = out.replace(/\{\{\{(\w+)\}\}\}/g, (_, key) =>
@@ -639,23 +642,37 @@
           ? `<div class="satc-slider__item-price">${priceLabel}</div>`
           : "";
         const itemTpl = getFeatureTpl("cartItem");
-        if (itemTpl?.template && (itemTpl.replaceDefault || itemTpl.template)) {
-          return wrapFeature(
-            "cartItem",
-            sanitizeHtml(
-              renderMustache(itemTpl.template, {
-                title: item.product_title || item.title || "",
-                quantity: qty,
-                price: priceLabel,
-                image: item.image || "",
-                variant: item.variant_title || "",
-                line_key: key,
-                qty_controls: qtyControls,
-                remove_button: removeBtn,
-              }),
-            ),
-            itemTpl.html || "",
+        const customTpl = String(itemTpl?.template || "").trim();
+        if (itemTpl && customTpl) {
+          let customHtml = sanitizeHtml(
+            renderMustache(customTpl, {
+              title: item.product_title || item.title || "",
+              quantity: qty,
+              price: priceLabel,
+              image: item.image || "",
+              variant:
+                item.variant_title && item.variant_title !== "Default Title"
+                  ? item.variant_title
+                  : "",
+              line_key: key,
+              qty_controls: qtyControls,
+              remove_button: removeBtn,
+            }),
           );
+          // Ensure line key + bind hooks exist even if merchant HTML omitted them
+          if (
+            customHtml &&
+            !/\bdata-satc-line\b/.test(customHtml) &&
+            !/\bdata-line-key=/.test(customHtml)
+          ) {
+            customHtml = `<div data-satc-line data-line-key="${escapeHtml(key)}">${customHtml}</div>`;
+          } else if (customHtml && !/\bdata-satc-line\b/.test(customHtml)) {
+            customHtml = customHtml.replace(
+              /^(<\w+)(\s|>)/,
+              `$1 data-satc-line data-line-key="${escapeHtml(key)}"$2`,
+            );
+          }
+          return wrapFeature("cartItem", customHtml, itemTpl.html || "");
         }
         const built = `
           <div class="satc-slider__item${lineShowImage ? "" : " satc-slider__item--no-image"}" data-satc-line data-line-key="${escapeHtml(key)}">

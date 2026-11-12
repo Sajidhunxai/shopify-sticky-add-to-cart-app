@@ -177,6 +177,12 @@
         --satc-line-title-size: {{ satc_line_title_size | default: 14 }}px;
         --satc-line-price-size: {{ satc_line_price_size | default: 14 }}px;
         --satc-line-gap: {{ satc_line_gap | default: 12 }}px;
+        --satc-line-bg: {{ satc_line_bg | default: 'transparent' }};
+        --satc-line-border: {{ satc_line_border | default: 'rgba(0,0,0,0.06)' }};
+        --satc-line-qty-bg: {{ satc_line_qty_bg | default: 'transparent' }};
+        {% if satc_line_text != blank %}--satc-line-text: {{ satc_line_text }};{% endif %}
+        {% if satc_line_qty_text != blank %}--satc-line-qty-text: {{ satc_line_qty_text }};{% endif %}
+        {% if satc_line_remove_color != blank %}--satc-line-remove: {{ satc_line_remove_color }};{% endif %}
       "
     >
       <div class="satc-slider__accent" aria-hidden="true"></div>
