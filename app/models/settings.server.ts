@@ -5,6 +5,7 @@ import {
   type BarConfig,
   type Plan,
 } from "./bar-config";
+import { storefrontConfigForLocale } from "./locale-default-copy";
 
 export type { BarConfig, Plan } from "./bar-config";
 export {
@@ -102,7 +103,7 @@ export async function syncStorefrontSettings(
             namespace: "sticky_atc",
             key: "config",
             type: "json",
-            value: JSON.stringify(config),
+            value: JSON.stringify(storefrontConfigForLocale(config)),
             ownerId,
           },
         ],

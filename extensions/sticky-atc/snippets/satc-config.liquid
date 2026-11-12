@@ -358,8 +358,11 @@
 {% if satc_ann_text == blank or satc_ann_text == 'Your products are reserved for {timer}!' %}
   {% assign satc_ann_text = 'general.reserved_for' | t %}
 {% endif %}
-{% if satc_reward_done == blank or satc_reward_done == 'Free shipping unlocked!' %}
+{% if satc_reward_done == blank or satc_reward_done == 'Free shipping unlocked!' or satc_reward_done == "You've unlocked free shipping!" %}
   {% assign satc_reward_done = 'general.free_shipping_unlocked' | t %}
+{% endif %}
+{% if satc_ship_done == blank or satc_ship_done == 'Free shipping unlocked!' or satc_ship_done == "You've unlocked free shipping!" %}
+  {% assign satc_ship_done = 'general.free_shipping_unlocked' | t %}
 {% endif %}
 {% if satc_rec_empty == blank or satc_rec_empty == 'Add your favorite items to your cart.' %}
   {% assign satc_rec_empty = 'general.add_favorites' | t %}

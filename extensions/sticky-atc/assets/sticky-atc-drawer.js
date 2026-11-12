@@ -232,17 +232,42 @@
       ];
     }
   }
-  rewardTiers = (Array.isArray(rewardTiers) ? rewardTiers : []).map((tier) => {
-    if (!tier || typeof tier !== "object") return tier;
-    return {
-      ...tier,
-      description: localizeTierText(tier.description, tier.description),
-      titleBefore: localizeTierText(
-        tier.titleBefore,
-        tier.titleBefore || "You're [AMOUNT] away!",
-      ),
-    };
-  });
+  const tierDescFallback = [
+    slider?.dataset.i18nTierFreeShipping || "Free Shipping",
+    slider?.dataset.i18nTierFreeExpress || "Free Express",
+    slider?.dataset.i18nTierFreeGift || "Free Gift",
+    slider?.dataset.i18nTierVipReward || "VIP Reward",
+  ];
+  const tierAwayFallback = [
+    slider?.dataset.i18nAwayFreeShipping ||
+      "You're [AMOUNT] away from free shipping!",
+    slider?.dataset.i18nAwayFreeExpress ||
+      "You're [AMOUNT] away from free express shipping!",
+    slider?.dataset.i18nAwayFreeGift ||
+      "You're [AMOUNT] away from a free gift!",
+    slider?.dataset.i18nAwayVipReward ||
+      "You're [AMOUNT] away from VIP reward!",
+  ];
+  rewardTiers = (Array.isArray(rewardTiers) ? rewardTiers : []).map(
+    (tier, index) => {
+      if (!tier || typeof tier !== "object") return tier;
+      const descRaw = String(tier.description || "").trim();
+      const beforeRaw = String(tier.titleBefore || "").trim();
+      return {
+        ...tier,
+        description: descRaw
+          ? localizeTierText(descRaw, descRaw)
+          : tierDescFallback[index] ||
+            slider?.dataset.i18nTierFreeShipping ||
+            "Free Shipping",
+        titleBefore: beforeRaw
+          ? localizeTierText(beforeRaw, beforeRaw)
+          : tierAwayFallback[index] ||
+            slider?.dataset.i18nAwayGeneric ||
+            "You're [AMOUNT] away!",
+      };
+    },
+  );
   const activeTiers = rewardTiers
     .filter((t) => t && t.enabled !== false)
     .slice()
