@@ -40,6 +40,16 @@ export type RecommendationSource = "collection" | "products";
 export type DrawerAnimation = "slide" | "fade" | "scale" | "none";
 export type RecsAnimation = "stagger" | "fade" | "slide" | "none";
 export type RewardAnimation = "smooth" | "pulse" | "glow" | "bounce" | "none";
+/** Where toast lives: inside the cart drawer panel, or fixed on the page */
+export type ToastPlacement = "drawer" | "page";
+export type ToastPosition =
+  | "top"
+  | "bottom"
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-right";
+export type ToastStyle = "solid" | "soft" | "outline" | "minimal";
 /** stacked = milestones above bar; middle = progress line through icons */
 export type RewardBarLayout = "stacked" | "middle";
 export type RewardBarStyle = "solid" | "gradient" | "striped";
@@ -268,6 +278,26 @@ export type BarConfig = {
   recommendationsProducts: RecommendationProduct[];
   /** Cart drawer open/close motion */
   drawerAnimation: DrawerAnimation;
+  /** Toast host: drawer panel or page overlay */
+  toastPlacement: ToastPlacement;
+  /** Corner / edge position for toast */
+  toastPosition: ToastPosition;
+  /** Visual style for toast */
+  toastStyle: ToastStyle;
+  toastRadius: number;
+  toastFontSize: number;
+  toastSuccessBg: string;
+  toastSuccessText: string;
+  toastErrorBg: string;
+  toastErrorText: string;
+  /** Show success toasts (add / update) */
+  toastShowSuccess: boolean;
+  /** Show error toasts */
+  toastShowError: boolean;
+  /** Show toast when a line is removed */
+  toastShowRemove: boolean;
+  /** Show success toast when quantity is updated */
+  toastShowUpdate: boolean;
   /** Recommendation cards entrance motion */
   recommendationsAnimation: RecsAnimation;
   /** Tiered rewards progress / unlock motion */
@@ -485,6 +515,19 @@ export const DEFAULT_BAR_CONFIG: BarConfig = {
   recommendationsSource: "collection",
   recommendationsProducts: [],
   drawerAnimation: "slide",
+  toastPlacement: "drawer",
+  toastPosition: "bottom",
+  toastStyle: "solid",
+  toastRadius: 10,
+  toastFontSize: 13,
+  toastSuccessBg: "#065f46",
+  toastSuccessText: "#ffffff",
+  toastErrorBg: "#991b1b",
+  toastErrorText: "#ffffff",
+  toastShowSuccess: true,
+  toastShowError: true,
+  toastShowRemove: true,
+  toastShowUpdate: false,
   recommendationsAnimation: "stagger",
   rewardAnimation: "smooth",
   discountEnabled: false,
@@ -668,6 +711,39 @@ function asDrawerAnimation(
   return "slide";
 }
 
+function asToastPlacement(
+  value: FormDataEntryValue | null | undefined | string,
+): ToastPlacement {
+  return String(value || "") === "page" ? "page" : "drawer";
+}
+
+function asToastPosition(
+  value: FormDataEntryValue | null | undefined | string,
+): ToastPosition {
+  const raw = String(value || "bottom");
+  if (
+    raw === "top" ||
+    raw === "bottom" ||
+    raw === "top-left" ||
+    raw === "top-right" ||
+    raw === "bottom-left" ||
+    raw === "bottom-right"
+  ) {
+    return raw;
+  }
+  return "bottom";
+}
+
+function asToastStyle(
+  value: FormDataEntryValue | null | undefined | string,
+): ToastStyle {
+  const raw = String(value || "solid");
+  if (raw === "soft" || raw === "outline" || raw === "minimal" || raw === "solid") {
+    return raw;
+  }
+  return "solid";
+}
+
 function asRecsAnimation(
   value: FormDataEntryValue | null | undefined | string,
 ): RecsAnimation {
@@ -778,6 +854,61 @@ export function parseBarConfig(raw: string | null | undefined): BarConfig {
         parsed.recommendationsSource,
       ),
       drawerAnimation: asDrawerAnimation(parsed.drawerAnimation),
+      toastPlacement: asToastPlacement(parsed.toastPlacement),
+      toastPosition: asToastPosition(parsed.toastPosition),
+      toastStyle: asToastStyle(parsed.toastStyle),
+      toastRadius: Math.min(
+        32,
+        Math.max(
+          0,
+          Math.round(
+            Number(parsed.toastRadius ?? DEFAULT_BAR_CONFIG.toastRadius) ||
+              DEFAULT_BAR_CONFIG.toastRadius,
+          ),
+        ),
+      ),
+      toastFontSize: Math.min(
+        20,
+        Math.max(
+          11,
+          Math.round(
+            Number(parsed.toastFontSize ?? DEFAULT_BAR_CONFIG.toastFontSize) ||
+              DEFAULT_BAR_CONFIG.toastFontSize,
+          ),
+        ),
+      ),
+      toastSuccessBg: asString(
+        parsed.toastSuccessBg,
+        DEFAULT_BAR_CONFIG.toastSuccessBg,
+      ),
+      toastSuccessText: asString(
+        parsed.toastSuccessText,
+        DEFAULT_BAR_CONFIG.toastSuccessText,
+      ),
+      toastErrorBg: asString(
+        parsed.toastErrorBg,
+        DEFAULT_BAR_CONFIG.toastErrorBg,
+      ),
+      toastErrorText: asString(
+        parsed.toastErrorText,
+        DEFAULT_BAR_CONFIG.toastErrorText,
+      ),
+      toastShowSuccess:
+        parsed.toastShowSuccess === undefined
+          ? DEFAULT_BAR_CONFIG.toastShowSuccess
+          : Boolean(parsed.toastShowSuccess),
+      toastShowError:
+        parsed.toastShowError === undefined
+          ? DEFAULT_BAR_CONFIG.toastShowError
+          : Boolean(parsed.toastShowError),
+      toastShowRemove:
+        parsed.toastShowRemove === undefined
+          ? DEFAULT_BAR_CONFIG.toastShowRemove
+          : Boolean(parsed.toastShowRemove),
+      toastShowUpdate:
+        parsed.toastShowUpdate === undefined
+          ? DEFAULT_BAR_CONFIG.toastShowUpdate
+          : Boolean(parsed.toastShowUpdate),
       recommendationsAnimation: asRecsAnimation(
         parsed.recommendationsAnimation,
       ),
@@ -1312,6 +1443,61 @@ export function barConfigFromFormData(formData: FormData): BarConfig {
       }
     })(),
     drawerAnimation: asDrawerAnimation(formData.get("drawerAnimation")),
+    toastPlacement: asToastPlacement(formData.get("toastPlacement")),
+    toastPosition: asToastPosition(formData.get("toastPosition")),
+    toastStyle: asToastStyle(formData.get("toastStyle")),
+    toastRadius: Math.min(
+      32,
+      Math.max(
+        0,
+        Math.round(
+          Number(formData.get("toastRadius")) ||
+            DEFAULT_BAR_CONFIG.toastRadius,
+        ),
+      ),
+    ),
+    toastFontSize: Math.min(
+      20,
+      Math.max(
+        11,
+        Math.round(
+          Number(formData.get("toastFontSize")) ||
+            DEFAULT_BAR_CONFIG.toastFontSize,
+        ),
+      ),
+    ),
+    toastSuccessBg: asString(
+      formData.get("toastSuccessBg"),
+      DEFAULT_BAR_CONFIG.toastSuccessBg,
+    ),
+    toastSuccessText: asString(
+      formData.get("toastSuccessText"),
+      DEFAULT_BAR_CONFIG.toastSuccessText,
+    ),
+    toastErrorBg: asString(
+      formData.get("toastErrorBg"),
+      DEFAULT_BAR_CONFIG.toastErrorBg,
+    ),
+    toastErrorText: asString(
+      formData.get("toastErrorText"),
+      DEFAULT_BAR_CONFIG.toastErrorText,
+    ),
+    toastShowSuccess: asBool(
+      formData.get("toastShowSuccess"),
+      DEFAULT_BAR_CONFIG.toastShowSuccess,
+    ),
+    toastShowError: asBool(
+      formData.get("toastShowError"),
+      DEFAULT_BAR_CONFIG.toastShowError,
+    ),
+    toastShowRemove: asBool(
+      formData.get("toastShowRemove"),
+      DEFAULT_BAR_CONFIG.toastShowRemove,
+    ),
+    toastShowUpdate: asBool(
+      formData.get("toastShowUpdate"),
+      DEFAULT_BAR_CONFIG.toastShowUpdate,
+    ),
     recommendationsAnimation: asRecsAnimation(
       formData.get("recommendationsAnimation"),
     ),

@@ -1,23 +1,14 @@
 import styles from "../../styles/dashboard.module.css";
 import type { BarConfig } from "../../models/bar-config";
-import { useI18n } from "../../i18n";
-import { NAV_GROUPS, type NavId } from "../nav";
-import type { UpdateConfig } from "../types";
+import { useI18nStore, useStudioStore } from "../../stores";
+import { NAV_GROUPS } from "../nav";
 
-export type StudioNavProps = {
-  config: BarConfig;
-  updateConfig: UpdateConfig;
-  nav: NavId;
-  onNavChange: (id: NavId) => void;
-};
-
-export function StudioNav({
-  config,
-  updateConfig,
-  nav,
-  onNavChange,
-}: StudioNavProps) {
-  const { t } = useI18n();
+export function StudioNav() {
+  const t = useI18nStore((s) => s.t);
+  const config = useStudioStore((s) => s.config);
+  const updateConfig = useStudioStore((s) => s.updateConfig);
+  const nav = useStudioStore((s) => s.nav);
+  const setNav = useStudioStore((s) => s.setNav);
 
   return (
     <aside className={styles.studioNav} aria-label={t("nav.settings")}>
@@ -49,7 +40,7 @@ export function StudioNav({
               className={`${styles.navItem} ${
                 nav === item.id ? styles.navItemActive : ""
               }`}
-              onClick={() => onNavChange(item.id)}
+              onClick={() => setNav(item.id)}
             >
               <span>{t(item.labelKey)}</span>
               {item.soon ? (

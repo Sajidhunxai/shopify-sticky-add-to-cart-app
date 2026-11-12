@@ -530,3 +530,98 @@
     right: auto;
   }
 }
+
+/* Shared toast + loading (bar-only mode; drawer CSS also defines these) */
+.satc-slider__toast,
+.satc-toast-page {
+  z-index: 2147483000;
+  max-width: min(360px, calc(100vw - 24px));
+  padding: 12px 14px;
+  border-radius: var(--satc-toast-radius, 10px);
+  font-size: var(--satc-toast-font, 13px);
+  font-weight: 650;
+  line-height: 1.35;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.satc-toast-page {
+  position: fixed;
+}
+
+.satc-toast-page.satc-slider__toast--pos-bottom {
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, 8px);
+}
+
+.satc-toast-page.satc-slider__toast--pos-top {
+  left: 50%;
+  top: 20px;
+  transform: translate(-50%, -8px);
+}
+
+.satc-toast-page.satc-slider__toast--pos-bottom-left {
+  left: 16px;
+  bottom: 20px;
+  transform: translateY(8px);
+}
+
+.satc-toast-page.satc-slider__toast--pos-bottom-right {
+  right: 16px;
+  bottom: 20px;
+  transform: translateY(8px);
+}
+
+.satc-toast-page.satc-slider__toast--pos-top-left {
+  left: 16px;
+  top: 20px;
+  transform: translateY(-8px);
+}
+
+.satc-toast-page.satc-slider__toast--pos-top-right {
+  right: 16px;
+  top: 20px;
+  transform: translateY(-8px);
+}
+
+.satc-slider__toast.is-visible,
+.satc-toast-page.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.satc-toast-page.is-visible {
+  transform: translate(0, 0);
+}
+
+.satc-toast-page.satc-slider__toast--pos-bottom.is-visible,
+.satc-toast-page.satc-slider__toast--pos-top.is-visible {
+  transform: translate(-50%, 0);
+}
+
+.satc-slider__toast--error {
+  background: var(--satc-toast-err-bg, #991b1b);
+  color: var(--satc-toast-err-text, #fff);
+  border: 1px solid transparent;
+}
+
+.satc-slider__toast--success {
+  background: var(--satc-toast-ok-bg, #065f46);
+  color: var(--satc-toast-ok-text, #fff);
+  border: 1px solid transparent;
+}
+
+.satc-slider__toast--info {
+  background: #111827;
+  color: #fff;
+}
+
+.satc-bar__button.is-loading {
+  opacity: 0.85;
+  pointer-events: none;
+}

@@ -1,7 +1,11 @@
 import { Form } from "react-router";
-import type { SetupPanelProps } from "../../types";
+import { useI18nStore, useSessionStore } from "../../../stores";
 
-export function SetupPanel({ busy, shop, t }: SetupPanelProps) {
+export function SetupPanel() {
+  const t = useI18nStore((s) => s.t);
+  const shop = useSessionStore((s) => s.shop);
+  const busy = useSessionStore((s) => s.busy);
+
   return (
     <s-stack gap="base">
       <s-paragraph>

@@ -1,8 +1,9 @@
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
+import { usePanelState } from "../../hooks/usePanelState";
 import { colorFromEvent } from "../../fields/color";
-import type { PanelProps } from "../../types";
 
-export function HeaderPanel({ config, updateConfig, t }: PanelProps) {
+export function HeaderPanel() {
+  const { config, updateConfig, t } = usePanelState();
   return (
     <s-stack gap="base">
       <s-heading>{t("nav.general")}</s-heading>
@@ -217,8 +218,6 @@ export function HeaderPanel({ config, updateConfig, t }: PanelProps) {
 
       <FeatureCustomTemplate
         featureKey="header"
-        config={config}
-        updateConfig={updateConfig}
       />
     </s-stack>
   );

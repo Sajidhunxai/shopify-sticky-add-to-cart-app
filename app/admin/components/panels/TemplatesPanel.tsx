@@ -1,8 +1,9 @@
 import styles from "../../../styles/dashboard.module.css";
+import { usePanelState } from "../../hooks/usePanelState";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
-import type { PanelProps } from "../../types";
 
-export function TemplatesPanel({ config, updateConfig, t }: PanelProps) {
+export function TemplatesPanel() {
+  const { config, updateConfig, t } = usePanelState();
   return (
     <s-stack gap="base">
       <s-paragraph>{t("templates.intro")}</s-paragraph>
@@ -36,8 +37,6 @@ export function TemplatesPanel({ config, updateConfig, t }: PanelProps) {
           "trust",
           "footer",
         ]}
-        config={config}
-        updateConfig={updateConfig}
         title={t("templates.featureTemplates")}
       />
     </s-stack>

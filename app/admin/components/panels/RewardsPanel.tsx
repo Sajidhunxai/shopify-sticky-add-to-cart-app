@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { usePanelState } from "../../hooks/usePanelState";
 import { useFetcher } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import styles from "../../../styles/dashboard.module.css";
@@ -16,7 +17,6 @@ import {
 } from "../../../models/bar-config";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import { colorFromEvent } from "../../fields/color";
-import type { RewardsPanelProps } from "../../types";
 
 type ResolveFileActionData = {
   ok?: boolean;
@@ -92,12 +92,8 @@ function PresetGlyph({ id }: { id: string }) {
   );
 }
 
-export function RewardsPanel({
-  config,
-  updateConfig,
-  updateRewardTier,
-  t,
-}: RewardsPanelProps) {
+export function RewardsPanel() {
+  const { config, updateConfig, updateRewardTier, t } = usePanelState();
   const shopify = useAppBridge();
   const fileFetcher = useFetcher<ResolveFileActionData>();
   const [activeTier, setActiveTier] = useState(0);
@@ -800,8 +796,6 @@ export function RewardsPanel({
         featureKey="rewards"
         extraKeys={["rewardTier"]}
         title={t("rewards.customHtml")}
-        config={config}
-        updateConfig={updateConfig}
       />
     </s-stack>
   );

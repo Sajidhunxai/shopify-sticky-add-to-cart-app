@@ -1,8 +1,14 @@
 import { Form } from "react-router";
 import styles from "../../../styles/dashboard.module.css";
-import type { PlanPanelProps } from "../../types";
+import { useI18nStore, useSessionStore } from "../../../stores";
 
-export function PlanPanel({ isPro, hideBranding, busy, t }: PlanPanelProps) {
+export function PlanPanel() {
+  const t = useI18nStore((s) => s.t);
+  const plan = useSessionStore((s) => s.plan);
+  const hideBranding = useSessionStore((s) => s.hideBranding);
+  const busy = useSessionStore((s) => s.busy);
+  const isPro = plan === "pro";
+
   return (
     <s-stack gap="base">
       <div className={styles.planCard}>
@@ -18,11 +24,7 @@ export function PlanPanel({ isPro, hideBranding, busy, t }: PlanPanelProps) {
           {isPro ? "$6.99" : "$0"}
           <span>{t("plan.perMonth")}</span>
         </p>
-        <p>
-          {isPro
-            ? t("plan.proDesc")
-            : t("plan.freeDesc")}
-        </p>
+        <p>{isPro ? t("plan.proDesc") : t("plan.freeDesc")}</p>
       </div>
       {isPro ? (
         <Form method="post">

@@ -41,7 +41,8 @@ import { TrustPanel } from "../admin/components/panels/TrustPanel";
 import { useBarConfigStudio } from "../admin/hooks/useBarConfigStudio";
 import { getNavLabel } from "../admin/nav";
 import { serializeBarConfigToFormData } from "../admin/serialize-config";
-import { LanguageSelect, useI18n } from "../i18n";
+import { LanguageSelect } from "../i18n";
+import { useI18nStore, useSessionStore, useStudioStore } from "../stores";
 import styles from "../styles/dashboard.module.css";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -182,21 +183,26 @@ export default function Index() {
   const navigation = useNavigation();
   const submit = useSubmit();
   const shopify = useAppBridge();
-  const { t } = useI18n();
+  const t = useI18nStore((s) => s.t);
+  const hydrateSession = useSessionStore((s) => s.hydrate);
+  const setBusy = useSessionStore((s) => s.setBusy);
+  const config = useStudioStore((s) => s.config);
+  const nav = useStudioStore((s) => s.nav);
   const busy = navigation.state !== "idle";
-  const isPro = plan === "pro";
 
-  const {
-    config,
-    updateConfig,
-    updateRewardTier,
-    nav,
-    setNav,
-    showDrawerPreview,
-    showEmptyPreview,
-    setPreviewDrawerManual,
-    setPreviewEmpty,
-  } = useBarConfigStudio(initialConfig);
+  useBarConfigStudio(initialConfig);
+
+  useEffect(() => {
+    hydrateSession({
+      shop,
+      plan: plan === "pro" ? "pro" : "free",
+      hideBranding,
+    });
+  }, [hydrateSession, shop, plan, hideBranding]);
+
+  useEffect(() => {
+    setBusy(busy);
+  }, [busy, setBusy]);
 
   useEffect(() => {
     if (actionData?.message) {
@@ -209,7 +215,6 @@ export default function Index() {
   };
 
   const activeLabel = getNavLabel(nav, t);
-  const panelProps = { config, updateConfig, t };
 
   return (
     <s-page heading={t("app.name")}>
@@ -234,12 +239,7 @@ export default function Index() {
       </s-banner>
 
       <div className={styles.studio}>
-        <StudioNav
-          config={config}
-          updateConfig={updateConfig}
-          nav={nav}
-          onNavChange={setNav}
-        />
+        <StudioNav />
 
         <section className={styles.studioPanel}>
           <header className={styles.panelHeader}>
@@ -247,46 +247,24 @@ export default function Index() {
             <p className={styles.panelSub}>{t("app.panelHint")}</p>
           </header>
 
-          {nav === "design" && <DesignPanel {...panelProps} />}
-          {nav === "header" && <HeaderPanel {...panelProps} />}
-          {nav === "display" && <DisplayPanel {...panelProps} />}
-          {nav === "cart-items" && <CartItemsPanel {...panelProps} />}
-          {nav === "announcements" && <AnnouncementsPanel {...panelProps} />}
-          {nav === "rewards" && (
-            <RewardsPanel
-              {...panelProps}
-              updateRewardTier={updateRewardTier}
-            />
-          )}
-          {nav === "recommendations" && (
-            <RecommendationsPanel {...panelProps} />
-          )}
-          {nav === "discounts" && <DiscountsPanel {...panelProps} />}
-          {nav === "trust" && <TrustPanel {...panelProps} />}
-          {nav === "cart-summary" && <CartSummaryPanel {...panelProps} />}
-          {nav === "pages" && <PagesPanel {...panelProps} />}
-          {nav === "behavior" && <BehaviorPanel {...panelProps} />}
-          {nav === "templates" && <TemplatesPanel {...panelProps} />}
-          {nav === "plan" && (
-            <PlanPanel
-              isPro={isPro}
-              hideBranding={hideBranding}
-              busy={busy}
-              t={t}
-            />
-          )}
-          {nav === "setup" && <SetupPanel shop={shop} busy={busy} t={t} />}
+          {nav === "design" && <DesignPanel />}
+          {nav === "header" && <HeaderPanel />}
+          {nav === "display" && <DisplayPanel />}
+          {nav === "cart-items" && <CartItemsPanel />}
+          {nav === "announcements" && <AnnouncementsPanel />}
+          {nav === "rewards" && <RewardsPanel />}
+          {nav === "recommendations" && <RecommendationsPanel />}
+          {nav === "discounts" && <DiscountsPanel />}
+          {nav === "trust" && <TrustPanel />}
+          {nav === "cart-summary" && <CartSummaryPanel />}
+          {nav === "pages" && <PagesPanel />}
+          {nav === "behavior" && <BehaviorPanel />}
+          {nav === "templates" && <TemplatesPanel />}
+          {nav === "plan" && <PlanPanel />}
+          {nav === "setup" && <SetupPanel />}
         </section>
 
-        <StudioPreview
-          config={config}
-          shop={shop}
-          hideBranding={hideBranding}
-          showDrawerPreview={showDrawerPreview}
-          showEmptyPreview={showEmptyPreview}
-          onShowDrawerChange={setPreviewDrawerManual}
-          onShowEmptyChange={setPreviewEmpty}
-        />
+        <StudioPreview />
       </div>
     </s-page>
   );

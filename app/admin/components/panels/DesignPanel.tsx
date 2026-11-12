@@ -1,9 +1,10 @@
 import styles from "../../../styles/dashboard.module.css";
+import { usePanelState } from "../../hooks/usePanelState";
 import type { BarConfig } from "../../../models/bar-config";
 import { colorFromEvent } from "../../fields/color";
-import type { PanelProps } from "../../types";
 
-export function DesignPanel({ config, updateConfig, t }: PanelProps) {
+export function DesignPanel() {
+  const { config, updateConfig, t } = usePanelState();
   return (
     <s-stack gap="base">
       <div className={styles.colorLegend}>

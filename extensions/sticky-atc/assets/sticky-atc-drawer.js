@@ -10,6 +10,8 @@
   if (slider.dataset.satcDrawerInit === "true") return;
   slider.dataset.satcDrawerInit = "true";
 
+  const store = () => window.SatcStore;
+
   // Theme sections often use transform/filter, which traps position:fixed and
   // kills backdrop-filter. Re-parent to <body> so overlay + blur sample the page.
   if (slider.parentElement !== document.body) {
@@ -26,21 +28,92 @@
     unavailable: slider.dataset.i18nUnavailable || "This product is unavailable",
     delete: slider.dataset.i18nDelete || "Delete",
     remove: slider.dataset.i18nRemove || "Remove",
+    removed: slider.dataset.i18nRemoved || "Removed from cart",
+    updated: slider.dataset.i18nUpdated || "Cart updated",
+    updating: slider.dataset.i18nUpdating || "Updating…",
     qtyTemplate: slider.dataset.i18nQty || "Qty __COUNT__",
     updateFailed: slider.dataset.i18nUpdateFailed || "Couldn’t update cart",
     decreaseQty: slider.dataset.i18nDecreaseQty || "Decrease quantity",
     increaseQty: slider.dataset.i18nIncreaseQty || "Increase quantity",
   };
 
+  const toastCfg = {
+    placement: slider.dataset.toastPlacement === "page" ? "page" : "drawer",
+    position: [
+      "top",
+      "bottom",
+      "top-left",
+      "top-right",
+      "bottom-left",
+      "bottom-right",
+    ].includes(slider.dataset.toastPosition)
+      ? slider.dataset.toastPosition
+      : "bottom",
+    style: ["solid", "soft", "outline", "minimal"].includes(
+      slider.dataset.toastStyle,
+    )
+      ? slider.dataset.toastStyle
+      : "solid",
+    showSuccess: slider.dataset.toastShowOk !== "false",
+    showError: slider.dataset.toastShowErr !== "false",
+    showRemove: slider.dataset.toastShowRemove !== "false",
+    showUpdate: slider.dataset.toastShowUpdate === "true",
+  };
+
   const formatQty = (count) =>
     String(i18n.qtyTemplate).replace(/__COUNT__|\{\{\s*count\s*\}\}/g, String(count));
 
   let toastTimer = null;
-  const showToast = (message, type = "info", ms = 4200) => {
-    const el = slider.querySelector("[data-satc-toast]");
-    if (!(el instanceof HTMLElement) || !message) return;
+  let pageToastEl = null;
+
+  const toastClassName = (type) =>
+    [
+      "satc-slider__toast",
+      `satc-slider__toast--${type}`,
+      `satc-slider__toast--pos-${toastCfg.position}`,
+      `satc-slider__toast--style-${toastCfg.style}`,
+      toastCfg.placement === "page" ? "satc-toast-page" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+  const ensureToastEl = () => {
+    if (toastCfg.placement === "page") {
+      if (!(pageToastEl instanceof HTMLElement)) {
+        pageToastEl = document.createElement("div");
+        pageToastEl.setAttribute("data-satc-toast-page", "true");
+        pageToastEl.setAttribute("role", "status");
+        pageToastEl.setAttribute("aria-live", "polite");
+        pageToastEl.hidden = true;
+        const cs = getComputedStyle(slider);
+        [
+          "--satc-toast-radius",
+          "--satc-toast-font",
+          "--satc-toast-ok-bg",
+          "--satc-toast-ok-text",
+          "--satc-toast-err-bg",
+          "--satc-toast-err-text",
+        ].forEach((prop) => {
+          const val = cs.getPropertyValue(prop);
+          if (val) pageToastEl.style.setProperty(prop, val.trim());
+        });
+        document.body.appendChild(pageToastEl);
+      }
+      return pageToastEl;
+    }
+    return slider.querySelector("[data-satc-toast]");
+  };
+
+  const showToast = (message, type = "info", ms = 4200, force = false) => {
+    if (!message) return;
+    if (!force) {
+      if (type === "success" && !toastCfg.showSuccess) return;
+      if (type === "error" && !toastCfg.showError) return;
+    }
+    const el = ensureToastEl();
+    if (!(el instanceof HTMLElement)) return;
     el.hidden = false;
-    el.className = `satc-slider__toast satc-slider__toast--${type}`;
+    el.className = toastClassName(type);
     el.textContent = String(message);
     requestAnimationFrame(() => el.classList.add("is-visible"));
     if (toastTimer) clearTimeout(toastTimer);
@@ -51,6 +124,12 @@
         el.textContent = "";
       }, 220);
     }, ms);
+  };
+
+  const setLoading = (el, on) => {
+    if (!(el instanceof HTMLElement)) return;
+    el.classList.toggle("is-loading", Boolean(on));
+    if ("disabled" in el) el.disabled = Boolean(on);
   };
 
   const readCartError = async (res) => {
@@ -616,8 +695,19 @@
     return `<button type="button" class="satc-slider__line-remove satc-slider__line-remove--${escapeHtml(lineRemoveSize)} ${styleClass}" data-satc-line-remove data-line-key="${escapeHtml(key)}" aria-label="${escapeHtml(label)}">${inner}</button>`;
   };
 
-  const changeLineQty = async (lineKey, quantity) => {
+  const changeLineQty = async (lineKey, quantity, sourceEl) => {
     if (!lineKey) return;
+    const nextQty = Math.max(0, Number(quantity) || 0);
+    const isRemove = nextQty === 0;
+    const loadKey = `line:${lineKey}`;
+    const lineEl =
+      sourceEl?.closest?.("[data-satc-line]") ||
+      Array.from(sliderItems?.querySelectorAll("[data-satc-line]") || []).find(
+        (node) => node.getAttribute("data-line-key") === String(lineKey),
+      );
+    store()?.startLoading(loadKey);
+    setLoading(lineEl, true);
+    setLoading(sourceEl, true);
     try {
       const res = await fetch(changeUrl(), {
         method: "POST",
@@ -625,19 +715,32 @@
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify({ id: lineKey, quantity: Math.max(0, Number(quantity) || 0) }),
+        body: JSON.stringify({ id: lineKey, quantity: nextQty }),
       });
       if (!res.ok) {
         const msg = await readCartError(res);
         throw new Error(typeof msg === "string" ? msg : i18n.updateFailed);
       }
       await refreshSlider();
+      if (isRemove) {
+        if (toastCfg.showRemove) {
+          store()?.setLastSuccess(i18n.removed);
+          showToast(i18n.removed, "success", 2200, true);
+        }
+      } else if (toastCfg.showUpdate) {
+        store()?.setLastSuccess(i18n.updated);
+        showToast(i18n.updated, "success", 1800, true);
+      }
     } catch (err) {
       console.error("[Sticky ATC] cart change", err);
-      showToast(
-        err && typeof err.message === "string" ? err.message : i18n.updateFailed,
-        "error",
-      );
+      const message =
+        err && typeof err.message === "string" ? err.message : i18n.updateFailed;
+      store()?.setLastError(message);
+      showToast(message, "error");
+      setLoading(lineEl, false);
+      setLoading(sourceEl, false);
+    } finally {
+      store()?.stopLoading(loadKey);
     }
   };
 
@@ -646,20 +749,20 @@
       btn.addEventListener("click", () => {
         const key = btn.getAttribute("data-line-key");
         const qty = Number(btn.getAttribute("data-qty") || 1);
-        changeLineQty(key, qty - 1);
+        changeLineQty(key, qty - 1, btn);
       });
     });
     sliderItems?.querySelectorAll("[data-satc-line-plus]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const key = btn.getAttribute("data-line-key");
         const qty = Number(btn.getAttribute("data-qty") || 1);
-        changeLineQty(key, qty + 1);
+        changeLineQty(key, qty + 1, btn);
       });
     });
     sliderItems?.querySelectorAll("[data-satc-line-remove]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const key = btn.getAttribute("data-line-key");
-        changeLineQty(key, 0);
+        changeLineQty(key, 0, btn);
       });
     });
   };
@@ -755,11 +858,16 @@
       showToast(i18n.unavailable, "error");
       return;
     }
+    const loadKey = `rec:${id}`;
     const label = btn?.textContent || recAddText;
+    const card = btn?.closest?.("[data-satc-rec]");
+    store()?.startLoading(loadKey);
     if (btn) {
       btn.disabled = true;
       btn.textContent = i18n.adding;
+      setLoading(btn, true);
     }
+    setLoading(card, true);
     try {
       const res = await fetch(addUrl(), {
         method: "POST",
@@ -777,6 +885,7 @@
         throw new Error(typeof msg === "string" ? msg : i18n.addFailed);
       }
       if (btn) btn.textContent = i18n.added;
+      store()?.setLastSuccess(i18n.addSuccess);
       showToast(i18n.addSuccess, "success", 2200);
       await refreshSlider();
       openSlider();
@@ -786,14 +895,21 @@
         err && typeof err.message === "string" && err.message
           ? err.message
           : i18n.addFailed;
+      store()?.setLastError(message);
       showToast(message, "error");
       if (btn) {
         btn.textContent = i18n.tryAgain;
+        setLoading(btn, false);
         btn.disabled = false;
       }
+      setLoading(card, false);
+      store()?.stopLoading(loadKey);
       return;
     }
+    setLoading(card, false);
+    store()?.stopLoading(loadKey);
     if (btn) {
+      setLoading(btn, false);
       setTimeout(() => {
         btn.textContent = label;
         btn.disabled = false;
@@ -1097,6 +1213,7 @@
       });
       if (!res.ok) throw new Error("cart fetch failed");
       const cart = await res.json();
+      store()?.setCart(cart);
       const itemCount = cart.item_count ?? cart.items?.length ?? 0;
       if (titleEl) titleEl.textContent = formatTitle(itemCount);
 
@@ -1250,6 +1367,7 @@
     if (slider.parentElement !== document.body) {
       document.body.appendChild(slider);
     }
+    store()?.setOpen(true);
     paintBackdrop();
     document.documentElement.classList.add("satc-drawer-open");
     slider.hidden = false;
@@ -1263,6 +1381,7 @@
 
   const closeSlider = () => {
     if (!slider) return;
+    store()?.setOpen(false);
     slider.classList.remove("is-open");
     document.documentElement.classList.remove("satc-drawer-open");
     setTimeout(() => {
@@ -1332,5 +1451,6 @@
     close: closeSlider,
     refresh: refreshSlider,
     toast: showToast,
+    store: store(),
   };
 })();

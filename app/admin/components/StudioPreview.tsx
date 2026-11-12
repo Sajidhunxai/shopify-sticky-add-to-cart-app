@@ -1,7 +1,11 @@
 import type { CSSProperties, ReactNode } from "react";
 import styles from "../../styles/dashboard.module.css";
-import { useI18n } from "../../i18n";
 import type { BarConfig } from "../../models/bar-config";
+import {
+  useI18nStore,
+  useSessionStore,
+  useStudioStore,
+} from "../../stores";
 import {
   activeRewardTiers,
   rewardMessage,
@@ -180,26 +184,17 @@ function hexToRgba(hex: string, opacityPct: number) {
   return `rgba(${r}, ${g}, ${b}, ${(opacityPct / 100).toFixed(2)})`;
 }
 
-export type StudioPreviewProps = {
-  config: BarConfig;
-  shop: string;
-  hideBranding: boolean;
-  showDrawerPreview: boolean;
-  showEmptyPreview: boolean;
-  onShowDrawerChange: (show: boolean) => void;
-  onShowEmptyChange: (show: boolean) => void;
-};
-
-export function StudioPreview({
-  config,
-  shop,
-  hideBranding,
-  showDrawerPreview,
-  showEmptyPreview,
-  onShowDrawerChange,
-  onShowEmptyChange,
-}: StudioPreviewProps) {
-  const { t } = useI18n();
+export function StudioPreview() {
+  const t = useI18nStore((s) => s.t);
+  const config = useStudioStore((s) => s.config);
+  const showDrawerPreview = useStudioStore((s) => s.showDrawerPreview());
+  const showEmptyPreview = useStudioStore((s) => s.showEmptyPreview());
+  const setPreviewDrawerManual = useStudioStore((s) => s.setPreviewDrawerManual);
+  const setPreviewEmpty = useStudioStore((s) => s.setPreviewEmpty);
+  const shop = useSessionStore((s) => s.shop);
+  const hideBranding = useSessionStore((s) => s.hideBranding);
+  const onShowDrawerChange = setPreviewDrawerManual;
+  const onShowEmptyChange = setPreviewEmpty;
   const previewBg =
     config.backgroundStyle === "gradient"
       ? `linear-gradient(135deg, ${hexToRgba(config.backgroundColor, config.backgroundOpacity)}, ${hexToRgba(config.backgroundColor, Math.max(40, config.backgroundOpacity - 25))})`
@@ -1374,6 +1369,55 @@ export function StudioPreview({
                     >
                       {config.drawerCheckoutText || t("preview.checkout")}
                     </div>
+                  </div>
+                )}
+                {(config.toastShowSuccess ||
+                  config.toastShowError ||
+                  config.toastShowRemove) && (
+                  <div
+                    style={{
+                      position:
+                        config.toastPlacement === "page" ? "fixed" : "absolute",
+                      zIndex: 40,
+                      maxWidth: 220,
+                      padding: "8px 10px",
+                      borderRadius: `${config.toastRadius}px`,
+                      fontSize: `${Math.max(10, config.toastFontSize - 1)}px`,
+                      fontWeight: 650,
+                      lineHeight: 1.3,
+                      pointerEvents: "none",
+                      ...(config.toastPosition.includes("top")
+                        ? { top: 10 }
+                        : { bottom: 10 }),
+                      ...(config.toastPosition.includes("left")
+                        ? { left: 10 }
+                        : config.toastPosition.includes("right")
+                          ? { right: 10 }
+                          : { left: 10, right: 10, maxWidth: "none" }),
+                      ...(config.toastStyle === "outline"
+                        ? {
+                            background: "#fff",
+                            color: config.toastSuccessBg,
+                            border: `1px solid ${config.toastSuccessBg}`,
+                          }
+                        : config.toastStyle === "soft"
+                          ? {
+                              background: `${config.toastSuccessBg}22`,
+                              color: config.toastSuccessBg,
+                            }
+                          : config.toastStyle === "minimal"
+                            ? {
+                                background: "transparent",
+                                color: config.toastSuccessBg,
+                                boxShadow: "none",
+                              }
+                            : {
+                                background: config.toastSuccessBg,
+                                color: config.toastSuccessText,
+                              }),
+                    }}
+                  >
+                    {t("preview.toastSample")}
                   </div>
                 )}
               </div>

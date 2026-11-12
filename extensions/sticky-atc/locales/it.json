@@ -20,6 +20,9 @@
     "update_failed": "Impossibile aggiornare il carrello",
     "add_failed": "Impossibile aggiungere al carrello",
     "add_success": "Aggiunto al carrello",
-    "unavailable": "Questo prodotto non è disponibile"
+    "unavailable": "Questo prodotto non è disponibile",
+    "removed": "Rimosso dal carrello",
+    "updated": "Carrello aggiornato",
+    "updating": "Aggiornamento…"
   }
 }

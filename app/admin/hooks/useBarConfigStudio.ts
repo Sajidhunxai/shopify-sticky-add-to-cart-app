@@ -1,84 +1,30 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useEffect } from "react";
 import type { BarConfig } from "../../models/bar-config";
-import type { NavId } from "../nav";
-import type { UpdateConfig, UpdateRewardTier } from "../types";
+import { useStudioStore } from "../../stores";
 
-export function updateConfig<K extends keyof BarConfig>(
-  setConfig: Dispatch<SetStateAction<BarConfig>>,
-  key: K,
-  value: BarConfig[K],
-) {
-  setConfig((prev) => ({ ...prev, [key]: value }));
-}
-
-const DRAWER_FOCUS_NAVS: NavId[] = [
-  "design",
-  "header",
-  "cart-items",
-  "announcements",
-  "rewards",
-  "recommendations",
-  "discounts",
-  "cart-summary",
-  "trust",
-  "templates",
-];
-
+/**
+ * Hydrates the Zustand studio store from the route loader and exposes
+ * selectors used by the dashboard.
+ */
 export function useBarConfigStudio(initialConfig: BarConfig) {
-  const [config, setConfig] = useState<BarConfig>(initialConfig);
-  const [nav, setNav] = useState<NavId>("design");
-  const [previewEmpty, setPreviewEmpty] = useState(false);
-  const [previewDrawerManual, setPreviewDrawerManual] = useState<
-    boolean | null
-  >(null);
-
-  const autoShowDrawer =
-    config.displayMode === "slider" &&
-    config.enabled &&
-    DRAWER_FOCUS_NAVS.includes(nav);
-  const showDrawerPreview =
-    config.displayMode === "slider" &&
-    config.enabled &&
-    (previewDrawerManual ?? autoShowDrawer);
-  // Recommendations default to empty cart; cart-items/summary open with sample lines.
-  const showEmptyPreview = previewEmpty;
+  const hydrate = useStudioStore((s) => s.hydrate);
+  const config = useStudioStore((s) => s.config);
+  const updateConfig = useStudioStore((s) => s.updateConfig);
+  const updateRewardTier = useStudioStore((s) => s.updateRewardTier);
+  const nav = useStudioStore((s) => s.nav);
+  const setNav = useStudioStore((s) => s.setNav);
+  const setPreviewDrawerManual = useStudioStore((s) => s.setPreviewDrawerManual);
+  const setPreviewEmpty = useStudioStore((s) => s.setPreviewEmpty);
+  const showDrawerPreview = useStudioStore((s) => s.showDrawerPreview());
+  const showEmptyPreview = useStudioStore((s) => s.showEmptyPreview());
 
   useEffect(() => {
-    setConfig(initialConfig);
-  }, [initialConfig]);
-
-  useEffect(() => {
-    if (nav === "cart-items" || nav === "cart-summary") {
-      setPreviewEmpty(false);
-    } else if (nav === "recommendations") {
-      setPreviewEmpty(true);
-    }
-  }, [nav]);
-
-  const boundUpdateConfig: UpdateConfig = useCallback(
-    (key, value) => updateConfig(setConfig, key, value),
-    [],
-  );
-
-  const updateRewardTier: UpdateRewardTier = useCallback((index, patch) => {
-    setConfig((prev) => {
-      const rewardTiers = prev.rewardTiers.map((tier, i) =>
-        i === index ? { ...tier, ...patch } : tier,
-      );
-      return { ...prev, rewardTiers };
-    });
-  }, []);
+    hydrate(initialConfig);
+  }, [hydrate, initialConfig]);
 
   return {
     config,
-    setConfig,
-    updateConfig: boundUpdateConfig,
+    updateConfig,
     updateRewardTier,
     nav,
     setNav,

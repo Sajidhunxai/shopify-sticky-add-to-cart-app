@@ -1,9 +1,10 @@
 import styles from "../../../styles/dashboard.module.css";
+import { usePanelState } from "../../hooks/usePanelState";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
 import { colorFromEvent } from "../../fields/color";
-import type { PanelProps } from "../../types";
 
-export function AnnouncementsPanel({ config, updateConfig, t }: PanelProps) {
+export function AnnouncementsPanel() {
+  const { config, updateConfig, t } = usePanelState();
   return (
     <s-stack gap="base">
       <s-stack direction="inline" gap="base">
@@ -123,8 +124,6 @@ export function AnnouncementsPanel({ config, updateConfig, t }: PanelProps) {
 
       <FeatureCustomTemplate
         featureKey="announcement"
-        config={config}
-        updateConfig={updateConfig}
       />
     </s-stack>
   );

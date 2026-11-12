@@ -1,11 +1,11 @@
 import { useAppBridge } from "@shopify/app-bridge-react";
+import { usePanelState } from "../../hooks/usePanelState";
 import type {
   RecommendationProduct,
   RecsAnimation,
   RecommendationSource,
 } from "../../../models/bar-config";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
-import type { PanelProps } from "../../types";
 
 type PickedProduct = {
   id?: string;
@@ -15,7 +15,8 @@ type PickedProduct = {
   variants?: Array<{ id?: string | number; available?: boolean }>;
 };
 
-export function RecommendationsPanel({ config, updateConfig, t }: PanelProps) {
+export function RecommendationsPanel() {
+  const { config, updateConfig, t } = usePanelState();
   const shopify = useAppBridge();
 
   const pickCollection = async () => {
@@ -279,8 +280,6 @@ export function RecommendationsPanel({ config, updateConfig, t }: PanelProps) {
       <FeatureCustomTemplate
         featureKey="recommendationCard"
         extraKeys={["recommendationSkeleton", "recommendations", "emptyCart"]}
-        config={config}
-        updateConfig={updateConfig}
       />
     </s-stack>
   );

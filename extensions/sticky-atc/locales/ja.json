@@ -20,6 +20,9 @@
     "update_failed": "カートを更新できませんでした",
     "add_failed": "カートに追加できませんでした",
     "add_success": "カートに追加しました",
-    "unavailable": "この商品は利用できません"
+    "unavailable": "この商品は利用できません",
+    "removed": "カートから削除しました",
+    "updated": "カートを更新しました",
+    "updating": "更新中…"
   }
 }

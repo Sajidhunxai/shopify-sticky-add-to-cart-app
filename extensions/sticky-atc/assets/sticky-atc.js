@@ -7,6 +7,7 @@
   const bar = document.querySelector("[data-satc-bar]");
   if (!bar) return;
 
+  const store = () => window.SatcStore;
   const button = bar.querySelector("[data-satc-button]");
   const priceEl = bar.querySelector("[data-satc-price]");
   const qtyInput = bar.querySelector("[data-satc-qty-input]");
@@ -18,6 +19,72 @@
     added: bar.dataset.i18nAdded || "Added ✓",
     tryAgain: bar.dataset.i18nTryAgain || "Try again",
     addFailed: bar.dataset.i18nAddFailed || "Couldn’t add to cart",
+    addSuccess: bar.dataset.i18nAddSuccess || "Added to cart",
+  };
+  const toastCfg = {
+    showSuccess: bar.dataset.toastShowOk !== "false",
+    showError: bar.dataset.toastShowErr !== "false",
+    position: [
+      "top",
+      "bottom",
+      "top-left",
+      "top-right",
+      "bottom-left",
+      "bottom-right",
+    ].includes(bar.dataset.toastPosition)
+      ? bar.dataset.toastPosition
+      : "bottom",
+    style: ["solid", "soft", "outline", "minimal"].includes(bar.dataset.toastStyle)
+      ? bar.dataset.toastStyle
+      : "solid",
+  };
+  let barToastEl = null;
+  let barToastTimer = null;
+  const showBarToast = (message, type = "info", ms = 4200) => {
+    if (!message) return;
+    if (type === "success" && !toastCfg.showSuccess) return;
+    if (type === "error" && !toastCfg.showError) return;
+    if (typeof window.SatcDrawer?.toast === "function") {
+      window.SatcDrawer.toast(message, type, ms);
+      return;
+    }
+    if (!(barToastEl instanceof HTMLElement)) {
+      barToastEl = document.createElement("div");
+      barToastEl.setAttribute("role", "status");
+      barToastEl.setAttribute("aria-live", "polite");
+      barToastEl.hidden = true;
+      const cs = getComputedStyle(bar);
+      [
+        "--satc-toast-radius",
+        "--satc-toast-font",
+        "--satc-toast-ok-bg",
+        "--satc-toast-ok-text",
+        "--satc-toast-err-bg",
+        "--satc-toast-err-text",
+      ].forEach((prop) => {
+        const val = cs.getPropertyValue(prop);
+        if (val) barToastEl.style.setProperty(prop, val.trim());
+      });
+      document.body.appendChild(barToastEl);
+    }
+    barToastEl.hidden = false;
+    barToastEl.className = [
+      "satc-slider__toast",
+      "satc-toast-page",
+      `satc-slider__toast--${type}`,
+      `satc-slider__toast--pos-${toastCfg.position}`,
+      `satc-slider__toast--style-${toastCfg.style}`,
+    ].join(" ");
+    barToastEl.textContent = String(message);
+    requestAnimationFrame(() => barToastEl.classList.add("is-visible"));
+    if (barToastTimer) clearTimeout(barToastTimer);
+    barToastTimer = setTimeout(() => {
+      barToastEl.classList.remove("is-visible");
+      setTimeout(() => {
+        barToastEl.hidden = true;
+        barToastEl.textContent = "";
+      }, 220);
+    }, ms);
   };
   const formSelector =
     'form[action*="/cart/add"], form[action$="/cart/add"], product-form form, [data-product-form]';
@@ -163,7 +230,10 @@
       return;
     }
 
+    const loadKey = `add:${variantId}`;
+    store()?.startLoading(loadKey);
     button.disabled = true;
+    button.classList.add("is-loading");
     const original = button.textContent;
     button.textContent = i18n.adding;
 
@@ -197,6 +267,9 @@
         }),
       );
 
+      store()?.setLastSuccess(i18n.addSuccess);
+      showBarToast(i18n.addSuccess, "success", 2200);
+
       if (displayMode === "slider" || afterAdd === "drawer") {
         await openDrawerAfterAdd();
       } else if (afterAdd === "cart") {
@@ -205,6 +278,8 @@
       }
 
       button.textContent = i18n.added;
+      button.classList.remove("is-loading");
+      store()?.stopLoading(loadKey);
       setTimeout(() => {
         button.textContent = original;
         button.disabled = false;
@@ -220,16 +295,14 @@
         error && typeof error.message === "string" && error.message
           ? error.message
           : i18n.addFailed;
-      if (typeof window.SatcDrawer?.toast === "function") {
-        window.SatcDrawer.toast(message, "error");
-      } else {
-        button.title = message;
-      }
+      store()?.setLastError(message);
+      showBarToast(message, "error");
+      button.classList.remove("is-loading");
+      store()?.stopLoading(loadKey);
       button.textContent = i18n.tryAgain;
       button.disabled = false;
       setTimeout(() => {
         button.textContent = original;
-        button.removeAttribute("title");
       }, 2500);
     }
   });

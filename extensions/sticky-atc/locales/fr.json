@@ -20,6 +20,9 @@
     "update_failed": "Impossible de mettre à jour le panier",
     "add_failed": "Impossible d'ajouter au panier",
     "add_success": "Ajouté au panier",
-    "unavailable": "Ce produit est indisponible"
+    "unavailable": "Ce produit est indisponible",
+    "removed": "Retiré du panier",
+    "updated": "Panier mis à jour",
+    "updating": "Mise à jour…"
   }
 }

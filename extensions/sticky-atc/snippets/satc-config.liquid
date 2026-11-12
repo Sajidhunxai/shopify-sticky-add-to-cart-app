@@ -145,6 +145,19 @@
   {% assign satc_rec_source = cfg.recommendationsSource %}
   {% assign satc_rec_products_cfg = cfg.recommendationsProducts %}
   {% assign satc_drawer_anim = cfg.drawerAnimation %}
+  {% assign satc_toast_placement = cfg.toastPlacement %}
+  {% assign satc_toast_position = cfg.toastPosition %}
+  {% assign satc_toast_style = cfg.toastStyle %}
+  {% assign satc_toast_radius = cfg.toastRadius %}
+  {% assign satc_toast_font = cfg.toastFontSize %}
+  {% assign satc_toast_ok_bg = cfg.toastSuccessBg %}
+  {% assign satc_toast_ok_text = cfg.toastSuccessText %}
+  {% assign satc_toast_err_bg = cfg.toastErrorBg %}
+  {% assign satc_toast_err_text = cfg.toastErrorText %}
+  {% assign satc_toast_show_ok = cfg.toastShowSuccess %}
+  {% assign satc_toast_show_err = cfg.toastShowError %}
+  {% assign satc_toast_show_remove = cfg.toastShowRemove %}
+  {% assign satc_toast_show_update = cfg.toastShowUpdate %}
   {% assign satc_rec_anim = cfg.recommendationsAnimation %}
   {% assign satc_reward_anim = cfg.rewardAnimation %}
   {% assign satc_reward_layout = cfg.rewardBarLayout %}
@@ -293,6 +306,19 @@
   {% assign satc_rec_source = 'collection' %}
   {% assign satc_rec_products_cfg = nil %}
   {% assign satc_drawer_anim = 'slide' %}
+  {% assign satc_toast_placement = 'drawer' %}
+  {% assign satc_toast_position = 'bottom' %}
+  {% assign satc_toast_style = 'solid' %}
+  {% assign satc_toast_radius = 10 %}
+  {% assign satc_toast_font = 13 %}
+  {% assign satc_toast_ok_bg = '#065f46' %}
+  {% assign satc_toast_ok_text = '#ffffff' %}
+  {% assign satc_toast_err_bg = '#991b1b' %}
+  {% assign satc_toast_err_text = '#ffffff' %}
+  {% assign satc_toast_show_ok = true %}
+  {% assign satc_toast_show_err = true %}
+  {% assign satc_toast_show_remove = true %}
+  {% assign satc_toast_show_update = false %}
   {% assign satc_rec_anim = 'stagger' %}
   {% assign satc_reward_anim = 'smooth' %}
   {% assign satc_reward_layout = 'stacked' %}
@@ -355,6 +381,19 @@
 {% if satc_rec_hide_cart == nil %}{% assign satc_rec_hide_cart = true %}{% endif %}
 {% if satc_rec_source == blank %}{% assign satc_rec_source = 'collection' %}{% endif %}
 {% if satc_drawer_anim == blank %}{% assign satc_drawer_anim = 'slide' %}{% endif %}
+{% if satc_toast_placement == blank %}{% assign satc_toast_placement = 'drawer' %}{% endif %}
+{% if satc_toast_position == blank %}{% assign satc_toast_position = 'bottom' %}{% endif %}
+{% if satc_toast_style == blank %}{% assign satc_toast_style = 'solid' %}{% endif %}
+{% if satc_toast_radius == blank %}{% assign satc_toast_radius = 10 %}{% endif %}
+{% if satc_toast_font == blank %}{% assign satc_toast_font = 13 %}{% endif %}
+{% if satc_toast_ok_bg == blank %}{% assign satc_toast_ok_bg = '#065f46' %}{% endif %}
+{% if satc_toast_ok_text == blank %}{% assign satc_toast_ok_text = '#ffffff' %}{% endif %}
+{% if satc_toast_err_bg == blank %}{% assign satc_toast_err_bg = '#991b1b' %}{% endif %}
+{% if satc_toast_err_text == blank %}{% assign satc_toast_err_text = '#ffffff' %}{% endif %}
+{% if satc_toast_show_ok == nil %}{% assign satc_toast_show_ok = true %}{% endif %}
+{% if satc_toast_show_err == nil %}{% assign satc_toast_show_err = true %}{% endif %}
+{% if satc_toast_show_remove == nil %}{% assign satc_toast_show_remove = true %}{% endif %}
+{% if satc_toast_show_update == nil %}{% assign satc_toast_show_update = false %}{% endif %}
 {% if satc_rec_anim == blank %}{% assign satc_rec_anim = 'stagger' %}{% endif %}
 {% if satc_reward_anim == blank %}{% assign satc_reward_anim = 'smooth' %}{% endif %}
 {% if satc_reward_layout == blank %}{% assign satc_reward_layout = 'stacked' %}{% endif %}
@@ -422,6 +461,9 @@
     {% if satc_show_on_other %}{% assign satc_page_ok = true %}{% endif %}
 {% endcase %}
 
+
+{% comment %} Zustand vanilla cart store — shared by bar + drawer {% endcomment %}
+<script src="{{ 'satc-store.js' | asset_url }}" defer></script>
 
 {% render 'satc-bar',
   block: block,
@@ -545,6 +587,19 @@
     satc_rec_source: satc_rec_source,
     satc_rec_with_items: satc_rec_with_items,
     satc_drawer_anim: satc_drawer_anim,
+    satc_toast_placement: satc_toast_placement,
+    satc_toast_position: satc_toast_position,
+    satc_toast_style: satc_toast_style,
+    satc_toast_radius: satc_toast_radius,
+    satc_toast_font: satc_toast_font,
+    satc_toast_ok_bg: satc_toast_ok_bg,
+    satc_toast_ok_text: satc_toast_ok_text,
+    satc_toast_err_bg: satc_toast_err_bg,
+    satc_toast_err_text: satc_toast_err_text,
+    satc_toast_show_ok: satc_toast_show_ok,
+    satc_toast_show_err: satc_toast_show_err,
+    satc_toast_show_remove: satc_toast_show_remove,
+    satc_toast_show_update: satc_toast_show_update,
     satc_reward_anim: satc_reward_anim,
     satc_reward_layout: satc_reward_layout,
     satc_reward_style: satc_reward_style,

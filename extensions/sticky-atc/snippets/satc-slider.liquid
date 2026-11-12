@@ -34,6 +34,13 @@
     data-drawer-mobile="{% if satc_drawer_mobile == true or satc_drawer_mobile == 'true' %}true{% else %}false{% endif %}"
     data-drawer-anim="{{ satc_drawer_anim | escape }}"
     data-after-add="{{ satc_after_add }}"
+    data-toast-placement="{{ satc_toast_placement | default: 'drawer' | escape }}"
+    data-toast-position="{{ satc_toast_position | default: 'bottom' | escape }}"
+    data-toast-style="{{ satc_toast_style | default: 'solid' | escape }}"
+    data-toast-show-ok="{% if satc_toast_show_ok == false or satc_toast_show_ok == 'false' %}false{% else %}true{% endif %}"
+    data-toast-show-err="{% if satc_toast_show_err == false or satc_toast_show_err == 'false' %}false{% else %}true{% endif %}"
+    data-toast-show-remove="{% if satc_toast_show_remove == false or satc_toast_show_remove == 'false' %}false{% else %}true{% endif %}"
+    data-toast-show-update="{% if satc_toast_show_update == true or satc_toast_show_update == 'true' %}true{% else %}false{% endif %}"
     data-i18n-cart-empty="{{ 'general.cart_empty' | t | escape }}"
     data-i18n-adding="{{ 'general.adding' | t | escape }}"
     data-i18n-added="{{ 'general.added' | t | escape }}"
@@ -43,10 +50,21 @@
     data-i18n-unavailable="{{ 'general.unavailable' | t | escape }}"
     data-i18n-delete="{{ 'general.delete' | t | escape }}"
     data-i18n-remove="{{ 'general.remove' | t | escape }}"
+    data-i18n-removed="{{ 'general.removed' | t | escape }}"
+    data-i18n-updated="{{ 'general.updated' | t | escape }}"
+    data-i18n-updating="{{ 'general.updating' | t | escape }}"
     data-i18n-qty="{{ 'general.qty' | t: count: '__COUNT__' | escape }}"
     data-i18n-update-failed="{{ 'general.update_failed' | t | escape }}"
     data-i18n-decrease-qty="{{ 'general.decrease_quantity' | t | escape }}"
     data-i18n-increase-qty="{{ 'general.increase_quantity' | t | escape }}"
+    style="
+      --satc-toast-radius: {{ satc_toast_radius | default: 10 }}px;
+      --satc-toast-font: {{ satc_toast_font | default: 13 }}px;
+      --satc-toast-ok-bg: {{ satc_toast_ok_bg | default: '#065f46' }};
+      --satc-toast-ok-text: {{ satc_toast_ok_text | default: '#ffffff' }};
+      --satc-toast-err-bg: {{ satc_toast_err_bg | default: '#991b1b' }};
+      --satc-toast-err-text: {{ satc_toast_err_text | default: '#ffffff' }};
+    "
     data-drawer-title="{{ satc_drawer_title | escape }}"
     data-ship-enabled="{% if satc_ship_on == true or satc_ship_on == 'true' %}true{% else %}false{% endif %}"
     data-ship-threshold="{{ satc_ship_threshold }}"
@@ -286,7 +304,7 @@
         {% endif %}
       </footer>
       <div
-        class="satc-slider__toast"
+        class="satc-slider__toast satc-slider__toast--pos-{{ satc_toast_position | default: 'bottom' }} satc-slider__toast--style-{{ satc_toast_style | default: 'solid' }}"
         data-satc-toast
         hidden
         role="status"

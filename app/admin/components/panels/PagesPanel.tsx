@@ -1,7 +1,8 @@
 import styles from "../../../styles/dashboard.module.css";
-import type { PanelProps } from "../../types";
+import { usePanelState } from "../../hooks/usePanelState";
 
-export function PagesPanel({ config, updateConfig, t }: PanelProps) {
+export function PagesPanel() {
+  const { config, updateConfig, t } = usePanelState();
   return (
     <s-stack gap="base">
       <s-heading>{t("pages.stickyShowOn")}</s-heading>

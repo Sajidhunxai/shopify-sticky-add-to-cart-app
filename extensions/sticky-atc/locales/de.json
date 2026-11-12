@@ -20,6 +20,9 @@
     "update_failed": "Warenkorb konnte nicht aktualisiert werden",
     "add_failed": "Konnte nicht hinzugefügt werden",
     "add_success": "Zum Warenkorb hinzugefügt",
-    "unavailable": "Dieses Produkt ist nicht verfügbar"
+    "unavailable": "Dieses Produkt ist nicht verfügbar",
+    "removed": "Aus dem Warenkorb entfernt",
+    "updated": "Warenkorb aktualisiert",
+    "updating": "Wird aktualisiert…"
   }
 }

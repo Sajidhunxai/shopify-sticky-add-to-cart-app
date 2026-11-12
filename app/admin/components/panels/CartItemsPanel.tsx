@@ -1,9 +1,10 @@
 import styles from "../../../styles/dashboard.module.css";
+import { usePanelState } from "../../hooks/usePanelState";
 import { colorFromEvent } from "../../fields/color";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
-import type { PanelProps } from "../../types";
 
-export function CartItemsPanel({ config, updateConfig, t }: PanelProps) {
+export function CartItemsPanel() {
+  const { config, updateConfig, t } = usePanelState();
   return (
     <s-stack gap="base">
       <s-heading>{t("cartItems.stickyHeading")}</s-heading>
@@ -400,8 +401,6 @@ export function CartItemsPanel({ config, updateConfig, t }: PanelProps) {
 
       <FeatureCustomTemplate
         featureKey="cartItem"
-        config={config}
-        updateConfig={updateConfig}
         title={t("cartItems.customHtml")}
       />
       <s-paragraph>{t("cartItems.customHtmlHelp")}</s-paragraph>

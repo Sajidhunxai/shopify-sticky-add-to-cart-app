@@ -6,15 +6,12 @@ import {
   type FeatureTemplate,
   type FeatureTemplateKey,
 } from "../../models/feature-templates";
-import type { BarConfig } from "../../models/bar-config";
-import { useI18n } from "../../i18n";
+import { useI18nStore, useStudioStore } from "../../stores";
 
 type CodeTab = "html" | "css" | "js";
 
 type Props = {
   featureKey: FeatureTemplateKey;
-  config: BarConfig;
-  updateConfig: <K extends keyof BarConfig>(key: K, value: BarConfig[K]) => void;
   extraKeys?: FeatureTemplateKey[];
   title?: string;
 };
@@ -33,12 +30,12 @@ const SHORT_HINT_KEYS: Record<CodeTab, string> = {
 
 export function FeatureCustomTemplate({
   featureKey,
-  config,
-  updateConfig,
   extraKeys = [],
   title: titleProp,
 }: Props) {
-  const { t } = useI18n();
+  const t = useI18nStore((s) => s.t);
+  const config = useStudioStore((s) => s.config);
+  const updateConfig = useStudioStore((s) => s.updateConfig);
   const title = titleProp ?? t("featureTemplate.title");
   const featureTabs = [featureKey, ...extraKeys];
   const [activeFeature, setActiveFeature] =

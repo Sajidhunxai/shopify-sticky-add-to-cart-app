@@ -1,7 +1,8 @@
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
-import type { PanelProps } from "../../types";
+import { usePanelState } from "../../hooks/usePanelState";
 
-export function DiscountsPanel({ config, updateConfig, t }: PanelProps) {
+export function DiscountsPanel() {
+  const { config, updateConfig, t } = usePanelState();
   return (
     <s-stack gap="base">
       <s-switch
@@ -38,8 +39,6 @@ export function DiscountsPanel({ config, updateConfig, t }: PanelProps) {
 
       <FeatureCustomTemplate
         featureKey="discount"
-        config={config}
-        updateConfig={updateConfig}
       />
     </s-stack>
   );

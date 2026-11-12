@@ -1,8 +1,9 @@
 import styles from "../../../styles/dashboard.module.css";
+import { usePanelState } from "../../hooks/usePanelState";
 import type { BarConfig } from "../../../models/bar-config";
-import type { PanelProps } from "../../types";
 
-export function DisplayPanel({ config, updateConfig, t }: PanelProps) {
+export function DisplayPanel() {
+  const { config, updateConfig, t } = usePanelState();
   return (
     <s-stack gap="base">
       <div

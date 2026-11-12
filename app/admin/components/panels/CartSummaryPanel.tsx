@@ -1,8 +1,9 @@
 import type { BarConfig } from "../../../models/bar-config";
+import { usePanelState } from "../../hooks/usePanelState";
 import { FeatureCustomTemplate } from "../FeatureCustomTemplate";
-import type { PanelProps } from "../../types";
 
-export function CartSummaryPanel({ config, updateConfig, t }: PanelProps) {
+export function CartSummaryPanel() {
+  const { config, updateConfig, t } = usePanelState();
   return (
     <s-stack gap="base">
       <s-select
@@ -34,8 +35,6 @@ export function CartSummaryPanel({ config, updateConfig, t }: PanelProps) {
 
       <FeatureCustomTemplate
         featureKey="footer"
-        config={config}
-        updateConfig={updateConfig}
         title={t("cartSummary.customTemplate")}
       />
     </s-stack>

@@ -22,11 +22,23 @@
     data-i18n-added="{{ 'general.added' | t | escape }}"
     data-i18n-try-again="{{ 'general.try_again' | t | escape }}"
     data-i18n-add-failed="{{ 'general.add_failed' | t | escape }}"
+    data-i18n-add-success="{{ 'general.add_success' | t | escape }}"
     data-i18n-cart-empty="{{ 'general.cart_empty' | t | escape }}"
+    data-toast-placement="{{ satc_toast_placement | default: 'drawer' | escape }}"
+    data-toast-position="{{ satc_toast_position | default: 'bottom' | escape }}"
+    data-toast-style="{{ satc_toast_style | default: 'solid' | escape }}"
+    data-toast-show-ok="{% if satc_toast_show_ok == false or satc_toast_show_ok == 'false' %}false{% else %}true{% endif %}"
+    data-toast-show-err="{% if satc_toast_show_err == false or satc_toast_show_err == 'false' %}false{% else %}true{% endif %}"
     style="
       --satc-bg: {{ satc_bg }};
       --satc-text: {% if satc_theme_text == true or satc_theme_text == 'true' %}rgb(var(--color-foreground, 18, 18, 18)){% else %}{{ satc_text }}{% endif %};
       --satc-font: {% if satc_theme_font == true or satc_theme_font == 'true' %}var(--font-body-family, var(--font-stack-body, inherit)){% else %}inherit{% endif %};
+      --satc-toast-radius: {{ satc_toast_radius | default: 10 }}px;
+      --satc-toast-font: {{ satc_toast_font | default: 13 }}px;
+      --satc-toast-ok-bg: {{ satc_toast_ok_bg | default: '#065f46' }};
+      --satc-toast-ok-text: {{ satc_toast_ok_text | default: '#ffffff' }};
+      --satc-toast-err-bg: {{ satc_toast_err_bg | default: '#991b1b' }};
+      --satc-toast-err-text: {{ satc_toast_err_text | default: '#ffffff' }};
       --satc-border-width: {{ satc_border_width }}px;
       --satc-border-color: {{ satc_border_color }};
       --satc-bar-radius: {{ satc_bar_radius }}px;
